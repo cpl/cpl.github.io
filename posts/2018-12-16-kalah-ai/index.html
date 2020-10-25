@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Kalah A.I. - Alexandru-Paul Copil</title><meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<meta property="og:description" content="Techniques and strategies for developing a Kalah (Mancala) A.I." />
+	<meta name="twitter:description" content="Techniques and strategies for developing a Kalah (Mancala) A.I." />
+	<meta name="description" content="Techniques and strategies for developing a Kalah (Mancala) A.I." />
+	<meta name="description" content="Techniques and strategies for developing a Kalah (Mancala) A.I." />
+
+	<meta property="og:title" content="Kalah A.I. | Alexandru-Paul Copil" />
+	<meta name="twitter:title" content="Kalah A.I. | Alexandru-Paul Copil" />
+
+	<meta property="og:image" content=""/>
+	<meta itemprop="name" content="Kalah A.I. | Alexandru-Paul Copil" />
+	<meta name="application-name" content="Kalah A.I. | Alexandru-Paul Copil" />
+	<meta property="og:site_name" content="" />
+	<meta property="og:title" content="Kalah A.I." />
+<meta property="og:description" content="Techniques and strategies for developing a Kalah (Mancala) A.I." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cpl.li/posts/2018-12-16-kalah-ai/" />
+<meta property="article:published_time" content="2018-12-16T00:00:00+00:00" />
+<meta property="article:modified_time" content="2018-12-16T00:00:00+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Kalah A.I."/>
+<meta name="twitter:description" content="Techniques and strategies for developing a Kalah (Mancala) A.I."/>
+<link href="https://cpl.li/css/fonts.css" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="https://cpl.li/css/main.css" />
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://cpl.li/">Alexandru-Paul Copil</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/posts">All posts</a>
+		
+		<a href="/about">About</a>
+		
+		<a href="/tags">Tags</a>
+		
+		<a href="https://github.com/cpl">Github</a>
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">Kalah A.I.</h1>
+			<div class="meta">Posted on Dec 16, 2018</div>
+		</div>
+		
+
+		<section class="body">
+			<h2 id="kalah">Kalah</h2>
+<p>Kalah, also known by many as Mancala is one of the oldest games that is still
+played to the day. The game is very simple in design and mechanics, it involves
+two players taking turns moving beans/seeds/pebbles on a board or game surface.</p>
+<p><img src="/assets/images/mancala.png" alt="Mancala"></p>
+<h3 id="gameplay">Gameplay</h3>
+<p>The board may vary in the number of holes it has and the number of pebbles each hole starts with. Some games include a &ldquo;pie rule&rdquo; which allows the second player to &ldquo;switch&rdquo; sides with the opponent.</p>
+<p>On a general turn, the player must pick all the beans from a hole and then proceed to move them one by one in the holes following a counter-clockwise direction. When it comes to score holes, you can only place beans inside your own and skip the opponent&rsquo;s. There is no way to remove beans from any of the score holes.</p>
+<h3 id="mechanics">Mechanics</h3>
+<p>When the final bean falls inside your score hole, you get an extra turn. This allows you to chain multiple turns one after another.</p>
+<p>When the final bean falls inside your own board, inside a hole without any other beans <strong>and</strong> the opposite hole on your opponents board contains any number of pebbles, you then get <strong>all</strong> the beans from the opponents hole + your bean, added to your score. This adds quite a lot of complexity to the game, as you must be both defensive and offensive.</p>
+<p>Another thing to watch out in a Mancala game, is the end. The game ends when either of the players runs out of beans on <strong>their side</strong> of the board. When this happens to a player, the other player takes all the remaining beans and adds them to their score.</p>
+<p>One strategy is to <em>starve</em> your opponent and hoard as many beans as possible. Your opponent might have a higher score during the game, but at the end you&rsquo;ll bet a considerable bonus to your score.</p>
+<p>The winner is decided based on the final number of beans inside each player&rsquo;s score hole. The player with more beans is considered the winner. It is possible (depending on the number of starting beans) for the players to end in a <strong>draw</strong>.</p>
+<p>In reality, the game might end earlier, when one of the player obtains <code>50% + 1</code> of the beans.</p>
+<h3 id="ai-strategies">A.I. Strategies</h3>
+<h4 id="min-max">Min-Max</h4>
+<p>Min-Max is a straightforward and simple to implement algorithm. All you have to do is compute the game tree and when the desired depth is reached (or the game ends on the branch) you assign a score to the respective leaf.</p>
+<p>After that we go back, and select the <strong>max</strong> node during our turns and <strong>min</strong> node during the opponents turn.</p>
+<p><img src="/assets/images/minmax.png" alt="Min-Max"></p>
+<p>A good thing to do (but resource intensive) is computing the game tree on each move. You could only compute the tree when an un-expected move from your optimal tree happens. And you could also get some performance increase when performing chaining moves.</p>
+<p>Another implementation-based optimization is to compute the game tree during the opponents turn for each of their moves.</p>
+<p>Other thing to consider for a mancala min-max game tree are:</p>
+<ul>
+<li>Invalid moves (assign an extremply small score)</li>
+<li>When to consider a game end?
+<ul>
+<li><code>50% + 1</code></li>
+<li>Real-end of game</li>
+</ul>
+</li>
+<li>Chaining moves</li>
+</ul>
+<h5 id="heuristics">Heuristics</h5>
+<p>The most important part of the min-max tree is deciding how to determine the value of a leaf node. This can be achieved simply by returning your score, or the score difference but this will not be optimal, as there are other factors to consider.</p>
+<p>From our experience, there are 7 factors, each with a different weight.</p>
+<ul>
+<li>Non-zero holes</li>
+<li>Own board sum</li>
+<li>Own score</li>
+<li>First hole value</li>
+<li>Right most move</li>
+<li>Sum board opponent (negative)</li>
+<li>Score opponent (negative)</li>
+</ul>
+<p>Another way of determining the score is <em>MCTS</em> but that is an entirely different story.</p>
+<h5 id="alpha-beta-pruning">Alpha-Beta Pruning</h5>
+<p>Alpha-Beta pruning adds two new variables (alpha and beta) which get passed down the min-max tree search.</p>
+<ul>
+<li><code>alpha</code> will be the <strong>maximum</strong> value during your turn.</li>
+<li><code>beta</code> will be the <strong>minimum</strong> value during your opponent&rsquo;s turn.</li>
+</ul>
+<p>When computing the min-max tree for a specific move, if <code>beta</code> is ever <strong>less than or equal</strong> to <code>alpha</code>, then we deem that move as sub-optimal and ignore the branch all-together, thus reducing the number of computation we must perform.</p>
+<h5 id="code">Code</h5>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust">func walkTree(depth int, board []int, scoreNorth, scoreSouth int, side position, alpha, beta int) int {
+    <span style="color:#75715e">// reach end of search (or game over)
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> depth <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">||</span> side <span style="color:#f92672">==</span> gameOver {
+        <span style="color:#66d9ef">return</span> computeHeuristics(board, scoreNorth, scoreSouth, g.positionOur)
+    }
+
+    <span style="color:#75715e">// max player
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> side <span style="color:#f92672">==</span> ourPosition {
+        maxVal :<span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">100000</span>
+
+        <span style="color:#75715e">// iterate move
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">for</span> <span style="color:#66d9ef">move</span> :<span style="color:#f92672">=</span> <span style="color:#ae81ff">7</span>; <span style="color:#66d9ef">move</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">1</span>; <span style="color:#66d9ef">move</span><span style="color:#f92672">--</span> {
+            <span style="color:#75715e">// ignore invalid move
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span> board[<span style="color:#66d9ef">move</span>] <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> {
+                <span style="color:#66d9ef">continue</span>
+            }
+
+            <span style="color:#75715e">// walk tree
+</span><span style="color:#75715e"></span>            localVal :<span style="color:#f92672">=</span> g.walkTree(
+                depth<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, newBoard, newScoreNorth, newScoreSouth, nextSide,
+                alpha, beta)
+
+            <span style="color:#75715e">// do max, alpha
+</span><span style="color:#75715e"></span>            maxVal <span style="color:#f92672">=</span> max(maxVal, localVal)
+            alpha <span style="color:#f92672">=</span> max(alpha, localVal)
+
+            <span style="color:#75715e">// pruning
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span> beta <span style="color:#f92672">&lt;=</span> alpha {
+                <span style="color:#66d9ef">break</span>
+            }
+        }
+
+        <span style="color:#66d9ef">return</span> maxVal
+    } <span style="color:#75715e">// else
+</span><span style="color:#75715e"></span>
+    <span style="color:#75715e">// min player
+</span><span style="color:#75715e"></span>    minVal :<span style="color:#f92672">=</span> <span style="color:#ae81ff">100000</span>
+
+    <span style="color:#66d9ef">for</span> <span style="color:#66d9ef">move</span> :<span style="color:#f92672">=</span> <span style="color:#ae81ff">7</span>; <span style="color:#66d9ef">move</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">1</span>; <span style="color:#66d9ef">move</span><span style="color:#f92672">--</span> {
+        <span style="color:#75715e">// ignore invalid move
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> board[<span style="color:#66d9ef">move</span>] <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> {
+            <span style="color:#66d9ef">continue</span>
+        }
+
+        <span style="color:#75715e">// walk tree
+</span><span style="color:#75715e"></span>        localVal :<span style="color:#f92672">=</span> g.walkTree(
+            depth<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, newBoard, newScoreNorth, newScoreSouth, nextSide,
+            alpha, beta)
+
+        <span style="color:#75715e">// do min, beta
+</span><span style="color:#75715e"></span>        minVal <span style="color:#f92672">=</span> min(minVal, localVal)
+        beta <span style="color:#f92672">=</span> min(beta, localVal)
+
+        <span style="color:#75715e">// pruning
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> beta <span style="color:#f92672">&lt;=</span> alpha {
+            <span style="color:#66d9ef">break</span>
+        }
+    }
+
+    <span style="color:#66d9ef">return</span> minVal
+}
+</code></pre></div><h4 id="other-strategies">Other strategies</h4>
+<p>Other strategies include (and could be discussed in a lot of detail):</p>
+<ul>
+<li>Machine Learning</li>
+<li>Reinforcement Learning</li>
+<li>MCTS (Monte-Carlo Tree Search)</li>
+</ul>
+<h3 id="repository">Repository</h3>
+<p>You can find an implementation of the min-max alpha-beta pruning with weighted heuristics agent for Mancala on my GitHub page.</p>
+<p><a href="http://github.com/thee-engineer/kalah-ai">github.com/thee-engineer/kalah-ai</a></p>
+
+		</section>
+
+		<div class="post-tags">
+			
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+<hr>2020  © Alexandru-Paul Copil |  <a href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+</footer>
+</div>
+    </body>
+</html>

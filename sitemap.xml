@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>https://cpl.li/</loc>
+    <lastmod>2020-05-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/tags/api/</loc>
+    <lastmod>2020-05-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2020-05-25-apis-good-bad-ugly/</loc>
+    <lastmod>2020-05-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/tags/guide/</loc>
+    <lastmod>2020-05-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/tags/http/</loc>
+    <lastmod>2020-05-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/</loc>
+    <lastmod>2020-05-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/tags/rant/</loc>
+    <lastmod>2020-05-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/tags/software/</loc>
+    <lastmod>2020-05-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/tags/system-design/</loc>
+    <lastmod>2020-05-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/tags/</loc>
+    <lastmod>2020-05-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/tags/technical/</loc>
+    <lastmod>2020-05-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2019-12-18-sql-murder-mystery/</loc>
+    <lastmod>2019-12-18T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2019-11-04-hiking-part-i/</loc>
+    <lastmod>2019-11-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2019-06-02-tacalie/</loc>
+    <lastmod>2019-06-02T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2019-05-30-bluetooth-hc08-macos/</loc>
+    <lastmod>2019-05-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2019-05-25-hangman-for-sysadmins/</loc>
+    <lastmod>2019-05-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2019-05-15-how-to-admin-exams/</loc>
+    <lastmod>2019-05-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2019-04-03-must-know-go/</loc>
+    <lastmod>2019-04-03T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2019-03-27-markov-chains-go/</loc>
+    <lastmod>2019-03-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2019-03-25-raspberry-pi-setup/</loc>
+    <lastmod>2019-03-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2019-03-14-git-gud-guide/</loc>
+    <lastmod>2019-03-14T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2019-03-12-mbrfat/</loc>
+    <lastmod>2019-03-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2019-01-31-page-replacement-algo/</loc>
+    <lastmod>2019-01-31T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2018-12-16-kalah-ai/</loc>
+    <lastmod>2018-12-16T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2018-11-22-favourite-font/</loc>
+    <lastmod>2018-11-22T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2018-11-09-fallen-london-review/</loc>
+    <lastmod>2018-11-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2018-11-09-basic-security/</loc>
+    <lastmod>2018-11-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2018-11-08-embedded-interview/</loc>
+    <lastmod>2018-11-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/posts/2018-10-12-memory-allocator/</loc>
+    <lastmod>2018-10-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/about/</loc>
+  </url>
+  
+  <url>
+    <loc>https://cpl.li/categories/</loc>
+  </url>
+  
+</urlset>

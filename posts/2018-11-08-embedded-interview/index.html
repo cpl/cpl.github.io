@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>How to prepare for a low-level interview - Alexandru-Paul Copil</title><meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<meta property="og:description" content="What is the right mentality when preparing for a technical low-level interview and what to expect." />
+	<meta name="twitter:description" content="What is the right mentality when preparing for a technical low-level interview and what to expect." />
+	<meta name="description" content="What is the right mentality when preparing for a technical low-level interview and what to expect." />
+	<meta name="description" content="What is the right mentality when preparing for a technical low-level interview and what to expect." />
+
+	<meta property="og:title" content="How to prepare for a low-level interview | Alexandru-Paul Copil" />
+	<meta name="twitter:title" content="How to prepare for a low-level interview | Alexandru-Paul Copil" />
+
+	<meta property="og:image" content=""/>
+	<meta itemprop="name" content="How to prepare for a low-level interview | Alexandru-Paul Copil" />
+	<meta name="application-name" content="How to prepare for a low-level interview | Alexandru-Paul Copil" />
+	<meta property="og:site_name" content="" />
+	<meta property="og:title" content="How to prepare for a low-level interview" />
+<meta property="og:description" content="What is the right mentality when preparing for a technical low-level interview and what to expect." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cpl.li/posts/2018-11-08-embedded-interview/" />
+<meta property="article:published_time" content="2018-11-08T00:00:00+00:00" />
+<meta property="article:modified_time" content="2018-11-08T00:00:00+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="How to prepare for a low-level interview"/>
+<meta name="twitter:description" content="What is the right mentality when preparing for a technical low-level interview and what to expect."/>
+<link href="https://cpl.li/css/fonts.css" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="https://cpl.li/css/main.css" />
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://cpl.li/">Alexandru-Paul Copil</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/posts">All posts</a>
+		
+		<a href="/about">About</a>
+		
+		<a href="/tags">Tags</a>
+		
+		<a href="https://github.com/cpl">Github</a>
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">How to prepare for a low-level interview</h1>
+			<div class="meta">Posted on Nov 8, 2018</div>
+		</div>
+		
+
+		<section class="body">
+			<h2 id="introduction">Introduction</h2>
+<p>First thing you should do when pursing a career in low-level systems (<em>kernel development, embedded systems, drivers, firmware, boot loaders, etc.</em>) is to realise that all knowledge you have from high-level languages and systems will amount to almost nothing.</p>
+<p>In other words you should prepare to change your views, mentality and approach when it comes to developing and designing low-level systems. When I was working on my own Operating System (<a href="https://github.com/thee-engineer/classic">Classic</a>) I started to think and work in <a href="https://en.wikipedia.org/wiki/Hexadecimal">base-16</a>, I started to think about what seemed at the time the strangest optimisations, such as aligning my code to cache lines. Another thing that I found different by a mile, was debugging. When you work close to the metal and from scratch there aren’t many tools around to help you. No <em>asserts</em>, no <em>tests</em>, no <em>printf</em> function, until you implement them. So be ready to debug with what you have, and that might be a single LED if you are unlucky or if you are lucky <a href="https://en.wikipedia.org/wiki/Universal_asynchronous_receiver-transmitter">UART</a> or <a href="https://en.wikipedia.org/wiki/JTAG">JTAG</a> interfaces.</p>
+<h2 id="knowledge">Knowledge</h2>
+<p>I could go into a lot of detail about everything you should know but then I’d end up writing a book (there are books out there about Operating Systems and Embedded systems which are great starting points).</p>
+<p>After deciding you have it in you, it’s time to load up on some technical concepts that you <strong>must</strong> definitely know before even touching a keyboard or <a href="https://en.wikipedia.org/wiki/System_on_a_chip">SoC</a>.</p>
+<p>I’d personally say someone is ready to start diving into low-level development after they feel comfortable with the topics below and can answer these questions:</p>
+<ul>
+<li>What is an <strong>Operating System</strong>?</li>
+<li>What is a <strong>kernel</strong>?</li>
+<li>What is the difference between a kernel and an OS?</li>
+<li>What is “<strong>memory</strong>” and how many types of memory are there?</li>
+<li>How is a <strong>CPU structured</strong>?</li>
+<li>How is the CPU connected to the rest of the “computer”?</li>
+<li>What is the <strong>Stack</strong>? What is the <strong>Heap</strong>? When do you use each one?</li>
+<li>What is <strong>Virtual Memory</strong> and why do we have it?</li>
+<li>What are <strong>interrupts</strong> and where are they used?</li>
+<li>What are the CPU’s modes?</li>
+<li>What are <strong>system calls</strong> and where and why are they used?</li>
+<li>What is the difference between 32 and 64 bit architectures?</li>
+<li>What is <strong>atomicity</strong>?</li>
+<li>What is <strong>concurrency</strong>?</li>
+<li>What is a <strong>pointer</strong>?</li>
+<li>What are <strong>signals</strong>? What are they used for?</li>
+<li>What is the difference between pass by reference and pass by value?</li>
+<li>Are you comfortable with different hardware peripherals?</li>
+<li>What are <strong>device mapped registers</strong>? How do you access them?</li>
+<li>How does dynamic memory allocation work?</li>
+<li>What is a <strong>memory leak</strong>? Who is responsible for it?</li>
+<li>What is a <strong>cache</strong> and how does it work? How many cache types are there?</li>
+<li>Why is the userland split from the kernel space?</li>
+<li>What is a buffer/stack overflow?</li>
+<li>How would you design a scheduler?</li>
+<li>What is a <strong>mutex</strong>? or a <strong>semaphore</strong>? or a <strong>spin-lock</strong>?</li>
+<li>What is <strong>starvation</strong> and how does it occur?</li>
+<li>What is a <strong>memory page</strong>?</li>
+</ul>
+<p>It is very likely that I missed some key concepts, but these questions should give you an idea of what you must know.</p>
+<h2 id="tools--language">Tools &amp; Language</h2>
+<p>Now hopefully you have the right mindset, the knowledge and you need some tools to start working and showing off your ideas and designs.</p>
+<p>There are two <strong>must know</strong> languages:</p>
+<ul>
+<li>C</li>
+<li>Assembly</li>
+</ul>
+<h3 id="assembly">Assembly</h3>
+<p>There is no universal assembly language, each architecture has its own set of assembly instructions, but they share bits and pieces. I personally chose to learn <strong>ARM Assembly</strong> and a little bit of <strong>Intel x86</strong>. And even then, each architecture might have different versions of the instruction set, because as hardware changes so does the instruction set.</p>
+<p>When picking an assembly language to learn, make sure to read about <a href="https://cs.stanford.edu/people/eroberts/courses/soco/projects/risc/risccisc/">RISC vs CISC</a>. It’s good to know and it should help you make an informed decision.</p>
+<h3 id="c">C</h3>
+<p>I believe everybody is familiar with <strong>C</strong> and came across it at least once in their developer lifetime. Some might associate it with “weird” arcane things like <code>void*</code>, <code>SEGFAULTS</code>, <code>malloc</code> and <code>free</code>. Some might call it the language with no strings (<code>char*</code>). People are not wrong about <strong>C</strong>, it is different from high-level languages like <strong>Python</strong> or <strong>JavaScript</strong>, but <strong>C</strong> has its purpose and there is a reason why it passed the test of time. <strong>C</strong> is a robust language that doesn’t hold your hand, <strong>C</strong> is fast and it doesn’t hide things from you.</p>
+<p>There is no <strong>best programming language</strong>, there is only <strong>the right programming language</strong> for the job. While you could develop an entire website in <strong>C</strong>, it wouldn’t be pleasant or a fun experience and you’d be better off doing it in <strong>JavaScript</strong>. This works the other way around too, You wouldn’t develop a real operating system in <strong>JavaScript</strong>.</p>
+<h4 id="why-c">Why C?</h4>
+<ul>
+<li>As I said, it is fast, robust, doesn’t hold your hand and allows you freedom (to make amazing things or <strong>disastrous mistakes</strong>, up to you).</li>
+<li>It is another-level-up from the assembly level and you can see this by calling <code>gcc -s</code> when “compiling”. This tells <code>gcc</code> to only generate the assembly code for the current machine architecture.</li>
+<li>All big architectures have <strong>C</strong> compilers that allow your software to be compiled and executed on most machines.</li>
+<li>Trust the compiler, it can really optimise your code, especially with <code>-O1</code>, <code>-O2</code> or if you feel brave <code>-O3</code>. But you must help the compiler whenever you can and that is why knowing some assembly will help you do that.</li>
+<li>It allows pointer manipulation and logic, in other words you have direct access to the main memory.</li>
+<li>Builtin low-level concepts, such as <code>volatile</code>, <code>extern</code>, <code>__attribute__</code>, packed and/or aligned code/data-structures, etc.</li>
+</ul>
+<h2 id="what-to-do-now">What to do now?</h2>
+<p>After you practice your <strong>C</strong> skills (you can do this on coding challenges websites: <a href="https://www.hackerrank.com">HackerRank</a>, <a href="https://leetcode.com">LeetCode</a>) and feel happy with your skills, you can start practicing more low-level focused challenges.</p>
+<p>Some in-between (low/high level) challenges I encountered on <a href="https://leetcode.com">LeetCode</a> are:</p>
+<ul>
+<li><a href="https://leetcode.com/problems/string-to-integer-atoi/description/">String to Integer (atoi)</a></li>
+<li><a href="https://leetcode.com/problems/design-circular-queue/description/">Design Circular Queue</a></li>
+<li><a href="https://leetcode.com/problems/power-of-four/description/">Power of Four</a></li>
+<li><a href="https://leetcode.com/problems/number-of-1-bits/description/">Number of 1 Bits</a></li>
+<li><a href="https://leetcode.com/problems/valid-parentheses/description/">Valid Parentheses</a></li>
+<li><a href="https://leetcode.com/problems/lru-cache/description/">LRU Cache</a></li>
+<li><a href="https://leetcode.com/problems/reverse-bits/description/">Reverse Bits</a></li>
+<li><a href="https://leetcode.com/problems/evaluate-reverse-polish-notation/description/">Reverse Polish Notation</a></li>
+</ul>
+<p>Similar to some of the above you can try and implement functions from the C standard library (just for practice, don’t do this in a serious program).</p>
+<h3 id="some-more-low-level-focused-questions-that-i-came-across-are">Some more low-level focused questions that I came across are:</h3>
+<ul>
+<li>Write a functions that returns the input with its endianness reversed</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust">uint32_t swap_endian(uint32_t word);
+</code></pre></div><ul>
+<li>What is the output to the following section of code</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust">int main() {
+	int a <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">64</span>; float b <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">7.0</span>f;
+	printf(<span style="color:#e6db74">&#34;%#X %#X&#34;</span>, a, <span style="color:#f92672">*</span>(int<span style="color:#f92672">*</span>)<span style="color:#f92672">&amp;</span>b);
+
+	<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><ul>
+<li>Write a function that can determine the endianness of a system at runtime</li>
+<li>More to come …</li>
+</ul>
+
+		</section>
+
+		<div class="post-tags">
+			
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+<hr>2020  © Alexandru-Paul Copil |  <a href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+</footer>
+</div>
+    </body>
+</html>

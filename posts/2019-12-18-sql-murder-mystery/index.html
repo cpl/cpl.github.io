@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>SQL Murder Mystery - Alexandru-Paul Copil</title><meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<meta property="og:description" content="Have fun investigating a murder in SQL City. you are a detective using SQL queries" />
+	<meta name="twitter:description" content="Have fun investigating a murder in SQL City. you are a detective using SQL queries" />
+	<meta name="description" content="Have fun investigating a murder in SQL City. you are a detective using SQL queries" />
+	<meta name="description" content="Have fun investigating a murder in SQL City. you are a detective using SQL queries" />
+
+	<meta property="og:title" content="SQL Murder Mystery | Alexandru-Paul Copil" />
+	<meta name="twitter:title" content="SQL Murder Mystery | Alexandru-Paul Copil" />
+
+	<meta property="og:image" content=""/>
+	<meta itemprop="name" content="SQL Murder Mystery | Alexandru-Paul Copil" />
+	<meta name="application-name" content="SQL Murder Mystery | Alexandru-Paul Copil" />
+	<meta property="og:site_name" content="" />
+	<meta property="og:title" content="SQL Murder Mystery" />
+<meta property="og:description" content="Have fun investigating a murder in SQL City. you are a detective using SQL queries" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cpl.li/posts/2019-12-18-sql-murder-mystery/" />
+<meta property="article:published_time" content="2019-12-18T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-12-18T00:00:00+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="SQL Murder Mystery"/>
+<meta name="twitter:description" content="Have fun investigating a murder in SQL City. you are a detective using SQL queries"/>
+<link href="https://cpl.li/css/fonts.css" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="https://cpl.li/css/main.css" />
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://cpl.li/">Alexandru-Paul Copil</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/posts">All posts</a>
+		
+		<a href="/about">About</a>
+		
+		<a href="/tags">Tags</a>
+		
+		<a href="https://github.com/cpl">Github</a>
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">SQL Murder Mystery</h1>
+			<div class="meta">Posted on Dec 18, 2019</div>
+		</div>
+		
+
+		<section class="body">
+			<p>This post will not be much of a read, just my &ldquo;logbook&rdquo; from solving the SQL Murder Mystery today.</p>
+<blockquote>
+<p>Edit: Had to remove SQL results tables due to poor formatting of the theme. To see original &ldquo;log&rdquo; check out the <a href="https://gist.github.com/cpl/17943377f49d266ff4c8649fc5752adc">gist</a>.</p>
+</blockquote>
+<p><strong>SPOILER</strong> WARNING. This game was fun! I recommend it to any SQL amateur or pro. Give it a go at <a href="https://mystery.knightlab.com/">https://mystery.knightlab.com/</a>.</p>
+<blockquote>
+<p>There&rsquo;s been a Murder in SQL City! The SQL Murder Mystery is designed to be both a self-directed lesson to learn SQL concepts and commands and a fun game for experienced SQL users to solve an intriguing crime.</p>
+</blockquote>
+<blockquote>
+<p>A crime has taken place and the detective needs your help. The detective gave you the crime scene report, but you somehow lost it. You vaguely remember that the crime was a ​murder​ that occurred sometime on ​Jan.15, 2018​ and that it took place in ​SQL City​. Start by retrieving the corresponding crime scene report from the police department’s database.</p>
+</blockquote>
+<h2 id="crime-report">Crime report</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> crime_scene_report
+	<span style="color:#66d9ef">WHERE</span> <span style="color:#66d9ef">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;murder&#39;</span> <span style="color:#66d9ef">AND</span> city<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;SQL City&#39;</span> <span style="color:#66d9ef">AND</span> date<span style="color:#f92672">=</span><span style="color:#ae81ff">20180115</span>;
+</code></pre></div><h2 id="suspects">Suspects</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> person
+	<span style="color:#66d9ef">WHERE</span> name <span style="color:#66d9ef">LIKE</span> <span style="color:#e6db74">&#39;%Annabel%&#39;</span> <span style="color:#66d9ef">AND</span> address_street_name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Franklin Ave&#39;</span>;
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> person
+	<span style="color:#66d9ef">WHERE</span> address_street_name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Northwestern Dr&#39;</span>
+	<span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> address_number <span style="color:#66d9ef">DESC</span>
+  <span style="color:#66d9ef">LIMIT</span> <span style="color:#ae81ff">1</span>;
+</code></pre></div><h2 id="suspects-licenses">Suspects licenses</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> drivers_license <span style="color:#66d9ef">WHERE</span> id<span style="color:#f92672">=</span><span style="color:#ae81ff">490173</span> <span style="color:#66d9ef">OR</span> id<span style="color:#f92672">=</span><span style="color:#ae81ff">118009</span>;
+</code></pre></div><h2 id="suspects-getfitnow-membership">Suspects GetFitNow Membership</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> get_fit_now_member.id, person_id, get_fit_now_member.name, membership_start_date, membership_status, person.name
+	<span style="color:#66d9ef">FROM</span> get_fit_now_member
+	<span style="color:#66d9ef">JOIN</span> person <span style="color:#66d9ef">ON</span> person.id <span style="color:#f92672">=</span> person_id
+	<span style="color:#66d9ef">WHERE</span> person.id<span style="color:#f92672">=</span><span style="color:#ae81ff">16371</span> <span style="color:#66d9ef">OR</span> person.id<span style="color:#f92672">=</span><span style="color:#ae81ff">14887</span>;
+</code></pre></div><h2 id="suspects-getfitnow-checkin-times">Suspects GetFitNow CheckIn Times</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> get_fit_now_check_in <span style="color:#66d9ef">WHERE</span> membership_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;90081&#39;</span>;
+</code></pre></div><h2 id="suspects-interviews">Suspects Interviews</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> interview <span style="color:#66d9ef">WHERE</span> person_id<span style="color:#f92672">=</span><span style="color:#ae81ff">16371</span> <span style="color:#66d9ef">OR</span> person_id<span style="color:#f92672">=</span><span style="color:#ae81ff">14887</span>;
+</code></pre></div><h2 id="investigating-transcripts">Investigating transcripts</h2>
+<h3 id="morty-schapiros-transcript">Morty Schapiro&rsquo;s transcript</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> get_fit_now_member
+	<span style="color:#66d9ef">JOIN</span> person <span style="color:#66d9ef">ON</span> person.id <span style="color:#f92672">=</span> person_id
+	<span style="color:#66d9ef">JOIN</span> drivers_license <span style="color:#66d9ef">ON</span> drivers_license.id <span style="color:#f92672">=</span> person.license_id
+	<span style="color:#66d9ef">WHERE</span>
+		get_fit_now_member.id <span style="color:#66d9ef">LIKE</span> <span style="color:#e6db74">&#39;48Z%&#39;</span> <span style="color:#66d9ef">AND</span> membership_status<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;gold&#39;</span> <span style="color:#66d9ef">AND</span>
+		drivers_license.gender <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;male&#39;</span> <span style="color:#66d9ef">AND</span> drivers_license.plate_number <span style="color:#66d9ef">LIKE</span> <span style="color:#e6db74">&#39;%H42W%&#39;</span>;
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> get_fit_now_check_in
+	<span style="color:#66d9ef">WHERE</span> membership_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;48Z55&#39;</span>;
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> interview
+	<span style="color:#66d9ef">WHERE</span> person_id <span style="color:#f92672">=</span> <span style="color:#ae81ff">67318</span>;
+</code></pre></div><ul>
+<li>The plot thickens</li>
+<li>We&rsquo;ll track this mysterious woman later on</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> facebook_event_checkin
+	<span style="color:#66d9ef">WHERE</span> person_id <span style="color:#f92672">=</span> <span style="color:#ae81ff">67318</span>;
+</code></pre></div><h3 id="annabel-millers-transcript">Annabel Miller&rsquo;s transcript</h3>
+<p>In her transcript she mentiones seeing the killer at the Gym. From her entry we know she was indeed there on 9th Jan, between <code>16:00</code> and <code>17:00</code>. This means the killer must have checked in before she left and the killer must have checked out after she left.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> get_fit_now_check_in
+	<span style="color:#66d9ef">WHERE</span> check_in_date<span style="color:#f92672">=</span><span style="color:#ae81ff">20180109</span>
+		<span style="color:#66d9ef">AND</span> check_in_time <span style="color:#f92672">&lt;</span>  <span style="color:#ae81ff">1700</span>
+		<span style="color:#66d9ef">AND</span> check_out_time <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1600</span>;
+</code></pre></div><ul>
+<li>We have to remember that <code>90081</code> is <em>Annabel</em></li>
+<li>Notice <code>48Z55</code> is <em>Jeremy Bowers</em>, the guy from Morty&rsquo;s transcript</li>
+<li>For <code>48Z7A</code> there is just the one check-in</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> get_fit_now_member
+	<span style="color:#66d9ef">JOIN</span> person <span style="color:#66d9ef">ON</span> person_id <span style="color:#f92672">=</span> person.id
+	<span style="color:#66d9ef">WHERE</span> get_fit_now_member.id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;48Z7A&#39;</span>;
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> facebook_event_checkin
+	<span style="color:#66d9ef">WHERE</span> person_id <span style="color:#f92672">=</span> <span style="color:#ae81ff">28819</span>;
+</code></pre></div><ul>
+<li>This person attended no events</li>
+</ul>
+<h3 id="jeremy-bowerss">Jeremy Bowers&rsquo;s</h3>
+<blockquote>
+<p>I was hired by a woman with a lot of money. I don&rsquo;t know her name but I know she&rsquo;s around 5'5&quot; (65&quot;) or 5'7&quot; (67&quot;). She has red hair and she drives a Tesla Model S. I know that she attended the SQL Symphony Concert 3 times in December 2017.</p>
+</blockquote>
+<ul>
+<li>From this statement we can extract a few things
+<ul>
+<li>It&rsquo;s a <code>female</code></li>
+<li><code>5'5&quot; (65&quot;)</code> or <code>5'7&quot; (67&quot;)</code></li>
+<li>Hair color is <code>red</code></li>
+<li>Car is <code>Tesla</code> <code>Model S</code></li>
+<li>She attended <code>SQL Symphony Concert 3</code>, 3 times in <code>December 2017</code></li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> person
+	<span style="color:#66d9ef">JOIN</span>  drivers_license <span style="color:#66d9ef">ON</span> person.license_id <span style="color:#f92672">=</span> drivers_license.id
+	<span style="color:#66d9ef">WHERE</span>
+		drivers_license.gender <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;female&#39;</span>  <span style="color:#66d9ef">AND</span>
+		drivers_license.hair_color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;red&#39;</span> <span style="color:#66d9ef">AND</span>
+		(height <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">65</span> <span style="color:#66d9ef">AND</span> height <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">67</span>)    <span style="color:#66d9ef">AND</span>
+		car_make <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Tesla&#39;</span> <span style="color:#66d9ef">AND</span> car_model<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Model S&#39;</span>;
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> facebook_event_checkin
+	<span style="color:#66d9ef">WHERE</span> person_id <span style="color:#66d9ef">IN</span> (<span style="color:#ae81ff">78881</span>, <span style="color:#ae81ff">90700</span>, <span style="color:#ae81ff">99716</span>);
+</code></pre></div><h2 id="investigating-miranda-priestly">Investigating Miranda Priestly</h2>
+<ul>
+<li><code>99716</code>, <em>Miranda Priestly</em> is the only person matching the criteria</li>
+<li>Will investigate the other points just to get an idea of this person</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> income <span style="color:#66d9ef">WHERE</span> ssn<span style="color:#f92672">=</span><span style="color:#ae81ff">987756388</span>;
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> get_fit_now_member <span style="color:#66d9ef">WHERE</span> person_id <span style="color:#f92672">=</span> <span style="color:#ae81ff">99716</span>;
+</code></pre></div><ul>
+<li>Not a GetFitNow member</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> interview <span style="color:#66d9ef">WHERE</span> person_id <span style="color:#f92672">=</span> <span style="color:#ae81ff">99716</span>;
+</code></pre></div><ul>
+<li>Did not give an interview</li>
+</ul>
+<h2 id="ending">Ending</h2>
+<p>Honestly not the ending I expected. I really hoped for this to go on for longer.
+I&rsquo;ve put in <em>Miranda Priestly</em> and <strong>won</strong>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> solution <span style="color:#66d9ef">VALUES</span> (<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#39;Miranda Priestly&#39;</span>);
+<span style="color:#66d9ef">SELECT</span> value <span style="color:#66d9ef">FROM</span> solution;
+</code></pre></div>
+		</section>
+
+		<div class="post-tags">
+			
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+<hr>2020  © Alexandru-Paul Copil |  <a href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+</footer>
+</div>
+    </body>
+</html>

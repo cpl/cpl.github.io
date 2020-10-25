@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Page Replacement Design - Alexandru-Paul Copil</title><meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<meta property="og:description" content="Common algorithms used for page replacement in a MMU" />
+	<meta name="twitter:description" content="Common algorithms used for page replacement in a MMU" />
+	<meta name="description" content="Common algorithms used for page replacement in a MMU" />
+	<meta name="description" content="Common algorithms used for page replacement in a MMU" />
+
+	<meta property="og:title" content="Page Replacement Design | Alexandru-Paul Copil" />
+	<meta name="twitter:title" content="Page Replacement Design | Alexandru-Paul Copil" />
+
+	<meta property="og:image" content=""/>
+	<meta itemprop="name" content="Page Replacement Design | Alexandru-Paul Copil" />
+	<meta name="application-name" content="Page Replacement Design | Alexandru-Paul Copil" />
+	<meta property="og:site_name" content="" />
+	<meta property="og:title" content="Page Replacement Design" />
+<meta property="og:description" content="Common algorithms used for page replacement in a MMU" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cpl.li/posts/2019-01-31-page-replacement-algo/" />
+<meta property="article:published_time" content="2019-01-31T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-01-31T00:00:00+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Page Replacement Design"/>
+<meta name="twitter:description" content="Common algorithms used for page replacement in a MMU"/>
+<link href="https://cpl.li/css/fonts.css" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="https://cpl.li/css/main.css" />
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://cpl.li/">Alexandru-Paul Copil</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/posts">All posts</a>
+		
+		<a href="/about">About</a>
+		
+		<a href="/tags">Tags</a>
+		
+		<a href="https://github.com/cpl">Github</a>
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">Page Replacement Design</h1>
+			<div class="meta">Posted on Jan 31, 2019</div>
+		</div>
+		
+
+		<section class="body">
+			<h2 id="nru">NRU</h2>
+<blockquote>
+<p>Very crude approximation of LRU</p>
+</blockquote>
+<p>This algorithm takes advantage of the <code>R</code> (referenced/read/written) bit and <code>M</code> (modified) bit. On every update cycle (could be every clock interrupt) all pages get their <code>R</code> bit set to 0, to help detect unreferenced pages.</p>
+<p>On a page fault, pages are inspected and separated in 4 classes:</p>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>R</th>
+<th>M</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>3</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p>The page swap algorithm will remove one random page from the lowest available class.</p>
+<h2 id="fifo">FIFO</h2>
+<blockquote>
+<p>Might throw out important pages</p>
+</blockquote>
+<p>As the name suggest, <strong>F</strong>irst-<strong>I</strong>n-<strong>F</strong>irst-<strong>O</strong>ut keeps a list in memory of all page frames. When a fault occurs, the tail page is thrown out and the new page is inserted at the &ldquo;top&rdquo; of the list. While this might work it may also throw out some important pages, causing unnecessary page faults.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[1] -&gt; [4] -&gt; [2] -&gt; [3] -&gt; [5]
+
+-- page fault, 7 --
+
+       [1] -&gt; [4] -&gt; [2] -&gt; [3]
+[7] -&gt; [1] -&gt; [4] -&gt; [2] -&gt; [3]
+
+-- page fault, 5 --
+
+       [7] -&gt; [1] -&gt; [4] -&gt; [2]
+[5] -&gt; [7] -&gt; [1] -&gt; [4] -&gt; [2]
+</code></pre></div><h2 id="second-chance">Second Chance</h2>
+<blockquote>
+<p>Big improvement over FIFO</p>
+</blockquote>
+<p>Similar to <em>FIFO</em>, the pages are stored in a list. Instead of removing the oldest page every single time a page fault occurs, we first check the <code>R</code> bit of the page. If it&rsquo;s <code>0</code>, we throw out the page and insert the new one at the start. If the bit is <code>1</code> then we move the page to the start of the list (just as we would do with a new page, and set it&rsquo;s <code>R</code> bit to <code>0</code>), this way we give the page another chance. The search continues up the list, moving pages which have their <code>R</code> bit <code>1</code> to the start, until an unused page is found.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[1] -&gt; [4] -&gt; [2] -&gt; [3] -&gt; [5]
+
+-- page fault, 7 --
+-- assume 5 has bit R, 1 --
+-- assume 3 has bit R, 0 --
+
+[5] -&gt; [1] -&gt; [4] -&gt; [2] -&gt; [3]
+       [5] -&gt; [1] -&gt; [4] -&gt; [2]
+[7] -&gt; [5] -&gt; [1] -&gt; [4] -&gt; [2]
+</code></pre></div><p>You might notice, the algorithm can get expensive in terms of resources as it has to move items around in the list.</p>
+<h2 id="clock">Clock</h2>
+<blockquote>
+<p>Realistic</p>
+</blockquote>
+<p>Instead of having to move pages in a list, this algorithm uses a circular list and a pointer to the oldest page.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">
+-&gt; [1] -&gt; [4] -&gt; [2] -&gt; [3] -&gt; *points back to [1]
+    ,
+   /|\
+    |
+  oldest
+   page
+ pointer
+</code></pre></div><p>If a page fault occurs, a similar approach to second chance is taken, check bit <code>R</code>, if it&rsquo;s <code>0</code> evict the page and insert the new one in it&rsquo;s place. If the bit is <code>1</code>, set it to <code>0</code> and move the pointer to the next entry.</p>
+<h2 id="lru">LRU</h2>
+<blockquote>
+<p>Excellent, but difficult to implement exactly</p>
+</blockquote>
+<p>LRU is a cyclic cache that tracks <strong>when</strong> was each page used last and updates the order of the list to keep track of the <strong>L</strong>east-<strong>R</strong>ecently-<strong>U</strong>sed page.</p>
+<p>This is very expensive to do in both software and hardware, there are special hardware implementations which work.</p>
+<p>There are a couple of software solutions which try to approximate/recreate the behaviour of the LRU algorithm.</p>
+<h2 id="nfu">NFU</h2>
+<blockquote>
+<p>Fairly crude approximation to LRU</p>
+</blockquote>
+<p>The <strong>N</strong>ot-<strong>F</strong>requently-<strong>U</strong>sed algorithm requires a counter for each page. The counter starts off at 0, and on every clock interrupt the counter is updated if the <code>R</code> bit is <code>1</code>. When a page fault occurs the page with the lowest counter is replaced with the new one.</p>
+<p>There are multiple ways the counter can be incremented. The simplest one is to keep adding 1 to it every time <code>R</code> is <code>1</code> (or simply <code>counter += R</code>).</p>
+<p>The issue with this is, some pages may be used heavily in one cycle of the program, thus increasing their counter to high numbers. Then these pages may go unused for the rest of the program, but because of their high counters, they may never be overtaken by new pages which will be swapped in and out.</p>
+<h2 id="ageing">Ageing</h2>
+<blockquote>
+<p>Efficient algorithm that approximates LRU well</p>
+</blockquote>
+<p>A simple modification to the counter updating policy used by <em>NFU</em> makes it much better. Instead of simply adding <code>R</code> on every update, we first shift the counter 1 bit to the right and then add <code>R</code> to the leftmost bit. This way the counter binary representation will contain the history/timeline when the page was used.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Imagine the R bit sequence: 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0
+
+time    Page Counter
+ |        00000000
+ |        00000000
+ |        10000000
+ |        11000000
+ |        11100000
+ |        01110000
+ |        10111000
+ |        11011100
+ |        01101110
+ |        10110111
+ |        01011011
+ |        00101101
+\|/
+ `
+</code></pre></div><h2 id="working-set">Working Set</h2>
+<blockquote>
+<p>Somewhat expensive to implement</p>
+</blockquote>
+<p>The <em>working set</em> algorithm takes advantage of the fact that normal programs will have a certain order/logic/pattern in the way they call pages. Page references tend to cluster around a small number of pages, this algorithm is used to order together pages <code>k</code> in a set that may be used at some point <code>t</code> in time, giving us the group <code>w(k, t)</code>.</p>
+<p>In the context of page replacement, the algorithm will use an approximate time <code>t</code> of last use and the <code>R</code> bit. The system will have a <code>T</code>, current time. When an update occurs, pages are scanned and:</p>
+<ul>
+<li>If <code>R</code> is <code>1</code>, update the timestamp to the current time</li>
+<li>If <code>R</code> is <code>0</code>
+<ul>
+<li>If the age (<code>T-t</code>) is greater than <code>t</code>, remove it</li>
+<li>If the age (<code>T-t</code>) is less than or equal to <code>t</code>, save the smallest one</li>
+</ul>
+</li>
+</ul>
+<p>If all pages have <code>R</code> equal to <code>1</code> then a page at random will be removed.</p>
+<h2 id="wsclock">WSClock</h2>
+<blockquote>
+<p>Good efficient algorithm</p>
+</blockquote>
+<p>This is a combination of the <em>Clock</em> and <em>Working Set</em> algorithms.</p>
+<p>A circular list structure will store the <code>t</code> and <code>R</code> for each page. When the page pointed at has the <code>R</code> bit <code>1</code>, it has <code>R</code> set to <code>0</code> and the pointer move to the next entry. If the current page has <code>R</code> equal to <code>0</code> then <code>t</code> is checked and if <code>T-t</code> is greater than it, the page gets replaced. Otherwise the algorithm just moves to the next page to avoid having to update the page.</p>
+
+		</section>
+
+		<div class="post-tags">
+			
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+<hr>2020  © Alexandru-Paul Copil |  <a href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+</footer>
+</div>
+    </body>
+</html>

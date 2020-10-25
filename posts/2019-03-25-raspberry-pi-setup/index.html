@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Raspberry Pi - Lite home server - Alexandru-Paul Copil</title><meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<meta property="og:description" content="How to setup your Raspberry Pi as your home lite-server" />
+	<meta name="twitter:description" content="How to setup your Raspberry Pi as your home lite-server" />
+	<meta name="description" content="How to setup your Raspberry Pi as your home lite-server" />
+	<meta name="description" content="How to setup your Raspberry Pi as your home lite-server" />
+
+	<meta property="og:title" content="Raspberry Pi - Lite home server | Alexandru-Paul Copil" />
+	<meta name="twitter:title" content="Raspberry Pi - Lite home server | Alexandru-Paul Copil" />
+
+	<meta property="og:image" content=""/>
+	<meta itemprop="name" content="Raspberry Pi - Lite home server | Alexandru-Paul Copil" />
+	<meta name="application-name" content="Raspberry Pi - Lite home server | Alexandru-Paul Copil" />
+	<meta property="og:site_name" content="" />
+	<meta property="og:title" content="Raspberry Pi - Lite home server" />
+<meta property="og:description" content="How to setup your Raspberry Pi as your home lite-server" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cpl.li/posts/2019-03-25-raspberry-pi-setup/" />
+<meta property="article:published_time" content="2019-03-25T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-03-25T00:00:00+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Raspberry Pi - Lite home server"/>
+<meta name="twitter:description" content="How to setup your Raspberry Pi as your home lite-server"/>
+<link href="https://cpl.li/css/fonts.css" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="https://cpl.li/css/main.css" />
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://cpl.li/">Alexandru-Paul Copil</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/posts">All posts</a>
+		
+		<a href="/about">About</a>
+		
+		<a href="/tags">Tags</a>
+		
+		<a href="https://github.com/cpl">Github</a>
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">Raspberry Pi - Lite home server</h1>
+			<div class="meta">Posted on Mar 25, 2019</div>
+		</div>
+		
+
+		<section class="body">
+			<h2 id="introduction">Introduction</h2>
+<hr>
+<p>A <a href="https://www.raspberrypi.org">Raspberry Pi</a> is a pretty nice and average priced <a href="https://en.wikipedia.org/wiki/System_on_a_chip">SoC</a>. The best thing about the Raspberry Pi is the community and software support behind it. The version I’ll be using today is a Raspberry Pi 3B (2015, v1.2) and as a little extra on top of it a FEZ Hat (Rev 1.1).</p>
+<p>If you never owned one and you’re planning on purchasing one, check out this <a href="http://socialcompare.com/en/comparison/raspberrypi-models-comparison">page</a> for a detailed comparison between all models.</p>
+<h2 id="what-to-do-with-it">What to do with it?</h2>
+<hr>
+<p>I always end up having spare Raspberry Pi’s laying around from Hackathons or all sorts of giveaways or purchased from older projects. The Raspberry Pi is not necessarily the most powerful SoC on the market, but the performance/price ratio results in a <em>value</em> product.</p>
+<p>In this post I’ll be covering the following:</p>
+<ul>
+<li>Headless start (no keyboard and no screen)</li>
+<li>SSH Server (with key auth)</li>
+<li>Starter packages</li>
+<li>Other generic &amp; utility stuff</li>
+<li>Environment setup (shell, aliases, …)</li>
+<li>PiHole (to disable all the nasty adds on all devices)</li>
+</ul>
+<p>For the time being these simple initial setup steps will do. In future posts I’ll be covering in more detail other projects I have in store for the Raspberry Pi. For example:</p>
+<ul>
+<li>Who is home (by scanning the network)</li>
+<li>Ambient logging (using the Fez Hat)</li>
+<li>Web server and API
+<ul>
+<li>File-dumping server</li>
+</ul>
+</li>
+<li>Front door camera
+<ul>
+<li>With web feed and alerts</li>
+</ul>
+</li>
+</ul>
+<h2 id="setup">Setup</h2>
+<hr>
+<p><img src="/assets/images/rasp_setup.jpg" alt="rpi_setup.png"></p>
+<p>You’ll obviously be needing a Raspberry Pi (pretty much any model works), a power supply (make sure it’s ~5.1V and between 0.5-1A depending on the connected peripherals), a microSD card and a means of connecting it to an already functional machine.</p>
+<p>On the software side, you have to download an Operating System for the Pi, my personal recommendation is <a href="https://www.raspberrypi.org/downloads/">Raspbian</a> (a Debian based OS, with plenty of software and great community support) or you can see a list of supported OS-es <a href="https://distrowatch.com/search.php?ostype=All&amp;category=Raspberry+Pi&amp;origin=All&amp;basedon=All&amp;notbasedon=None&amp;desktop=All&amp;architecture=All&amp;package=All&amp;rolling=All&amp;isosize=All&amp;netinstall=All&amp;language=All&amp;defaultinit=All&amp;status=Active#simple">here</a>.</p>
+<p>Now that you have the image (<code>.img</code>) of your choice of OS, it’s time to “burn” it onto the microSD card. For this you’ll need special software on your <em>master</em> machine.</p>
+<ul>
+<li><a href="https://www.balena.io/etcher/">Etcher</a> - macOS</li>
+<li><a href="https://sourceforge.net/projects/win32diskimager/">Win32DiskImager</a> - Windows</li>
+<li>Linux, you can figure this out</li>
+</ul>
+<p>After the microSD is ready, you should see a mounted media called <code>/boot</code>. Upon entering it a series of files will be located, the most important of these files are:</p>
+<ul>
+<li>The Firmare (split across most of the files)</li>
+<li><code>kernel.img</code> (the kernel of the operating system)</li>
+<li><code>config.txt</code> (this is used the <a href="https://elinux.org/Raspberry_Pi_VideoCore_APIs">VideoCore</a> to initialise the system)
+<ul>
+<li>It’s advised not to mingle in here unless you know what you’re doing</li>
+</ul>
+</li>
+</ul>
+<p>At this point we are not yet done with the microSD, inside the <code>/boot/</code> directory create a file named <code>ssh</code>. Yes, an empty file. (<code>touch ssh</code> when inside the directory). This will allow you to connect using the default user (<code>pi</code> with password <code>raspberry</code>) over <code>ssh</code>.</p>
+<p>Another thing you might want to do is setup a <strong>WiFi</strong> connection for your Pi. This can be achieved by creating another file called <code>wpa_supplicant.conf</code>. In which you’ll have to write a config like this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">country=&lt;2 LETTER COUNTRY CODE&gt;
+update_config=1
+ctrl_interface=/var/run/wpa_supplicant
+
+network={
+ scan_ssid=1
+ ssid=&#34;&lt;NETWORK SSID, NAME&gt;&#34;
+ psk=&#34;&lt;NETWORK PASSWORD&gt;&#34;
+}
+</code></pre></div><p>I don’t really like the hassle of dealing with WiFi before having access to the system and I always have access to an ethernet cable, but in case you don’t, that’s all you need to do.</p>
+<h2 id="let-there-be-light">Let there be light</h2>
+<hr>
+<p>Now your Pi should be ready to boot. Safely remove the microSD from your machine, place it in the Pi (make sure there his no power source connected to it), plug in the ethernet cable and then the power cable.</p>
+<p>At this point you should have a <strong>red</strong> light on (telling you that power is present) and a <strong>green</strong> LED (the ACT LED) telling you the operating system it doing its thing.</p>
+<p>Time to connect to your Pi. If you created the <code>ssh</code> file inside the microSD <code>/boot</code> directory, you should now be able to run the following command <code>ssh pi@raspberry.local</code>. This command may not work on some networks as the hostname lookup might not work or other pi’s might be present on the network. To be sure your machine is even connected to the network perform a network scan an use the IP directly to connect (<code>nmap --help</code>).</p>
+<p>When <em>sshing</em> into your Pi, you will be promoted to type a password, as we mentioned above the default password for <code>pi</code> is <code>raspberry</code>.</p>
+<p>Tada! Now change that default password so you don’t expose yourself to unwanted intruders later down the road. Do this by typing <code>passwd</code>. A prompt will ask for your current password and then the new password + a confirmation.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Changing password for pi.
+(current) UNIX password:
+Enter new UNIX password:
+Retype new UNIX password:
+</code></pre></div><p>You should probably also change the password for the <code>root</code> user. <code>sudo passwd root</code>, but make sure you don’t forget this one. And to be extra safe no <code>root</code> incidents happen, lock the account using <code>sudo passwd -l root</code>.</p>
+<h2 id="raspi-config">raspi-config</h2>
+<hr>
+<p>A great utility tool that comes with Raspbian is <code>raspi-config</code>. You can run this as <code>sudo raspi-config</code> and a nice <em>curses</em> <em>gui</em> will appear. From here you can do the initial setup of your Pi.</p>
+<ul>
+<li>Go to <strong>2 Network Options</strong> &gt; <strong>N1 Hostname</strong>
+<ul>
+<li>Change the hostname from <code>raspberry</code> to something more meaningful. I like using the periodic table for labelling my machines (more on this on a different post).</li>
+</ul>
+</li>
+<li>Go to <strong>4 Localisation Options</strong>
+<ul>
+<li>Change your <strong>Locale</strong>, <strong>Timezone</strong>, <strong>Keyboard Layout</strong> to your preferred style</li>
+</ul>
+</li>
+<li>Go to <strong>7 Advanced Options</strong> &gt; <strong>A1 Expand Filesystem</strong>
+<ul>
+<li>This will ensure that all of the microSD space is used</li>
+</ul>
+</li>
+<li>Click <strong>Finish</strong> and agree to having your system rebooted</li>
+</ul>
+<p>Next time you’ll be logging in over ssh remember to use your new password.</p>
+<h2 id="update-time">Update time</h2>
+<hr>
+<p>The version of the OS you got definitely contains outdated packages and you should almost always update. This is done by using <code>apt-get</code> on any Debian/Ubuntu OS-es.</p>
+<p>Before starting this, make sure your Pi is connected to the internet and power and the chances of these two getting disconnected is as close to 0% as possible.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">sudo apt-get update
+sudo apt-get update
+</code></pre></div><p>Now depending on your internet speed, how many packages must be updated and the mercy of the E͕̣͇l̹̖̙̯̬̫̗ḏę̻̭̺̜̜̹r͇͈̯͓ ̧̜G̨͍̮̺̦̳͕͓o̴̮͎d̤͖͈s̵̠̞̲̺̝, this may take a while so go make a tea or something.</p>
+<p>Just to be safe run the commands above again! Don’t play around with package managers, they can make your life easy but they can also make it a living nightmare.</p>
+<p>After the updates are done and the Universe hopefully didn’t reach Heat death by that point, you can safely reboot your Pi (<code>sudo reboot</code>). And connect to it again after it boots.</p>
+<h2 id="goto-packages">Goto packages</h2>
+<hr>
+<p>On pretty much any system I setup or own I want to have the following packages:</p>
+<ul>
+<li><code>ufw</code> - Nice and simple firewall rule management, allows you to block undesired connections (such as your housemates trying to DOS you :) ).
+<ul>
+<li><code>sudo ufw allow 22</code> - ssh</li>
+<li><code>sudo ufw allow 80</code> - http</li>
+<li><code>sudo ufw allow 443</code> - https</li>
+<li><code>sudo ufw allow 53</code> - dns</li>
+<li><code>sudo ufw allow 123</code> - ntp</li>
+<li><code>sudo ufw default deny incoming</code></li>
+<li><code>sudo ufw default allow outgoing</code></li>
+</ul>
+</li>
+<li><code>htop</code>, <code>iotop</code>, <code>iftop</code> - Monitor different resources on the Pi</li>
+<li><code>vim</code> - Not meaning to start any wars here, but how can some people use <code>emacs</code>, right?</li>
+<li><code>git</code></li>
+<li><code>golang</code> - I’ll be using it to create the web/network projects/tools.</li>
+</ul>
+<p>To install a package use <code>sudo apt-get install &lt;package name&gt;</code>.</p>
+<h2 id="secure-secure-shell">Secure Secure-SHell</h2>
+<hr>
+<p>The default login authentication method for <code>ssh</code> is password <strong>or</strong> key. A more secure way of dealing with <code>ssh</code> is by enforcing key only auth (this renders any brute forcing or dictionary attacks useless).</p>
+<p>Before we enforce key auth only, we should make sure key auth works, with the password as a safety net.</p>
+<p>Generate yourself a ssh key or use an existing one. This step should be done on your master machine, or you’ll have to transfer the private key from the machine. To generate a key run <code>ssh-keygen</code>, when promoted for a file to save the key in use the default one, then type in a strong but easy to type and remember password.</p>
+<p>Inside your <code>~/.ssh/</code> directory you should now have a private key <code>id_rsa</code> and a public one <code>id_rsa.pub</code>. <strong>NEVER SHARE YOUR PRIVATE KEY</strong>. Inside the <code>~/.shh/</code> dir, create a file called <code>authorized_keys</code> and inside it you can paste the public keys which are allowed to connect to this machine and user using their respective private keys (each line can be a public key).</p>
+<p>Now exit/close the ssh connection and then try to log back in, this time if you properly configured your ssh keys (this is a topic that goes beyond the purpose of this post), the Pi shouldn’t prompt you for any password. If this is the case, you can now disable password auth.</p>
+<p>In order to change the <code>sshd</code> configuration, type <code>sudo vim /etc/ssh/sshd_config</code> (or <code>nano</code>) and modify the following lines:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">PasswordAuthentication no
+LoginGraceTime 1m
+</code></pre></div><p>Other settings might look interesting, such as changing the default listening port. Feel free to look around and modify it to your liking. But beware, playing with <code>sshd</code> configuration can leave you locked out of your system, forcing you to start over (or mount the filesystem and change the configurations).</p>
+<h2 id="motd">MOTD</h2>
+<hr>
+<p>Message of the day, is the message which shows up whenever you login. By default on a Raspbian machine that is:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+</code></pre></div><p>And it can be changed by editing <code>/etc/motd</code>. I like putting some ASCII ART in there just to cheer me up (might work on a “auto updating” MOTD with ASCII art, that would be awesome and probably someone already did it).</p>
+<h2 id="zsh">ZSH</h2>
+<hr>
+<p>Having a well configured shell is more than just the looks, it helps you navigate your system faster and more efficiently. A shell package like <a href="https://github.com/robbyrussell/oh-my-zsh">oh-my-zsh</a> gives you out of this world auto-completion, highlighting and utilities.</p>
+<p>In order to install it:</p>
+<ul>
+<li><code>sudo apt-get install zsh</code>, first install the zsh (shell)</li>
+<li><code>sh -c &quot;$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)&quot;</code>, and then download and execute their install script</li>
+</ul>
+<p>For more details on configuring it, check out the projects repo page on GitHub.</p>
+<h2 id="pihole">PiHole</h2>
+<hr>
+<p>With this I’ll try and tie things up as this post is already a blob of text and ramblings. <a href="https://pi-hole.net">Pi Hole</a> is a cool <em>little</em> project that acts as a DNS for all the devices you want to connect to it, filtering out known advertisers DNS queries and then keeping these that interest you. It has a nice dashboard to view all the stats of your usage.</p>
+<p>It has a simple setup process, only requiring you to execute the following:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">curl -sSL https://install.pi-hole.net | bash
+</code></pre></div><p>And then allowing you to configure some very basic things.</p>
+<h2 id="wrap-up">Wrap up</h2>
+<hr>
+<p>With all of the above in mind and hopefully you looking forward to some more well planned posts about different projects I’ll be working on in the upcoming months, I hope this helped to some degree. The Raspberry Pi is a fun little tool that is both good for learning and real-world applications. Be creative and learn as much as you can on this simple, controlled environment while at the same time setting up all kinds of useful projects.</p>
+<h3 id="dont">Don’t</h3>
+<p>While a Raspberry Pi might look like a nice little powerful thing. <strong>It’s not</strong>. Sure there are plenty of nice and ingenious projects you can put together using one, and plenty of production-grade software available for it, this doesn’t mean you SHOULD do X. I’ve heard plenty of unfeasible ideas and even tried out some myself just to be disappointed. Use your head and don’t stop at “Can I do X?” but also ask “Should I do X?”.</p>
+<blockquote>
+<p>Sure you <strong>can</strong> run a Kubernetes cluster on 10 Raspberry PIs, but <strong>should</strong> you?</p>
+</blockquote>
+<blockquote>
+<p>No, you shouldn’t.</p>
+</blockquote>
+
+		</section>
+
+		<div class="post-tags">
+			
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+<hr>2020  © Alexandru-Paul Copil |  <a href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+</footer>
+</div>
+    </body>
+</html>

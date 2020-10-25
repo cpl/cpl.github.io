@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Markov Chains in Go - Alexandru-Paul Copil</title><meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<meta property="og:description" content="A fun little project that generates new text based on markov chains" />
+	<meta name="twitter:description" content="A fun little project that generates new text based on markov chains" />
+	<meta name="description" content="A fun little project that generates new text based on markov chains" />
+	<meta name="description" content="A fun little project that generates new text based on markov chains" />
+
+	<meta property="og:title" content="Markov Chains in Go | Alexandru-Paul Copil" />
+	<meta name="twitter:title" content="Markov Chains in Go | Alexandru-Paul Copil" />
+
+	<meta property="og:image" content=""/>
+	<meta itemprop="name" content="Markov Chains in Go | Alexandru-Paul Copil" />
+	<meta name="application-name" content="Markov Chains in Go | Alexandru-Paul Copil" />
+	<meta property="og:site_name" content="" />
+	<meta property="og:title" content="Markov Chains in Go" />
+<meta property="og:description" content="A fun little project that generates new text based on markov chains" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cpl.li/posts/2019-03-27-markov-chains-go/" />
+<meta property="article:published_time" content="2019-03-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-03-27T00:00:00+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Markov Chains in Go"/>
+<meta name="twitter:description" content="A fun little project that generates new text based on markov chains"/>
+<link href="https://cpl.li/css/fonts.css" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="https://cpl.li/css/main.css" />
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://cpl.li/">Alexandru-Paul Copil</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/posts">All posts</a>
+		
+		<a href="/about">About</a>
+		
+		<a href="/tags">Tags</a>
+		
+		<a href="https://github.com/cpl">Github</a>
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">Markov Chains in Go</h1>
+			<div class="meta">Posted on Mar 27, 2019</div>
+		</div>
+		
+
+		<section class="body">
+			<h2 id="introduction">Introduction</h2>
+<hr>
+<p>While browsing the golang documentation and packages I stumbled upon something entirely new, a “codewalk” for a markov chain algorithm that generates text based on a “trained” markov chain from user input [<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>]. This reminded me of the time I studied Markov Chains for a University course but never got to see a software implementation of what it might look. To my surprise it was pretty simple and straightforward.</p>
+<p>Brushing up my knowledge of markov chains and checking out a visual explanations [<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>] and another more complex implementation of the same algorithm [<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>], I decided to try and make my own and then connect it to my API.</p>
+<p>Now if you’re not interested in how I did it and just <strong>want to dump some obscene amounts of text</strong> for my poor little free Heroku hosted API to handle, then skip to <strong><a href="#tryit">here</a></strong>. If you wish to see the <strong>GitHub repo</strong> go <a href="https://git.cpl.li/markov">here</a>.</p>
+<h2 id="what-are-markov-chains">What are Markov Chains</h2>
+<hr>
+<p>I wouldn’t call myself a mathematician so if you want a more mathematical explanation check out Wikipedia, or any the referenced posts.</p>
+<p>I will do my best and explain it with an example. If we provide the following block of text to a markov chain:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">I am an engineer
+I am not a mathematician
+</code></pre></div><p>We can split this text into sequences of different sizes</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// size 1
+</span><span style="color:#75715e"></span>[<span style="color:#e6db74">&#34;I&#34;</span> <span style="color:#e6db74">&#34;am&#34;</span> <span style="color:#e6db74">&#34;an&#34;</span> <span style="color:#e6db74">&#34;engineer&#34;</span> <span style="color:#e6db74">&#34;I&#34;</span> <span style="color:#e6db74">&#34;am&#34;</span> <span style="color:#e6db74">&#34;not&#34;</span> <span style="color:#e6db74">&#34;a&#34;</span> <span style="color:#e6db74">&#34;mathematician&#34;</span> <span style="color:#f92672">...</span>]
+
+<span style="color:#75715e">// size 2
+</span><span style="color:#75715e"></span>[<span style="color:#e6db74">&#34;I am&#34;</span> <span style="color:#e6db74">&#34;am an&#34;</span> <span style="color:#e6db74">&#34;an engineer&#34;</span> <span style="color:#e6db74">&#34;engineer I&#34;</span> <span style="color:#e6db74">&#34;I am&#34;</span> <span style="color:#e6db74">&#34;am not&#34;</span> <span style="color:#f92672">...</span>]
+
+<span style="color:#75715e">// size 3
+</span><span style="color:#75715e"></span><span style="color:#e6db74">&#34;I am an&#34;</span> <span style="color:#e6db74">&#34;am an engineer&#34;</span> <span style="color:#e6db74">&#34;an engineer I&#34;</span> <span style="color:#e6db74">&#34;engineer I am&#34;</span> <span style="color:#f92672">...</span>]
+</code></pre></div><p>Now for each sequence we must also store the following token, thus creating a pair. Not that in our example the size 2 sequence <code>&quot;I am&quot;</code> can be followed by multiple words: <code>an</code> <code>not</code> so our transition mapping has to keep both relations and their occurrence count (as a pair may occur multiple times this increasing its frequency)</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">Pair</span> {
+    <span style="color:#a6e22e">Sequence</span>: <span style="color:#e6db74">&#34;I am&#34;</span>
+    <span style="color:#a6e22e">Next</span>: {
+        <span style="color:#e6db74">&#34;an&#34;</span>:  <span style="color:#ae81ff">1</span>
+        <span style="color:#e6db74">&#34;not&#34;</span>: <span style="color:#ae81ff">1</span>
+    }
+}
+</code></pre></div><p>After the transition map is created on a sequence of input data, it’s actually up to you how you decide to generate the next token, the way I did it is by giving the Builder a <em>seed</em> which is actually just a sequence of word, if non is provided the Builder will pick at random a starting sequence and go from there.</p>
+<h2 id="implementation">Implementation</h2>
+<hr>
+<p>It was easy to create a simple markov chain using the following structs:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// represents a grouping of individual words
+</span><span style="color:#75715e">// eg: []string{“I”, “am”, “Alex”}, this can be extracted
+</span><span style="color:#75715e">// from an original string of any form or shape:
+</span><span style="color:#75715e">// “I am Alex”, “I   am  Alex”, “I:am:Alex”
+</span><span style="color:#75715e">// and it’s all up to the caller to split their strings into sequences
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Sequence</span> []<span style="color:#66d9ef">string</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// a pairs represents a possible transition between a sequence of n words
+</span><span style="color:#75715e">// and the next (single) word
+</span><span style="color:#75715e">// the Current sequence must be of an equal lenght to the chain pair size
+</span><span style="color:#75715e">// meaning you can’t have some transitions for 2-grouped words and 1-grouped words
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Pair</span> <span style="color:#66d9ef">struct</span> {
+	<span style="color:#a6e22e">Current</span> <span style="color:#a6e22e">Sequence</span>
+	<span style="color:#a6e22e">Next</span>    <span style="color:#66d9ef">string</span>
+}
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// by having a
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">transitionMap</span> <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">int</span>
+<span style="color:#75715e">// and then nested inside
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">frequencyMatrix</span> <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#a6e22e">transitionMap</span>
+<span style="color:#75715e">// we generate our mapping of all encountered
+</span><span style="color:#75715e">// sequences to their respective next word
+</span><span style="color:#75715e">// and the number of times this occurs
+</span></code></pre></div><p>And then by creating the <code>Builder</code> on top of a chain, we can continually generate new words, append them to a sequence and then use that sequence to further poll the <code>Chain</code> for new words.</p>
+<h2 id="improvements">Improvements</h2>
+<hr>
+<p>There are plenty of improvements that can be made but this was intended as a fun little project to kill off some of the time I don’t have. Maybe another day I’ll pick this up and make it generate even more accurate and funny text, until then please feel free to enjoy an “interactive” version below.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="try-it">Try it</h2>
+<hr>
+<p>You can submit any sort of text here (it’s not stored anywhere) with a character
+limit of 50.000 (and yes it’s both frontend and backend validated). You will
+then be redirected to my api, where you’ll get a generated text of 200 words max.</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<h2 id="references">References</h2>
+<hr>
+<section class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1" role="doc-endnote">
+<p><a href="https://golang.org/doc/codewalk/markov/">Codewalk: Markov chain algorithm</a> <a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2" role="doc-endnote">
+<p><a href="http://setosa.io/ev/markov-chains/">Markov Chains explained visually</a> <a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3" role="doc-endnote">
+<p><a href="https://mb-14.github.io/tech/2018/10/24/gomarkov.html">Building markov chains in golang</a> <a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</section>
+
+		</section>
+
+		<div class="post-tags">
+			
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+<hr>2020  © Alexandru-Paul Copil |  <a href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+</footer>
+</div>
+    </body>
+</html>

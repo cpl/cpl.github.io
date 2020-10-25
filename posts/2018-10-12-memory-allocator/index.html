@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Designing Classic’s memory allocator - Alexandru-Paul Copil</title><meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<meta property="og:description" content="What goes into making a memory allocator? One of the most used and misunderstood aspects of modern software development." />
+	<meta name="twitter:description" content="What goes into making a memory allocator? One of the most used and misunderstood aspects of modern software development." />
+	<meta name="description" content="What goes into making a memory allocator? One of the most used and misunderstood aspects of modern software development." />
+	<meta name="description" content="What goes into making a memory allocator? One of the most used and misunderstood aspects of modern software development." />
+
+	<meta property="og:title" content="Designing Classic’s memory allocator | Alexandru-Paul Copil" />
+	<meta name="twitter:title" content="Designing Classic’s memory allocator | Alexandru-Paul Copil" />
+
+	<meta property="og:image" content=""/>
+	<meta itemprop="name" content="Designing Classic’s memory allocator | Alexandru-Paul Copil" />
+	<meta name="application-name" content="Designing Classic’s memory allocator | Alexandru-Paul Copil" />
+	<meta property="og:site_name" content="" />
+	<meta property="og:title" content="Designing Classic’s memory allocator" />
+<meta property="og:description" content="What goes into making a memory allocator? One of the most used and misunderstood aspects of modern software development." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cpl.li/posts/2018-10-12-memory-allocator/" />
+<meta property="article:published_time" content="2018-10-12T00:00:00+00:00" />
+<meta property="article:modified_time" content="2018-10-12T00:00:00+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Designing Classic’s memory allocator"/>
+<meta name="twitter:description" content="What goes into making a memory allocator? One of the most used and misunderstood aspects of modern software development."/>
+<link href="https://cpl.li/css/fonts.css" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="https://cpl.li/css/main.css" />
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://cpl.li/">Alexandru-Paul Copil</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/posts">All posts</a>
+		
+		<a href="/about">About</a>
+		
+		<a href="/tags">Tags</a>
+		
+		<a href="https://github.com/cpl">Github</a>
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">Designing Classic’s memory allocator</h1>
+			<div class="meta">Posted on Oct 12, 2018</div>
+		</div>
+		
+
+		<section class="body">
+			<h2 id="memory">Memory</h2>
+<p>Before even starting to design the memory allocator itself, I had to decide where the heap (memory zone managed by the allocator) will reside in memory.</p>
+<p><img src="/assets/images/cls.malloc2.png" alt=""></p>
+<p>As you can see the kernel has its own heap and memory allocator. The user space uses a separate but similar allocator (for security purposes) and the heap is loaded at the end of the initial virtual memory allocated to a task.</p>
+<p>When designing a memory allocator you will have to make all kinds of decision depending on <strong>why</strong> and <strong>where</strong> you need <code>malloc</code>. In my case I wanted a general purpose memory allocator.</p>
+<h2 id="structure">Structure</h2>
+<p>First design choice I had to make was how to store the memory blocks, distinguish free blocks from allocated blocks.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust">typedef <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">mem_block</span> {
+    <span style="color:#66d9ef">u32</span>                 size;
+    void<span style="color:#f92672">*</span>               addr;
+    <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">mem_block</span><span style="color:#f92672">*</span>   next;
+} mem_block;
+</code></pre></div><p>The structure above was used to represent memory blocks of a given <code>size</code> which started on the stack at <code>addr</code> and pointed to the next block <code>next</code>.</p>
+<p>This design formed a linked list which could be easily tracked using:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#66d9ef">static</span> mem_block<span style="color:#f92672">*</span>   _KERNEL_ALOC <span style="color:#f92672">=</span> (void<span style="color:#f92672">*</span>)<span style="color:#ae81ff">0x000FFFFF</span>;
+mem_block<span style="color:#f92672">*</span>          _KERNEL_ALOC_LAST;
+mem_block<span style="color:#f92672">*</span>          _KERNEL_ALOC_TAIL;
+</code></pre></div><p>Here the <code>_KERNEL_ALOC_LAST</code> pointer is the last memory block in physical memory and <code>_KERNEL_ALOC_TAIL</code> pointer is the last memory block in the linked list of memory blocks.</p>
+<p><code>_KERNEL_ALOC_LAST</code> is used to free up fragmented memory in the structure of the memory allocator.</p>
+<p><img src="/assets/images/cls.malloc3.png" alt=""></p>
+<h2 id="alignment">Alignment</h2>
+<p>A rule/trade-off I employed was <strong>16 word</strong> aligned memory allocations, meaning that all addresses within the heap would look like <code>0xFFFFFFF0</code> allowing the first <strong>4 bits</strong> to be used as <strong>flags</strong>. Bit 0, represents if the block is allocated (0) or free (1).</p>
+<p>While <strong>speed</strong> is a very important aspect when dealing with memory operations we also want to optimise the memory we allocate and NEVER lose portions of memories (memory leaks) especially at the very foundation of the memory allocator.</p>
+<p>When looking to allocate a block of memory, first the input size must be validated. What happens when a users calls <code>malloc(1)</code>, are we seriously going to allocate a <strong>1 byte</strong> block? Of course not, we will allocate a block of <code>MIN_SIZE</code> (in my case <strong>64 bytes</strong> or <strong>16 words</strong>) and the programmer is free to use a single byte or all 64. Now what happens when the user makes a call for <code>malloc(1073741824)</code>? Do we just give up <strong>1GB</strong> of memory to a single program? Obviously not, we are going to allocate a <code>MAX_SIZE</code> block and now comes another design decision related to actual physical memory allocated, and we have two main approaches: <strong>lazy</strong> or <strong>eager</strong>.</p>
+<h3 id="lazy">Lazy</h3>
+<p>We “tell” the user he can have his huge amount of memory but we don’t allocate all of the physical pages until the user actually uses the requested memory address. Think of it like Cloud Storage services, they might offer you <strong>50GB</strong> but that space is not reserved for you until you actually use it, because not all users will fill <strong>50GB</strong> of data.</p>
+<h3 id="eager">Eager</h3>
+<p>Actually allocate the requested memory and pray that you didn’t just starve the entire system or that you have plenty of swap space.</p>
+<h2 id="speed">Speed</h2>
+<p>While most tasks will handle a <strong>O(n)</strong> style iterative algorithm there are ways to speed up memory allocation. One is creating another linked of <strong>free blocks</strong> and adding another <code>next</code> pointer to the next free block. This greatly increases allocation time to <strong>O(1)</strong> but requires additional memory to store the pointers</p>
+<p>Another speed/memory trade-off is related to <strong>contiguous</strong> free memory blocks. When allocating <strong>256 bytes</strong> of memory, it is possible to have a free block of <strong>64 bytes</strong> and another neighbouring free block of <strong>192</strong> bytes. A nice design choice is to search all <strong>contiguous</strong> free blocks until their sizes add up to the requested allocation or more and then perform a merge within the allocator structure.</p>
+<p>Another speed/memory trade-off is what happens when you want to allocate let’s say  <strong>64 bytes</strong>, and the first free block is <strong>1024 bytes</strong>, but somewhere down the list a <strong>64 byte</strong> free block can be found. Do we always search for the best matching smallest block? Do we fragment memory? Or create a score/heuristic to decide when to be greedy and when to optimise memory.</p>
+<p>If a specific program requires absolute speed and wishes to bypass all other checks, I like to implement a <strong>fast malloc</strong> call, <code>falloc</code>, that spawns another allocation block at the very end of the list ignoring any and all memory optimisations.</p>
+<h2 id="free">Free</h2>
+<p>Freeing up blocks can be slow at times, because you have to search for the right address of the block, which without any sort of mapping will be <strong>O(n)</strong>. What you can do to optimise speed is not actually free up the memory at the time of the <code>free</code> call instead you can save up a batch of free request and perform them in one iteration. Another optimisation is performing memory frees when as a daemon task whenever the scheduler decides it has the resources for it.</p>
+<p>These two options delay memory frees and could cause a lot of memory to stagnate until the requests are truly processed.</p>
+
+		</section>
+
+		<div class="post-tags">
+			
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+<hr>2020  © Alexandru-Paul Copil |  <a href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+</footer>
+</div>
+    </body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>HC-08 Bluetooth (LE) with Arduino and macOS - Alexandru-Paul Copil</title><meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<meta property="og:description" content="My experience with a HC-08 Bluetooth module and macOS BLE" />
+	<meta name="twitter:description" content="My experience with a HC-08 Bluetooth module and macOS BLE" />
+	<meta name="description" content="My experience with a HC-08 Bluetooth module and macOS BLE" />
+	<meta name="description" content="My experience with a HC-08 Bluetooth module and macOS BLE" />
+
+	<meta property="og:title" content="HC-08 Bluetooth (LE) with Arduino and macOS | Alexandru-Paul Copil" />
+	<meta name="twitter:title" content="HC-08 Bluetooth (LE) with Arduino and macOS | Alexandru-Paul Copil" />
+
+	<meta property="og:image" content=""/>
+	<meta itemprop="name" content="HC-08 Bluetooth (LE) with Arduino and macOS | Alexandru-Paul Copil" />
+	<meta name="application-name" content="HC-08 Bluetooth (LE) with Arduino and macOS | Alexandru-Paul Copil" />
+	<meta property="og:site_name" content="" />
+	<meta property="og:title" content="HC-08 Bluetooth (LE) with Arduino and macOS" />
+<meta property="og:description" content="My experience with a HC-08 Bluetooth module and macOS BLE" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cpl.li/posts/2019-05-30-bluetooth-hc08-macos/" />
+<meta property="article:published_time" content="2019-05-30T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-05-30T00:00:00+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="HC-08 Bluetooth (LE) with Arduino and macOS"/>
+<meta name="twitter:description" content="My experience with a HC-08 Bluetooth module and macOS BLE"/>
+<link href="https://cpl.li/css/fonts.css" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="https://cpl.li/css/main.css" />
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://cpl.li/">Alexandru-Paul Copil</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/posts">All posts</a>
+		
+		<a href="/about">About</a>
+		
+		<a href="/tags">Tags</a>
+		
+		<a href="https://github.com/cpl">Github</a>
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">HC-08 Bluetooth (LE) with Arduino and macOS</h1>
+			<div class="meta">Posted on May 30, 2019</div>
+		</div>
+		
+
+		<section class="body">
+			<p>I received one of these <code>HC-08</code> Bluetooth modules for Arduino and other micro controllers. I thought it will be a nice, fun and simple experience. After all everything has or used to have Bluetooth, we are in the age of “<a href="https://twitter.com/internetofshit">IoT</a>”.</p>
+<!-- raw HTML omitted -->
+<h2 id="hc-08">HC-08</h2>
+<hr>
+<p>While it’s not the best Bluetooth module out there, it’s also not the worst. Connecting it to a micro controller is straightforward. Connect <code>GND</code> to <code>GND</code>, <code>VCC</code> to a <code>5V</code> power source, the <code>HC-08</code> <code>TX</code> to the controller <code>RX</code>. For the <code>RX</code> of the <code>HC-08</code>, you must watch out, as it requires <code>3.3V</code>. If your controller uses <code>5V</code> logic, then you must adapt your voltage to 3.3 (you can use the schematic below).</p>
+<p><img src="/assets/images/bluetooth-101_bb.png" alt="Connecting HC-08 to Arduino Uno"></p>
+<p>(the 1kOhm resistor is between the RX-TX line and the 2kOhm resistor connects back to the ground)</p>
+<p>I used the following code to send messages and <em>commands</em> to turn an LED on and off.</p>
+<!-- raw HTML omitted -->
+<p>By using a BLE Terminal App I was able to detect my device, connect to it and communicate both ways. I was unable to do the same from <strong>macOS</strong>, but more on this later.</p>
+<h2 id="at-commands">AT Commands</h2>
+<hr>
+<p>You can send special commands over serial to your bluetooth module. Some devices may require special pins to be powered in a certain way. Check the datagram of your device for more information. In <strong>AT</strong> mode you can send string with the prefix <code>AT+</code>. To test wether your devices supports and is in <strong>AT</strong> mode, sending the string <code>AT</code> will return an <code>OK</code> message.</p>
+<p>For a list of available AT commands check your modules manual. Some devices have a <em>mini-AT</em> mode. Commands can be used to query data (<code>AT+NAME=?</code>) will return the name of the device. The same command can be used to set the name (<code>AT+NAME=FooBar</code>).</p>
+<h2 id="macos--bluetooth">macOS &amp; Bluetooth</h2>
+<hr>
+<p>The idea behind my project was controlling different devices from my terminal	(because I use it more than anything else and I always have a terminal window open somewhere) using BLE.</p>
+<p>When scanning for Bluetooth devices on <strong>macOS</strong> my <code>HC-08</code> wouldn’t show up, but my iPhone and Raspberry Pi were able to pick it up. I checked the hardware on my Mac and the Bluetooth is <code>LMP Version: 4.0 (0x6)</code>. Which means it has BLE support.</p>
+<p>I thought to myself that maybe normal users have no need for ALL random micro controllers with Bluetooth to show up in their discovery menu, so maybe the underlaying software was hiding something from me (as Apple software normally does &gt;.&gt;). So i tried this tool <a href="https://github.com/toy/blueutil">blueutil</a>. But scanning for my device or even trying to directly connect using its address didn’t work.</p>
+<p>This is when my journey to the deep corners of Apple’s IOKit drivers and Bluetooth. Their developer <a href="https://developer.apple.com/bluetooth/">documentation</a> mentions some different frameworks. Most apps and devices use the common <strong>IOBluetooth</strong> Framework. For BLE devices you must use <a href="https://developer.apple.com/documentation/corebluetooth"><strong>CoreBluetooth</strong></a></p>
+<h3 id="xpc-workaround">XPC Workaround</h3>
+<p>While searching for people who found a way to access the Bluetooth API without using <strong>Swift</strong> or <strong>Objective-C</strong>, I found this <a href="https://github.com/noble/noble">repo</a>. It’s a NodeJS library that uses XPC connections to communicate with the Bluetooth service/daemon. This is a nasty workaround because Apple changes the inner-workings of their software with each major update and without notice. This will result in breaking changes and having to patch your library with every update, resulting in a big library full of duct-tape.</p>
+<h3 id="binding-the-api">Binding the API</h3>
+<p>The other <em>workaround</em> which is actually cleaner is <a href="https://github.com/Timeular/noble-mac">noble-mac</a> which binds some <strong>Swift</strong> and <strong>Objective-C</strong> functions to JavaScript. The <strong>Swift</strong> and <strong>Objective-C</strong> use the Framework API and the JavaScript only links the frameworks + binds the functions and allows for easy use. I wanted to do the same using <strong>Go</strong>, but frankly that would take quite a while to setup and even before that I would have to read about <strong>Swift</strong>, <strong>Objective-C</strong> and <strong>IOKit</strong>. Instead I have my own workaround</p>
+<h3 id="middleman">Middleman</h3>
+<p>I will be using my Raspberry Pi to controller any Bluetooth device. Maybe even setup a web server or basic API to not require me to be connected over SSH or something else.</p>
+<h2 id="apple-resources">Apple Resources</h2>
+<hr>
+<p>In my endless search for a solution I did stumble upon some interesting <a href="https://developer.apple.com/download/more/?=additional%20Tools">tools</a> developed by Apple for Apple and other interested developers.</p>
+<p><img src="/assets/images/apple-tools.png" alt="Apple Additional Tools"></p>
+<p>One of these tools is a <strong>Bluetooth Explorer</strong> which is able to scan for BLE devices, display them and even connect. If I had to guess all these apps were developed using their APIs and would have loved to have a command line interface that does the very same thing. I hate GUIs.</p>
+
+		</section>
+
+		<div class="post-tags">
+			
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+<hr>2020  © Alexandru-Paul Copil |  <a href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+</footer>
+</div>
+    </body>
+</html>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Alexandru-Paul Copil</title>
+    <link>https://cpl.li/tags/</link>
+    <description>Recent content in Tags on Alexandru-Paul Copil</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>© Alexandru-Paul Copil</copyright>
+    <lastBuildDate>Mon, 25 May 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://cpl.li/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>api</title>
+      <link>https://cpl.li/tags/api/</link>
+      <pubDate>Mon, 25 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/tags/api/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>guide</title>
+      <link>https://cpl.li/tags/guide/</link>
+      <pubDate>Mon, 25 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/tags/guide/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>http</title>
+      <link>https://cpl.li/tags/http/</link>
+      <pubDate>Mon, 25 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/tags/http/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>rant</title>
+      <link>https://cpl.li/tags/rant/</link>
+      <pubDate>Mon, 25 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/tags/rant/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>software</title>
+      <link>https://cpl.li/tags/software/</link>
+      <pubDate>Mon, 25 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/tags/software/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>system-design</title>
+      <link>https://cpl.li/tags/system-design/</link>
+      <pubDate>Mon, 25 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/tags/system-design/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>technical</title>
+      <link>https://cpl.li/tags/technical/</link>
+      <pubDate>Mon, 25 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/tags/technical/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

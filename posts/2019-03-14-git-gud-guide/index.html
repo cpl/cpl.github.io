@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>A Git Gud Guide - Alexandru-Paul Copil</title><meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<meta property="og:description" content="A simple guide to creating a better image for your git repositories and OpenSource projects" />
+	<meta name="twitter:description" content="A simple guide to creating a better image for your git repositories and OpenSource projects" />
+	<meta name="description" content="A simple guide to creating a better image for your git repositories and OpenSource projects" />
+	<meta name="description" content="A simple guide to creating a better image for your git repositories and OpenSource projects" />
+
+	<meta property="og:title" content="A Git Gud Guide | Alexandru-Paul Copil" />
+	<meta name="twitter:title" content="A Git Gud Guide | Alexandru-Paul Copil" />
+
+	<meta property="og:image" content=""/>
+	<meta itemprop="name" content="A Git Gud Guide | Alexandru-Paul Copil" />
+	<meta name="application-name" content="A Git Gud Guide | Alexandru-Paul Copil" />
+	<meta property="og:site_name" content="" />
+	<meta property="og:title" content="A Git Gud Guide" />
+<meta property="og:description" content="A simple guide to creating a better image for your git repositories and OpenSource projects" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cpl.li/posts/2019-03-14-git-gud-guide/" />
+<meta property="article:published_time" content="2019-03-14T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-03-14T00:00:00+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="A Git Gud Guide"/>
+<meta name="twitter:description" content="A simple guide to creating a better image for your git repositories and OpenSource projects"/>
+<link href="https://cpl.li/css/fonts.css" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="https://cpl.li/css/main.css" />
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://cpl.li/">Alexandru-Paul Copil</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/posts">All posts</a>
+		
+		<a href="/about">About</a>
+		
+		<a href="/tags">Tags</a>
+		
+		<a href="https://github.com/cpl">Github</a>
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">A Git Gud Guide</h1>
+			<div class="meta">Posted on Mar 14, 2019</div>
+		</div>
+		
+
+		<section class="body">
+			<h2 id="target-audience">Target audience</h2>
+<hr>
+<p>This guide is targeted towards people who have already used <code>git</code> and have some basic knowledge of how it works and which commands exists and what they do. The main purpose is to provide an overview into the good practices behind the OpenSource community.</p>
+<h2 id="introduction">Introduction</h2>
+<hr>
+<p>First things first. This guide assumes some general/basic knowledge regarding <code>git</code>. It was created by Linus Torvalds (creator of the Linux Kernel) and the source code is available <a href="https://github.com/git/git">here</a>.</p>
+<p>Documentation and other (more specific) guides can be found everywhere on the internet but mainly on <a href="https://git-scm.com">Git SCM</a>.</p>
+<p>For starters Git is a “version control” tool. For the purpose of this guide I hope you know what this means. And more importantly I hope you understand why it’s sensible to use Git for software projects (and with the introduction of Git LargeFileStorage, design/media projects).</p>
+<p>What Git basically allows you to do is create “snapshots” of your project (in a smart way, not by redundantly keeping the full files) by saving a “tree” of your “changes”.</p>
+<p><img src="/assets/images/git_graph.png" alt="A Git Graph of commits with branch merging"></p>
+<p>Before going any further I’ll have to ask you to check your git version and make sure you have an up to date version. (type <code>git version</code> in your terminal). Another important aspect I recommend to <strong>everyone</strong> is using Git from your terminal for most work. There are many GUI clients and even IDEs come with Git capabilities but more than often these are cumbersome and lead to annoying and rage inducing moments. What I advise is the following:</p>
+<ul>
+<li>Have a terminal open at all times</li>
+<li>Use Git from the terminal for everything
+<ul>
+<li>Except <strong>rebasing</strong>, for that I use VSCodes highlighting with manual <strong>rebasing</strong></li>
+</ul>
+</li>
+</ul>
+<h2 id="pick-a-provider">Pick a provider</h2>
+<hr>
+<ul>
+<li><a href="https://github.com">GitHub</a>
+<ul>
+<li>Owned now by Microsoft (this proved to be productive for Github’s evolution)</li>
+<li>Free unlimited private and public repos</li>
+<li>Plenty of integrations trough the “Apps Marketplace”</li>
+<li>Good interface for managing merges, projects, and pretty much everything</li>
+<li>Nice GUI</li>
+<li>Big community and social aspects</li>
+<li>By far the most popular of all three</li>
+<li>“Gists” hosting (kinda like PasteBin)</li>
+<li>GitHub pages and Wikis, allows you to create static websites for your projects using <a href="http://jekyllrb.com/">Jekyll</a> and even hosting a personal website under <code>username.github.io</code>.</li>
+</ul>
+</li>
+<li><a href="https://gitlab.com">GitLab</a>
+<ul>
+<li>Use to be better than GitHub simply because of the free unlimited private repos, but now GitHub has that too</li>
+<li>Better projects organisation using folders and groups</li>
+<li>Amazing CI integration</li>
+<li>Can create “private” projects viewable only by other GitLab users (not sure why you’d do this)</li>
+<li>Can create Kubernetes clusters for your projects</li>
+<li>Pretty much better than GitHub in terms of GUI and what it offers, but it lacks the social aspects</li>
+</ul>
+</li>
+<li><a href="https://bitbucket.org">BitBucket</a>
+<ul>
+<li>I mean? It’s ok.</li>
+</ul>
+</li>
+</ul>
+<p>It’s not a life or death choice to pick a provider, you can actually use how many you wish. This can be achieved by setting up multiple remotes. For example:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e"># this can be your main remote</span>
+git remote add origin <span style="color:#e6db74">&#34;github_project_uri&#34;</span>
+
+<span style="color:#75715e"># this can your other remotes</span>
+git remote add gitlab <span style="color:#e6db74">&#34;gitlab_project_uri&#34;</span>
+git remote add bitbucket <span style="color:#e6db74">&#34;bitbucket_project_uri&#34;</span>
+
+<span style="color:#75715e"># now after commiting your files, you can do</span>
+<span style="color:#75715e"># this to push to your GitHub remote</span>
+git push
+<span style="color:#75715e"># and then, the following for GitLab and BitBucket</span>
+git push gitlab master
+git push bitbucket master
+</code></pre></div><h2 id="git-configuration">Git configuration</h2>
+<hr>
+<p>You can create a file <code>~/.gitconfig</code>. I will provide my own configuration below:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ini" data-lang="ini"><span style="color:#66d9ef">[alias]</span>
+    <span style="color:#a6e22e">co</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">checkout
+</span><span style="color:#e6db74">    ci = commit
+</span><span style="color:#e6db74">    st = status
+</span><span style="color:#e6db74">    br = branch
+</span><span style="color:#e6db74">    hist = log --pretty=format:\&#34;%h %ad | %s%d [%an]\&#34; --graph --date=short
+</span><span style="color:#e6db74">    type = cat-file -t
+</span><span style="color:#e6db74">    dump = cat-file -p
+</span><span style="color:#e6db74">    undo = reset --soft HEAD^</span>
+<span style="color:#66d9ef">[core]</span>
+    <span style="color:#a6e22e">autocrlf</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">false
+</span><span style="color:#e6db74">    safecrlf = true</span>
+<span style="color:#66d9ef">[push]</span>
+    <span style="color:#a6e22e">default</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">simple</span>
+<span style="color:#66d9ef">[branch]</span>
+    <span style="color:#a6e22e">autosetuprebase</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">always</span>
+<span style="color:#66d9ef">[color]</span>
+    <span style="color:#a6e22e">ui</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">auto
+</span><span style="color:#e6db74">    branch = auto
+</span><span style="color:#e6db74">    diff = auto
+</span><span style="color:#e6db74">    status = auto</span>
+<span style="color:#66d9ef">[color &#34;branch&#34;]</span>
+    <span style="color:#a6e22e">current</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">yellow reverse
+</span><span style="color:#e6db74">    local = yellow
+</span><span style="color:#e6db74">    remote = green</span>
+<span style="color:#66d9ef">[color &#34;diff&#34;]</span>
+    <span style="color:#a6e22e">meta</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">yellow bold
+</span><span style="color:#e6db74">    frag = magenta bold
+</span><span style="color:#e6db74">    old = red bold
+</span><span style="color:#e6db74">    new = green bold</span>
+<span style="color:#66d9ef">[color &#34;status&#34;]</span>
+    <span style="color:#a6e22e">added</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">yellow
+</span><span style="color:#e6db74">    changed = green
+</span><span style="color:#e6db74">    untracked = cyan</span>
+<span style="color:#66d9ef">[user]</span>
+    <span style="color:#a6e22e">email</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">useyour@own.email
+</span><span style="color:#e6db74">    name = Jon DOe
+</span><span style="color:#e6db74">    signingkey = XXXXXXXX</span>
+<span style="color:#66d9ef">[filter &#34;lfs&#34;]</span>
+	<span style="color:#a6e22e">clean</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">git-lfs clean -- %f
+</span><span style="color:#e6db74">	smudge = git-lfs smudge -- %f
+</span><span style="color:#e6db74">	process = git-lfs filter-process
+</span><span style="color:#e6db74">	required = true</span>
+</code></pre></div><p>The <code>signingkey</code> is optional if you want your commits to be signed by your GPG/PGP key in order for other to know and trust the source of your commits. We’ll discuss this later.</p>
+<h3 id="aliases">Aliases</h3>
+<p>Also I have some shell aliases for git. You can come up with other names that are more natural for you.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#75715e"># GIT</span>
+alias gpush<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;git push&#39;</span>
+alias gpull<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;git pull&#39;</span>
+alias gstat<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;git status&#39;</span>
+alias gdiff<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;git-diff&#39;</span>
+alias glog<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;git log&#39;</span>
+alias gls<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;git-ls-files&#39;</span>
+alias ggraph<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;git log --pretty=format:&#34;%h %s&#34; --graph&#39;</span>
+alias gitc<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;git commit -S -m&#39;</span>
+alias gitp<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;git commit --amend -C HEAD&#39;</span>
+</code></pre></div><h3 id="ssh-keys">SSH Keys</h3>
+<p>You probably used Git with <strong>HTTPS</strong> remotes at some point, or maybe you still are. There are also <strong>SSH</strong> remotes. What this means is that you don’t have to insert your username or password every single time you want to do something privileged. With	<strong>SSH</strong> you simply use your <code>ssh-agent</code> to provide authentication via public-private key. Discussing this in depth would go beyond the guides propose. Follow these instructions <a href="https://help.github.com/articles/connecting-to-github-with-ssh">here</a> or search for other.</p>
+<h2 id="project-setup">Project setup</h2>
+<hr>
+<p>I usually start my project on the website of the provider before creating any files locally. For the sake of keeping this guide more focused on Git than GitHub/GitLab/Bitbucket/etc, I will use GitHub as an example.</p>
+<p><img src="/assets/images/git_new_repo.png" alt="Git new repo"></p>
+<h3 id="name--description">Name &amp; description</h3>
+<p>After this point you’ll be asked to name your project (pick something nice), I usually see a mix of preference between the naming style. I don’t believe there is a right one, but just keep in mind people will use the name to clone and find your project, so keep it short, simple, nice and relevant. Use the project description for a more detailed explanation.</p>
+<p><strong>Naming styles:</strong></p>
+<ul>
+<li><code>lowercase-with-hypens</code></li>
+<li><code>snake_case</code></li>
+<li><code>CamelCase</code></li>
+<li><code>please-dont_doThis</code></li>
+</ul>
+<p>I like to associate my project naming convention with the language syntax convention, but most of the time I just end up using <code>lowercase-with-hypens</code> or simply <code>lowercase</code> single word.</p>
+<p>Another thing you’ll be asked is if you want the repo to be private or public.</p>
+<p>Note that all these things can be later changed, including the name of the repo.  For example if you had <code>github.com/username/som-project</code> you can rename it in the repo’s settings to <code>github.com/username/awesome-project</code> or even something completely different. GitHub will keep the previous URL pointing to your newly name repo (this will change if you create another repo with the initial name).</p>
+<h3 id="license">LICENSE</h3>
+<ul>
+<li>Do people care? Maybe.</li>
+<li>Do companies care? Maybe.</li>
+<li>Should you put a LICENSE on your project? Yes.</li>
+</ul>
+<p>A LICENSE tells the people who want to use/modify/distribute/etc your project how to handle it and which steps are necessary. There many OpenSource LICENSEs out there, which range from permissive to restrictive.</p>
+<p>If you aren’t sure which license to pick for a specific project, use the following website: <a href="https://choosealicense.com">Choose a License</a>.</p>
+<p>Some other “interesting” licenses worth mentioning:</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Beerware">Beerware</a></li>
+<li><a href="https://github.com/me-shaon/GLWTPL">Good Luck With That</a></li>
+</ul>
+<h3 id="readme">README</h3>
+<p>I find it very important to keep a nice and clean README file. Whenever somebody visits your repository this will be the first thing they’ll see. First impressions matter. Sometimes I avoid potentially interesting projects due to the lack of a README and documentation.</p>
+<p>If your project has no README then for somebody who is not familiar with your project, all they can see is a bunch of files and nothing else.</p>
+<p>A good README should provide the following information (not necessarily in this order):</p>
+<ul>
+<li>The reason behind your project, and what it “brings to the table”</li>
+<li>An introduction and description</li>
+<li>Installation instructions
+<ul>
+<li>Requierments</li>
+<li>Environment</li>
+<li>Download links</li>
+</ul>
+</li>
+<li>Usage instructions</li>
+<li>Contribution guides</li>
+<li>Features list, TODO list</li>
+</ul>
+<p>If you are unsure how to write your README check out some <a href="https://github.com/trending?since=monthly">popular projects</a> on GitHub.</p>
+<p>README files come in all flavours (formats). The most common I believe is “MarkDown” (<a href="https://en.wikipedia.org/wiki/Markdown">if you don’t know what Markdown is</a>) but there are other version. I recommend avoiding TXT, and even sticking to Markdown as it’s supported everywhere (all my blog posts are written in Markdown :) ).</p>
+<h4 id="badges">Badges</h4>
+<p>If you browsed OpenSource projects before you might have seen “badges” on people’s READMEs.</p>
+<p><img src="/assets/images/git_badges.png" alt="Badges"></p>
+<p>It’s usually nice to have badges to help improve the image of your project, badges can include different information such as: build status, code health, testing coverage, etc.</p>
+<p>Try NOT to over encumber your README file with badges as it may end up looking tacky. The example above could do without the Ethereum address and hits counter.</p>
+<p>Most services which provide badges will give you the “code” you need to insert into your README file based on it’s format. If you want to know more or generate your own badges, check this out: <a href="https://shields.io">Shields.io</a>.</p>
+<h3 id="gitignore">Gitignore</h3>
+<p>When creating your repo on GitHub you’ll be asked to select a programming language for the <code>.gitignore</code> file. They have some very good templates that require little to no changes.</p>
+<p>If you don’t know by now, the <code>.gitignore</code> file (or files, you can have multiple scattered around your project) tells git which files to <strong>ignore</strong> when  <code>git add ...</code>. For example you want to ignore common OS misc files (<em>.DS_Store</em>), you want to ignore caches (<em><strong>pycache</strong></em>), binary files (<em>something.o</em>, <em>main.pyc</em>), config files (<em>_config.json</em>) and other misc files/directories.</p>
+<p>The gitignore pattern format can be used to ignore multiple files at once <code>*.png</code> will tell git to not commit any file ending in <code>.png</code>. A more in depth explanation of the patter can be found <a href="https://git-scm.com/docs/gitignore">here</a>.</p>
+<h3 id="welcome">Welcome</h3>
+<p>Now you should be welcomed by a screen like this (assuming you didn’t create any README, LICENSE or Gitignore file from within the web GUI, if you did you will have the project files view but can still obtain the remote URI, same steps apply below):</p>
+<p><img src="/assets/images/git_welcome.png" alt="GitHub welcome"></p>
+<p>At this point you should copy the remote URI. If you decided to improve your life and use <strong>SSH</strong> then copy (<code>git@github.com:thee-engineer/_remove_me_later.git</code>) if you still want the painful <strong>HTTPS</strong> (<code>https://github.com/thee-engineer/_remove_me_later.git</code>).</p>
+<p>With the <strong>remote URI</strong> in your clipboard, go to your terminal and type:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">git clone git@github.com:thee-engineer/_remove_me_later.git
+cd _remove_me_later
+git status
+</code></pre></div><p>And should see the following (or a single Initial commit containing the files generated above by the web interface).</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">On branch master
+
+No commits yet
+
+nothing to commit (create/copy files and use &#34;git add&#34; to track)
+</code></pre></div><h2 id="the-things-they-dont-want-you-to-know">The things they don’t want you to know</h2>
+<hr>
+<h3 id="gitattributes">GitAttributes</h3>
+<p>A not so popular “meta-git file” is the <code>.gitattriubtes</code> file. It allows some interesting configuration towards how files are treated and interpreted (<a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes">Git Attributes</a>, more in depth documentation).</p>
+<p>For example you can tell the git diff algorithm how to treat different file types based on their extension.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">*.docx diff=word
+*.png diff=exif
+</code></pre></div><p>You can tell git which files to commit using LFS.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">*.pdf filter=lfs diff=lfs merge=lfs -text
+</code></pre></div><p>You can tell websites like GitHub which languages to consider different extensions as.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">*.h linguist-language=C
+</code></pre></div><p><img src="/assets/images/git_lang.png" alt="GitHub Lang"></p>
+<h3 id="github">.github</h3>
+<p>GitHub allows the creation of a <code>.github</code> directory in which you can include 2 interesting and useful files.</p>
+<h4 id="issue_templatemd">ISSUE_TEMPLATE.md</h4>
+<p>When someone will open a new issue on your project, they will get whatever you wrote inside <code>.github/ISSUE_TEMPLATE.md</code> as their starting template.</p>
+<p>Having a template like this helps with managing and sorting issues on a large project.</p>
+<p>This is the template I use:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-md" data-lang="md"><span style="color:#75715e">&lt;!--- Provide a general summary of the issue in the Title above --&gt;</span>
+
+<span style="color:#75715e">## Expected Behavior
+</span><span style="color:#75715e"></span><span style="color:#75715e">&lt;!--- If you&#39;re describing a bug, tell us what should happen --&gt;</span>
+<span style="color:#75715e">&lt;!--- If you&#39;re suggesting a change/improvement, tell us how it should work --&gt;</span>
+
+<span style="color:#75715e">## Current Behavior
+</span><span style="color:#75715e"></span><span style="color:#75715e">&lt;!--- If describing a bug, tell us what happens instead of the expected behavior --&gt;</span>
+<span style="color:#75715e">&lt;!--- If suggesting a change/improvement, explain the difference from current behavior --&gt;</span>
+
+<span style="color:#75715e">## Possible Solution
+</span><span style="color:#75715e"></span><span style="color:#75715e">&lt;!--- Not obligatory, but suggest a fix/reason for the bug, --&gt;</span>
+<span style="color:#75715e">&lt;!--- or ideas how to implement the addition or change --&gt;</span>
+
+<span style="color:#75715e">## Steps to Reproduce (for bugs)
+</span><span style="color:#75715e"></span><span style="color:#75715e">&lt;!--- Provide a link to a live example, or an unambiguous set of steps to --&gt;</span>
+<span style="color:#75715e">&lt;!--- reproduce this bug. Include code to reproduce, if relevant --&gt;</span>
+1.
+2.
+3.
+4.
+
+<span style="color:#75715e">## Context
+</span><span style="color:#75715e"></span><span style="color:#75715e">&lt;!--- How has this issue affected you? What are you trying to accomplish? --&gt;</span>
+<span style="color:#75715e">&lt;!--- Providing context helps us come up with a solution that is most useful in the real world --&gt;</span>
+
+<span style="color:#75715e">## Your Environment
+</span><span style="color:#75715e"></span><span style="color:#75715e">&lt;!--- Include as many relevant details about the environment you experienced the bug in --&gt;</span>
+<span style="font-style:italic">* Version used:
+</span><span style="font-style:italic">*</span> Browser Name and version:
+<span style="font-style:italic">* Operating System and version (desktop or mobile):
+</span><span style="font-style:italic">*</span> Link to your project:
+</code></pre></div><h4 id="pull_request_templatemd">PULL_REQUEST_TEMPLATE.md</h4>
+<p>Is the other file, which as the name says a template for Pull Requests. Below is the template I use:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-md" data-lang="md"><span style="color:#75715e">&lt;!--- Provide a general summary of your changes in the Title above --&gt;</span>
+
+<span style="color:#75715e">## Description
+</span><span style="color:#75715e"></span><span style="color:#75715e">&lt;!--- Describe your changes in detail --&gt;</span>
+
+<span style="color:#75715e">## Motivation and Context
+</span><span style="color:#75715e"></span><span style="color:#75715e">&lt;!--- Why is this change required? What problem does it solve? --&gt;</span>
+<span style="color:#75715e">&lt;!--- If it fixes an open issue, please link to the issue here. --&gt;</span>
+
+<span style="color:#75715e">## How Has This Been Tested?
+</span><span style="color:#75715e"></span><span style="color:#75715e">&lt;!--- Please describe in detail how you tested your changes. --&gt;</span>
+<span style="color:#75715e">&lt;!--- Include details of your testing environment, tests ran to see how --&gt;</span>
+<span style="color:#75715e">&lt;!--- your change affects other areas of the code, etc. --&gt;</span>
+
+<span style="color:#75715e">## Screenshots (if appropriate):
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">## Types of changes
+</span><span style="color:#75715e"></span><span style="color:#75715e">&lt;!--- What types of changes does your code introduce? Put an </span><span style="color:#e6db74">`x`</span><span style="color:#75715e"> in all the boxes that apply: --&gt;</span>
+<span style="color:#66d9ef">- [ ]</span> Bug fix (non-breaking change which fixes an issue)
+<span style="color:#66d9ef">- [ ]</span> New feature (non-breaking change which adds functionality)
+<span style="color:#66d9ef">- [ ]</span> Breaking change (fix or feature that would cause existing functionality to not work as expected)
+
+<span style="color:#75715e">## Checklist:
+</span><span style="color:#75715e"></span><span style="color:#75715e">&lt;!--- Go over all the following points, and put an </span><span style="color:#e6db74">`x`</span><span style="color:#75715e"> in all the boxes that apply. --&gt;</span>
+<span style="color:#75715e">&lt;!--- If you&#39;re unsure about any of these, don&#39;t hesitate to ask. We&#39;re here to help! --&gt;</span>
+<span style="color:#66d9ef">- [ ]</span> My code follows the code style of this project.
+<span style="color:#66d9ef">- [ ]</span> My change requires a change to the documentation.
+<span style="color:#66d9ef">- [ ]</span> I have updated the documentation accordingly.
+</code></pre></div><h2 id="project-structure">Project structure</h2>
+<hr>
+<p>This will mainly depend on the language and software you’re using, but a general folder I recommend people to have is <code>/docs/</code>. GitHub will read <code>/docs/README.md</code> if you don’t have a <code>/README.md</code>. I usually put all documentation and related assets inside <code>/docs/</code>. Another nice aspect of the <code>/docs/</code> directory is the GithubPages support. You can place your <code>.md</code> (or web files) inside <code>/docs/</code> and then enable GithubPages on <code>/docs/</code> directory. Allowing you to create a nice project docs website.</p>
+<h2 id="management">Management</h2>
+<hr>
+<h3 id="issues">Issues</h3>
+<p>When creating a repo on GitHub, it will auto-create some default Issues Labels (most of which are very good to have). You should have a look over them to get an idea of what might be missing or what might not be needed. I find colours are quite important (red for bugs, blue for enhancements, yellow for todo, (ノಠ益ಠ)ノ彡┻━┻ for when you had enough).</p>
+<p>A very important and widely used issue label is <code>help wanted</code> (darkish green). It will allow people to search for projects (on your providers website or third party websites) which require help with different things. This is one of the best things in the OpenSource community, use it.</p>
+<h3 id="milestones">Milestones</h3>
+<p>Milestones allow you to sort/organise/group your issues into milestones. Telling your users and contributors what to expect and where the project is heading. A milestone can be a planned version of your software, or a very big feature which consists of multiple smaller blocks. Milestones can even have deadlines.</p>
+<h3 id="projects">Projects</h3>
+<p>Do you like Kanban boards? Then this is for you. It helps you organise message, issues and pretty much anything into separate board. This includes some level of automation for simple Kanban layouts.</p>
+<h3 id="releases">Releases</h3>
+<p>You can assign “releases” (behind the scenes tags will be used) to mark a certain checkpoint in your git history as a Release or Pre-Release. This tells people that the marked version should work as a binary. Releases are normally accompanied by binaries.</p>
+<p><img src="/assets/images/git_releases.png" alt="Releases"></p>
+<p>A good versioning scheme is <code>v2.1</code> where <code>2</code> represents the major version and <code>1</code> the minor version. Some people prefer a <code>v2.1.3</code> but frankly, <strong>tomayto, tomahto</strong>.</p>
+<h2 id="ci---continuous-integration">CI - Continuous Integration</h2>
+<hr>
+<p>CI allows you to setup an automatic pipeline where every time (or as often or not you wish it to be) you can have your code executed by a remote machine under  certain environments. A good provider of such service is <a href="https://travis-ci.com">Travis CI - Test and Deploy with Confidence</a>. They will have tutorials on setting up different configuration depending on the language and software you are using.</p>
+<p>For example you might be working on a macOS machine on a Go project. You have certain environment settings which might influence the execution and compilation of your program. Distributing this without testing under foreign conditions might result in Linux/Windows users not being able to execute your program.</p>
+<p>CI helps you avoid this by customising the pipeline to the point where your code gets tested after being published. The code can be tested under a clean environment, under different software version (eg testing Go 1.6 all the way to the latest version), testing your program to see if it compiles and runs under other operating systems.</p>
+<p>Below is an example of my Travis-CI config file for Cryptor.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">language</span>: <span style="color:#ae81ff">go</span>
+
+<span style="color:#f92672">os</span>:
+  - <span style="color:#ae81ff">linux</span>
+  - <span style="color:#ae81ff">osx</span>
+
+<span style="color:#f92672">matrix</span>:
+  <span style="color:#f92672">allow_failures</span>:
+    - <span style="color:#f92672">os</span>: <span style="color:#ae81ff">osx</span>
+
+<span style="color:#f92672">go</span>:
+  - <span style="color:#ae81ff">tip</span>
+
+<span style="color:#f92672">before_install</span>:
+  - <span style="color:#ae81ff">go get github.com/mattn/goveralls</span>
+  - <span style="color:#ae81ff">go get github.com/wadey/gocovmerge</span>
+  - <span style="color:#ae81ff">go get -v ./...</span>
+
+<span style="color:#f92672">script</span>:
+  - <span style="color:#ae81ff">make testall</span>
+  - <span style="color:#ae81ff">cp build/report.out coverage.txt</span>
+
+<span style="color:#f92672">after_success</span>:
+  - <span style="color:#ae81ff">$GOPATH/bin/goveralls -coverprofile=build/report.out -service=travis-ci</span>
+  - <span style="color:#ae81ff">bash &lt;(curl -s https://codecov.io/bash)</span>
+  - <span style="color:#ae81ff">make clean</span>
+</code></pre></div><p>Each section of this config file is better documented on the Travis-CI website. What you can take from here is the fact that my code has some prerequisites which are installed before executing the test-suite (on the latest Go version, under Linux and macOS) and after a successful test, the code goes to a coverage third party service.</p>
+<h2 id="commit-practices">Commit practices</h2>
+<hr>
+<p>This is subjective and it’s up to you. You decide when it’s the appropriate time and moment to create a new commit. This could mean:</p>
+<ul>
+<li>Committing every time you implement something new</li>
+<li>Committing each component individually</li>
+<li>Committing a days worth of work</li>
+<li>Committing every N amount of time</li>
+</ul>
+<p>What I find nice is not pushing all the time after each and every commit especially if you are about to create a couple more commits.</p>
+<p>Try to keep your commit messages clean, relevant to the changes made. Start your messages with an uppercase letter and don’t be afraid to use multiple sentences but beware to limit your <strong>subject</strong> to 50 chars and wrap your <strong>body</strong> at 72 chars. What this means is you can use multiple commit “messages” for a single commit.</p>
+<p>Try and keep your subjects in one sentence and DO NOT end it with a period.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">git commit -m <span style="color:#e6db74">&#34;This is the subject&#34;</span> -m <span style="color:#e6db74">&#34;Followed by the body/description of this commit&#34;</span>
+</code></pre></div><p><strong>Use imperative!</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Merge branch &#39;prototype`
+Revert &#34;Remove old package&#34;
+Merge pull request #42 from example/master
+Add support for third party service
+</code></pre></div><p>A more well structured and in-depth guide to commit etiquette: <a href="https://chris.beams.io/posts/git-commit/">How to Write a Git Commit Message</a>.</p>
+<h2 id="referencesfurther-reading">References/Further reading</h2>
+<hr>
+<ul>
+<li><a href="https://chris.beams.io/posts/git-commit/">How to Write a Git Commit Message</a></li>
+<li><a href="https://git-scm.com/book/en/v2">Git - Book</a></li>
+<li><a href="https://guides.github.com">GitHub Guides</a></li>
+</ul>
+
+		</section>
+
+		<div class="post-tags">
+			
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+<hr>2020  © Alexandru-Paul Copil |  <a href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+</footer>
+</div>
+    </body>
+</html>

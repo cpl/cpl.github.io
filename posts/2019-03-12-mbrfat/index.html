@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>MBR, LBA, FAT32 - Alexandru-Paul Copil</title><meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<meta property="og:description" content="An aggregated repository of information regarding File System FAT and MBR" />
+	<meta name="twitter:description" content="An aggregated repository of information regarding File System FAT and MBR" />
+	<meta name="description" content="An aggregated repository of information regarding File System FAT and MBR" />
+	<meta name="description" content="An aggregated repository of information regarding File System FAT and MBR" />
+
+	<meta property="og:title" content="MBR, LBA, FAT32 | Alexandru-Paul Copil" />
+	<meta name="twitter:title" content="MBR, LBA, FAT32 | Alexandru-Paul Copil" />
+
+	<meta property="og:image" content=""/>
+	<meta itemprop="name" content="MBR, LBA, FAT32 | Alexandru-Paul Copil" />
+	<meta name="application-name" content="MBR, LBA, FAT32 | Alexandru-Paul Copil" />
+	<meta property="og:site_name" content="" />
+	<meta property="og:title" content="MBR, LBA, FAT32" />
+<meta property="og:description" content="An aggregated repository of information regarding File System FAT and MBR" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cpl.li/posts/2019-03-12-mbrfat/" />
+<meta property="article:published_time" content="2019-03-12T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-03-12T00:00:00+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="MBR, LBA, FAT32"/>
+<meta name="twitter:description" content="An aggregated repository of information regarding File System FAT and MBR"/>
+<link href="https://cpl.li/css/fonts.css" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="https://cpl.li/css/main.css" />
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://cpl.li/">Alexandru-Paul Copil</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/posts">All posts</a>
+		
+		<a href="/about">About</a>
+		
+		<a href="/tags">Tags</a>
+		
+		<a href="https://github.com/cpl">Github</a>
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">MBR, LBA, FAT32</h1>
+			<div class="meta">Posted on Mar 12, 2019</div>
+		</div>
+		
+
+		<section class="body">
+			<h2 id="notes-before-reading">Notes before reading</h2>
+<ul>
+<li>This post is intended to document my experience with FAT32, LBA, MBR within the context of <a href="git.cpl.li/classic.kernel">Classic Kernel</a> and the microSD EEMCA controller.</li>
+<li>Notation regarding addresses and values are in Little Endian (as it is in all references).</li>
+<li>13 Mar, Updated based on more hands down experience.</li>
+</ul>
+<h2 id="mbr">MBR</h2>
+<hr>
+<h3 id="introduction">Introduction</h3>
+<p><strong>MBR</strong> (Master Boot Record) is a special sector on a partitioned disk which holds information on the “logical” partitioning of the physical disk and what the underlaying file system is and how &amp; where it stored files and other such entries.</p>
+<p>MBR is a rather old concept, which was first introduced in 1983 for IBM-PC compatible machines. Nowadays MBR is getting replaced by <strong>GPT</strong> (GUID Partition Table). The main reason behind thing is the disk size limit which comes with MBR (<strong>2 TiB</strong>).</p>
+<h3 id="sector-layout">Sector Layout</h3>
+<p>There are multiple structure to the MBR layout. Each one brings its own minor or major changes to the original design. The one rule is that the sector must fit inside the MBR sector size of <strong>512 bytes</strong>.
+* Classical generic MBR
+* Modern standard MBR
+* AAP MBR
+* NEWLDR MBR
+* AST/NEC MS-DOS and SpeedStor MBR
+* Ontrack Disk Manager MBR</p>
+<h3 id="classical-generic-mbr">Classical Generic MBR</h3>
+<p>Usually when first loading a sector from disk, it’s best to check the 2 bytes (boot signature) at address offset <code>0x1FE</code>. Now the little-endian order of the 2 bytes is expected to be <code>0xAA55</code> but it has been often mixed in documentation and official documents as <code>0x55AA</code>. My honest advice to you is to check for both cases. But remember that the official implementation has <code>0x55</code> at offset <code>0x1FE</code> and <code>0xAA</code> at <code>0x1FF</code>.</p>
+<p>The diagrams below showcases the structure of a <strong>Generic MBR</strong>, including a detailed view inside the contents of a <strong>partition entry</strong>.</p>
+<p><strong>Boot Sector + Partition</strong></p>
+<p><img src="/assets/images/mbr_layout.svg" alt="Boot Sector Layout + Partition"></p>
+<p>You can safely ignore the “Bootstrap Code area”. The important fields for the MBR are the partition entries (<code>0x01BE</code>, <code>0x01CE</code>, <code>0x01DE</code>, <code>0x01EE</code>) and as mentioned above, the <em>signature</em>.</p>
+<p><strong>Boot Sector</strong></p>
+<p><img src="/assets/images/mbro_layout.svg" alt="Boot Sector"></p>
+<p><strong>Partition</strong></p>
+<p><img src="/assets/images/mbrp_layout.svg" alt="Partition"></p>
+<p>When reading a partition entry from the <strong>MBR</strong> make sure to check the status field (<code>0x00</code>) has the value <code>0x80</code>. Next check the <a href="https://en.wikipedia.org/wiki/Partition_type">partition type</a>, in this case to be FAT32 and to support LBA. The linked table has all the common and less common partition types.</p>
+<h2 id="lba">LBA</h2>
+<hr>
+<h3 id="introduction-1">Introduction</h3>
+<p><strong>LBA</strong> (Logical Block Allocation) is a common scheme used for specifying the address/location of blocks of data as they are stored on disk. Blocks are located by an index, counting up from 0.</p>
+<p><strong>This fits in with <strong>MBR</strong> as the MBR partition must support CHS addressing, LBA abstracts the cylinder “layer”.</strong></p>
+<p>There isn’t much to be said about <strong>LBA</strong> as it is only a scheme for simplifying disk sectors access. But it’s worth acknowledging the existence of <strong>LBA</strong> because different File Systems have version which may support it and version which may not. This can be determined based on the <a href="https://en.wikipedia.org/wiki/Partition_type">partition type</a>.</p>
+<h2 id="fat">FAT</h2>
+<hr>
+<h3 id="introduction-2">Introduction</h3>
+<p><strong>FAT</strong> (File Allocation Table) is one of the most basic file system architectures. <strong>FAT</strong> is robust, simple and can provide performance even in lightweight implementations, but it’s no competitor to modern file system which offer scalability and reliability.</p>
+<p>Originally designed in 1977 and intended for Floppy Disks, <strong>FAT</strong> was soon after adopted by DOS and Windows9x systems. Due to it’s popularity in desktop environments and the evolution of storage sizes, <strong>FAT</strong> now has three major versions (not counting the original 8 bit design)(the number represents the table element bits):
+* FAT<strong>12</strong>
+* FAT<strong>16</strong>
+* FAT<strong>32</strong></p>
+<p><strong>FAT</strong> has since been cut out as the default File System from Windows machines, but it still remains popular in the portable media devices market.</p>
+<h3 id="layout">Layout</h3>
+<p><img src="/assets/images/fat_fs_layout.svg" alt="FAT FS Layout"></p>
+<ul>
+<li>The first reserved sector (0) is also known as “Boot Sector” or “Volume Boot Record” (<strong>VBR</strong>). This area contains the “BIOS Parameter Block” (<strong>BPB</strong>) which contains the most basic information about the file system. This part is discussed in detail below.</li>
+<li>The <strong>FAT 1</strong> and <strong>FAT 2</strong> are the actual allocations tables, the <strong>FAT 2</strong> table is only a redundancy table and it’s not usually used.</li>
+<li><strong>Clusters</strong>
+<ul>
+<li>This is where all the actual file and directory data is stored.</li>
+<li>“FAT32 typically commences the Root Directory Table in cluster number 2: the first cluster of the Data Region.”</li>
+</ul>
+</li>
+</ul>
+<h3 id="boot-sector">Boot Sector</h3>
+<p>By far the most cumbersome design when it comes to FAT, from my experience. This was mainly by the conflicting nature of <a href="https://github.com/bztsrc/raspi3-tutorial/tree/master/0D_readfile">this</a> working implementation of a FAT file system and the rest of the documentation available online.</p>
+<p>The digram below is based on <a href="https://en.wikipedia.org/wiki/BIOS_parameter_block">1</a> and <a href="https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system">2</a>. It’s hard to create a simple representation when taking in consideration all the backwards compatibility introduced by Microsoft over the years.</p>
+<p><img src="/assets/images/vbs_layout.svg" alt="Boot Sector Layout"></p>
+<p>Out of all these values there are only few of interest when handling a FAT32 File System.</p>
+<ul>
+<li><code>0x0B</code> - <code>2 bytes</code> - Bytes per sector (value is <code>512 bytes</code>)</li>
+<li><code>0x0D</code> - <code>1 byte </code> - Sectors per cluster (a power of two)</li>
+<li><code>0x0E</code> - <code>2 bytes</code> - Number of reserved sectors (common value is <code>0x20</code>)</li>
+<li><code>0x10</code> - <code>1 byte </code> - Number of FATs (value is <code>2</code>)</li>
+<li><code>0x24</code> - <code>4 bytes</code> - Sectors per FAT (varies based on disk size)</li>
+<li><code>0x2C</code> - <code>4 bytes</code> - Root directory cluster (common value is <code>0x00000002</code>)</li>
+</ul>
+<p>After checking these variables to make sure they fit your expectations you can extract some useful variables (starting <strong>LBAs</strong> for each of the regions).</p>
+<h3 id="cluster-map">Cluster Map</h3>
+<p>A file will occupy at least one cluster depending on its size. A file taking up more than one cluster, will be represented using a chain of clusters. A chain of cluster may be fragmented across the <strong>Data Region</strong>. There are special entries better explained <a href="https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system#File_Allocation_Table">here</a>.</p>
+<p>It’s important to note the difference between a <strong>cluster</strong> and <strong>sector</strong>. Normally a cluster can be found across multiple sectors (usually at least 8 sectors, giving a cluster size of <code>4096 bytes</code>).</p>
+<p>A cluster (ID) can be transformed into an LBA value by applying the following formula: <code>lba = cluster_start_lba + (cluster_id - 2) * sectors_per_cluster</code>. The <code>- 2</code> is applied because there are no cluster <code>0</code> or <code>1</code> and cluster’s IDs begin from <code>2</code>. The <code>cluster_start_lba</code> will be obtained from the <strong>Directory Table</strong>, starting from the root directory table.</p>
+<h3 id="directory-table">Directory Table</h3>
+<p><img src="/assets/images/mbr_directory_entry.svg" alt="Directory Entry"></p>
+<p>The entries are 32 bytes long each. The first 11 bytes are the file name and extension (8 byte name + 3 byte extension). These are padded by spaces if the name is not long enough or shortened (<code>LARGEFILENAME.SOMETHING</code> becomes <code>LARGEF~1SOM</code>, where <code>~1</code> is the shortened entry number in order to support multiple copies with the same short name and <code>SOM</code> is simply the short version of <code>SOMETHING</code>).</p>
+<p>It’s important to note (and as mentioned above) the only good thing directory entries will provide are the first cluster number and some information about the file (as seen in the diagram).</p>
+<p>The first directory table you’ll have access to is the <strong>root directory table</strong>, which is located on the Boot Record. When reading the directory table entries, always check the first byte of the name. Based on the value you can tell a couple of things:</p>
+<ul>
+<li><code>0xE5</code> - Unused</li>
+<li><code>0x00</code> - End of directory table</li>
+</ul>
+<p>After validating the entry, you can now extract the first cluster value by combining the <code>cluster_lower</code> and <code>cluster_higher</code> into a <code>4 byte</code> value. With the cluster now you can perform a lookup into the FAT clusters.</p>
+<h3 id="down-the-rabbit-hole">Down the rabbit hole</h3>
+<p>By this point you should have access to the LBA of each region (boot record, reserved sectors, FATs, data) and the cluster value of the file we’re looking for.</p>
+<p>The <strong>FAT32</strong> table is a big array of 32bit entries where each one’s position in the array corresponds to a cluster number and the value indicates the next cluster for the file. You can think of this as a “singly linked list” (but not really) or more like <em>an array where each value is another index inside the array</em>.</p>
+<p>At this point all you have to do is load up the starting LBA of the FAT tables and then use your cluster number as an offset. From there you will keep walking the clusters until you reach a value of <code>0xFFFFFFFF</code> (I’ve seen <code>0x00000000</code> used in some cases, best check for both).</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Master_boot_record#PTE">Master boot record - Wikipedia</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Logical_block_addressing">Logical block addressing - Wikipedia</a></li>
+<li><a href="https://wiki.osdev.org/Partition_Table">Partition Table - OSDev Wiki</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Partition_type">Partition type - Wikipedia</a></li>
+<li><a href="https://github.com/bztsrc/raspi3-tutorial/tree/master/0D_readfile">raspi3-tutorial/0D_readfile - bztsrc@github</a></li>
+<li><a href="https://en.wikipedia.org/wiki/File_Allocation_Table">File Allocation Table - Wikipedia</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system">Design of the FAT file system - Wikipedia</a></li>
+<li><a href="https://en.wikipedia.org/wiki/BIOS_parameter_block">BIOS parameter block - Wikipedia</a></li>
+<li><a href="https://www.pjrc.com/tech/8051/ide/fat32.html">Paul’s 8051 Code Library - Understanding the FAT32 Filesystem</a></li>
+</ul>
+
+		</section>
+
+		<div class="post-tags">
+			
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+<hr>2020  © Alexandru-Paul Copil |  <a href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+</footer>
+</div>
+    </body>
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>APIs, the good, the bad and the ugly - Alexandru-Paul Copil</title><meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<meta property="og:description" content="Good APIs, Bad APIs, Horror APIs, and a personal rant &#43; opinionated designs on APIs" />
+	<meta name="twitter:description" content="Good APIs, Bad APIs, Horror APIs, and a personal rant &#43; opinionated designs on APIs" />
+	<meta name="description" content="Good APIs, Bad APIs, Horror APIs, and a personal rant &#43; opinionated designs on APIs" />
+	<meta name="description" content="Good APIs, Bad APIs, Horror APIs, and a personal rant &#43; opinionated designs on APIs" />
+
+	<meta property="og:title" content="APIs, the good, the bad and the ugly | Alexandru-Paul Copil" />
+	<meta name="twitter:title" content="APIs, the good, the bad and the ugly | Alexandru-Paul Copil" />
+
+	<meta property="og:image" content=""/>
+	<meta itemprop="name" content="APIs, the good, the bad and the ugly | Alexandru-Paul Copil" />
+	<meta name="application-name" content="APIs, the good, the bad and the ugly | Alexandru-Paul Copil" />
+	<meta property="og:site_name" content="" />
+	<meta property="og:title" content="APIs, the good, the bad and the ugly" />
+<meta property="og:description" content="Good APIs, Bad APIs, Horror APIs, and a personal rant &#43; opinionated designs on APIs" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cpl.li/posts/2020-05-25-apis-good-bad-ugly/" />
+<meta property="article:published_time" content="2020-05-25T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-05-25T00:00:00+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="APIs, the good, the bad and the ugly"/>
+<meta name="twitter:description" content="Good APIs, Bad APIs, Horror APIs, and a personal rant &#43; opinionated designs on APIs"/>
+<link href="https://cpl.li/css/fonts.css" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="https://cpl.li/css/main.css" />
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://cpl.li/">Alexandru-Paul Copil</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/posts">All posts</a>
+		
+		<a href="/about">About</a>
+		
+		<a href="/tags">Tags</a>
+		
+		<a href="https://github.com/cpl">Github</a>
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">APIs, the good, the bad and the ugly</h1>
+			<div class="meta">Posted on May 25, 2020</div>
+		</div>
+		
+
+		<section class="body">
+			<h2 id="unrelated-rambling">Unrelated rambling</h2>
+<p>Long time no blog, 2020 is the year that keeps on giving. While some people consider this to be a pretty chaotic and horrible year, I&rsquo;ve been making the best of it.</p>
+<ul>
+<li>Learning to bake bread and other such things</li>
+<li>Learning frontend (React)</li>
+<li>Dipping my toes into GraphQL</li>
+<li>Quiting my corporate job</li>
+</ul>
+<p>The usual.</p>
+<p><img src="https://media.giphy.com/media/1rNWZu4QQqCUaq434T/giphy.gif" alt="2020"></p>
+<h2 id="prologue">Prologue</h2>
+<p>In my past year working in the corproate world, I had to integrate with both internal and external APIs on a daily basis. Whilst doing so, I&rsquo;ve encountered API ranging from &ldquo;We have a library for every language in existance&rdquo; to &ldquo;ƒuçk you, we don&rsquo;t speak HTTP here, use XML over TCP&rdquo; and everything inbetween:</p>
+<ul>
+<li>Single GET endpoint and everything is passed as query args</li>
+<li>APIs who respond with TEXT or HTML (have fun parsing)</li>
+<li>Non-deterministic state</li>
+<li>Custom status codes that span over an entire <code>uint64</code></li>
+<li>Making 5 API calls to get one thing done</li>
+<li>What&rsquo;s consitency? Here have the same field in 3 types: <code>3</code> <code>3.14</code> <code>&quot;3.1&quot;</code></li>
+<li>5XX, server is busy doing body shots or something, who knows</li>
+</ul>
+<p>As such, I had the honor of using some really smart APIs that inspired me to design better interfaces myself, and then there are the cråppy APIs (some of them are critical to the Internet as we know it) which gives me nightmares and makes me think that <a href="https://en.wikipedia.org/wiki/Year_2038_problem">2038</a> will be the <em>end</em>.</p>
+<p>In this post, I&rsquo;ll cover some of my frustrations/rants with APIs, share with you the horrors I have encountered and give my two cents on the matter of API good practices and design.</p>
+<h2 id="what-makes-an-api-useful">What makes an API useful?</h2>
+<p>Ignoring all the fancy terms (REST, SOAP, GraphQL, &hellip;) for now, at the end of the day, an API is there to serve one fundamental purpose:</p>
+<blockquote>
+<p>Defining a contract between a client and a server.</p>
+</blockquote>
+<p>Nothing more, nothing <em>less</em>. By defining a contract, an API allows a client (end user, another service, etc) to <strong>easily</strong> communicate with the server (or service).</p>
+<p>As such, your API shouldn&rsquo;t be just an extension of your service, it should represent a <em>simplified</em> and <em>generalized</em> extension of your internal system.</p>
+<p>It shouldn&rsquo;t matter what language your backend is in or what questionable tech decisions you&rsquo;ve made, as long as the API you offer is <strong>good</strong>.</p>
+<h3 id="what-is-an-api-really">What is an API really?</h3>
+<p>A magical thing you don&rsquo;t maintain that someone you don&rsquo;t know wrote and you integrate with and fully trust and expect to work today, tomorrow and maybe a year from now.</p>
+<p>An API is a trust exercise between two developers who never met.</p>
+<h2 id="what-makes-an-api-accesible">What makes an API accesible?</h2>
+<p>The protocol it uses.</p>
+<p>Imagine you want to open up a world wide business but you have limited resources and can&rsquo;t afford to translate all your material to satisfy all customers in all countries. What do you do? You pick the most common language that&rsquo;s going to cover the largest percentage of your client demographic.</p>
+<p>Same concept applies to APIs. Your goal as a <em>System Designer</em> working on an API, is to make it as accesible as possible to other developers and clients. As such, you should pick a common protocol for your target users.</p>
+<p>Sure you could argue that any network connected machine in the world is capable of speaking TCP/UDP, but smarten up. HTTP(S) is the protocol you should be aiming for (this doesn&rsquo;t mean you have to be exlusive and can&rsquo;t offer your API over multiple protocols).</p>
+<h3 id="why-http">Why HTTP?</h3>
+<p>HTTP fits so nicely in the entire paradigm of APIs (mainly REST). I won&rsquo;t go into much detail, but here is a list:</p>
+<ul>
+<li>Any self respecting language has a builtin or community library to support HTTP</li>
+<li>It&rsquo;s easy to secure with TLS</li>
+<li>Allows separation of concern by having the concept of &ldquo;HTTP call&rdquo; to one endpoint
+<ul>
+<li>One request, to one endpoint, leads to one response</li>
+</ul>
+</li>
+<li><a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes">HTTP status codes</a> have universal meanings and map nicely to any expected API behaviour
+<ul>
+<li><code>200 OK</code> - all is good</li>
+<li><code>201 Created</code> - (not a fan of using this, but it works)</li>
+<li><code>204 No Content</code> - basically a soft/expected 404</li>
+<li><code>400 Bad Request</code> - read the docs and try again</li>
+<li><code>401 Unauthorized</code> - you forgot the API key dummy</li>
+<li><code>403 Forbidden</code> - this endpoint doesn&rsquo;t come with the free version of our API, pay up</li>
+<li><code>404 Not Found</code> - <code>¯\_(ツ)_/¯</code></li>
+<li><code>5xx</code> - we ƒuçked up</li>
+<li><code>4xx</code> - you ƒuçked up</li>
+</ul>
+</li>
+<li>A HTTP request has multiple components, each having a diffrent role
+<ul>
+<li>URL
+<ul>
+<li>Allows you to nicely group endpoint by concern
+<ul>
+<li><code>/api/users/:user_id/</code></li>
+<li><code>/api/users/:user_id/friends</code></li>
+<li><code>/api/objects/:object_id</code></li>
+<li><code>/api/admin/operation</code></li>
+</ul>
+</li>
+<li>Allows the use of &ldquo;params&rdquo;: <code>:user_id</code>, <code>:object_id</code> to pass &ldquo;variables&rdquo;</li>
+<li>Query args for <em>filtering</em>
+<ul>
+<li><code>?country=RO&amp;age=24</code></li>
+<li><code>?page=2&amp;limit=50</code></li>
+<li><code>?dateFrom=2020-01-01&amp;dateTo=2020-06-01</code></li>
+<li><code>?isAwesome=true</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Methods (following a REST paradigm)
+<ul>
+<li><code>GET</code> - for READ operations</li>
+<li><code>POST</code> - for WRITE operations where a <strong>new</strong> resource is created</li>
+<li><code>PUT</code> - for replacing information of an object</li>
+<li><code>PATCH</code> - for updating information of an object</li>
+<li><code>DELETE</code> - for removing a resource</li>
+<li>Don&rsquo;t forget that at the end of the day, HTTP methods are just a string, you can use whichever for whatever, it&rsquo;s a common misconception that HTTP methods hold any real value or functionality. For all a server cares, you can use <code>DELETE</code> to READ data and <code>GET</code> to create new entries</li>
+</ul>
+</li>
+<li>Body
+<ul>
+<li>The body of the requests you accept and responses you send is a big topic we&rsquo;ll cover.</li>
+</ul>
+</li>
+<li>Headers
+<ul>
+<li>A great place to put misc things, I always think of headers like a sidecar on a motorcycle</li>
+<li>Spoiler alert, your <code>Authorization</code> header should go here!</li>
+<li>Headers are all around great to have and even greater for passing metadata and <em>passive</em> information</li>
+<li>Beware of the <a href="https://stackoverflow.com/questions/686217/maximum-on-http-header-values"><em>invisible limits</em></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="protocol-is-just-half-the-game">Protocol is just half the game</h3>
+<p>The language you speak is just half of it, the other half is about the message <em>format</em>.</p>
+<p>In the case of APIs using HTTP, the request and response types are defined using media type headers (<code>Accept</code>, <code>Content-Type</code>).</p>
+<p>In the case of modern APIs I&rsquo;d say you&rsquo;re best to go with JSON. XML is acceptable if you are integrating with legacy systems or need to offer legacy support. Any other reason or format should not be tolerated.</p>
+<p>Using YAML gets you the death penalty.</p>
+<p>Using JSON or XML doesn&rsquo;t mean your API is good, there are plenty ways of doing poor JSON/XML responses/requests.</p>
+<p>Imagine the following response:</p>
+<pre><code>[
+  {
+    &quot;name&quot;: &quot;Item 1&quot;,
+    &quot;cost&quot;: 31.40
+  },
+  {
+    &quot;name&quot;: &quot;Item 2&quot;,
+    &quot;cost&quot;: &quot;31.40$&quot;
+  },
+  {
+    &quot;name&quot;: &quot;Item 3&quot;,
+    &quot;cost&quot;: 3140
+  }
+]
+</code></pre><p>This would require reflection and extra logic on the client side to handle the response.</p>
+<p>In modern languages, the format is important as that is the layer that is going to map back and forth to your logic structs. In Go for example, you can map structs to JSON (or other formats) using &ldquo;tags&rdquo;.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">Foo</span> <span style="color:#66d9ef">struct</span> {
+  <span style="color:#a6e22e">Bar</span>  <span style="color:#66d9ef">int</span>     <span style="color:#e6db74">`json:&#34;bar&#34;`</span>
+  <span style="color:#a6e22e">Baz</span>  <span style="color:#f92672">*</span><span style="color:#66d9ef">string</span> <span style="color:#e6db74">`json:&#34;baz,omitempty&#34;`</span>
+  <span style="color:#a6e22e">Soap</span> <span style="color:#66d9ef">bool</span>    <span style="color:#e6db74">`json:&#34;soap_bar&#34;`</span>
+}
+</code></pre></div><p>This can then map to and from:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+  <span style="color:#f92672">&#34;bar&#34;</span>: <span style="color:#ae81ff">14</span>,
+  <span style="color:#f92672">&#34;baz&#34;</span>: <span style="color:#e6db74">&#34;hello world&#34;</span>,
+  <span style="color:#f92672">&#34;soap_bar&#34;</span>: <span style="color:#66d9ef">false</span>
+}
+</code></pre></div><ul>
+<li><a href="https://mholt.github.io/json-to-go/">JSON to Go</a></li>
+</ul>
+<h2 id="what-makes-an-api-usable">What makes an API usable?</h2>
+<p>Well, going back to the &ldquo;usefullness&rdquo; of an API</p>
+<blockquote>
+<p>Defining a contract between a client and a server.</p>
+</blockquote>
+<p>The usability aspect is defined by yet another fundamental concept. Why use an API in the first place?</p>
+<blockquote>
+<p>To solve a problem.</p>
+</blockquote>
+<p>Usability is defined by how good of a tool an API for the job at hand. Offer as much functionality as possible behind an interface as simple as possible.</p>
+<h2 id="what-makes-an-api-robust">What makes an API robust?</h2>
+<blockquote>
+<p>Stateless, Consistency, Abstraction, Deterministic</p>
+</blockquote>
+<p>It&rsquo;s hard to keep the four separated, as they sometimes intersect.</p>
+<h3 id="statelessness">Statelessness</h3>
+<p>Trying to keep your API as stateless as possible. You don&rsquo;t want endpoints to change behaviour based on &ldquo;state&rdquo; you set with previous calls.</p>
+<p>Creating endpoints with dependencies on calling other endpoints is bad.</p>
+<h3 id="consistency">Consistency</h3>
+<p>It doesn&rsquo;t matter if an API is consistently bad or consistently good as long as it is consistent.</p>
+<p>There is nothing worse than unexpected behaviour and edge cases in an API.</p>
+<p>It&rsquo;s very important with activly developed APIs to use versioning or to keep backwards compatability. (Versioning is good in the path and acceptable in a header).</p>
+<h3 id="deterministic">Deterministic</h3>
+<p>Making a request twice should give the same answer as long as the data behind the API did not change.</p>
+<p>Making multiple requests to the same endpoint with the same data shouldn&rsquo;t change the response unless the data changes acordingly.</p>
+<h3 id="abstraction">Abstraction</h3>
+<p>An API should hide complexity from the user where apropriate.</p>
+<p>As such an API should provide as few endpoints as possible. If you offfer 100 endpoints, but all users use the same 5 endpoints, then consider scaling down. Also if your users have to run 5 requets to get 1 job done, consider hiding the complexity of the 5 endpoints behind a single one.</p>
+<p>Keep in mind, that it&rsquo;s your job and responsability as a System Designer to put in the extra work <em>now</em> in order to save others months of frustration and pain trying to integrate with your lazy API.</p>
+<h2 id="what-makes-an-api-secure">What makes an API secure?</h2>
+<p>First concern should be around securing communications. In the case of HTTP, that is achieved by serving your API over HTTPS (with TLS). There is no reason to have your API served over <strong>plaintext HTTP</strong>.</p>
+<p>Next, is the Auth* bit. For this I thought it would be nice to see diffrent aproaches, ranging from &ldquo;I&rsquo;ll see you in hell&rdquo; to &ldquo;Thanks, that&rsquo;s how it should be done&rdquo;:</p>
+<p><img src="https://media.giphy.com/media/uA6sERHUlCXYI/giphy.gif" alt="See you in hell"></p>
+<ul>
+<li>Cookies - it&rsquo;s a pain to parse &amp; pass, and multi-instance services must somehow share the cookie in order to not deauth each other</li>
+<li>Credentials in the path of the URL (WHY?!!)</li>
+<li>Passing username and password as query args - most proxies, routers, etc will have no problem with logging the URL or caching it somewhere with your secrets</li>
+<li>Credentials in the body of the request (STOP!)</li>
+<li>Using basic auth (ok, not the best, not the worst)</li>
+<li>Using any form of decent auth: (yes and thank you)
+<ul>
+<li>Bearer token</li>
+<li>API key</li>
+<li>JWT</li>
+</ul>
+</li>
+</ul>
+<p>Extra hell points for:</p>
+<ul>
+<li>IP whitelisting without CIDR support</li>
+<li>Using an undocumented header for Authorization</li>
+<li>Not using <code>401</code> and <code>403</code> status codes, instead giving some generic <code>4xx</code> or <code>5xx</code></li>
+<li>Forced use of IP whitelisting</li>
+<li>User-Agent rate limit</li>
+</ul>
+<p>Extra good points:</p>
+<ul>
+<li>High rate limit per IP</li>
+<li>Rate limit per API key</li>
+</ul>
+<h2 id="what-makes-an-api-performant">What makes an API performant?</h2>
+<p>Performance is relative in the world of computing. When working with APIs over the internet speed is quesionable and it&rsquo;s important to know where to optimize.</p>
+<p>You know you can take down response time by 0.5ms for one endpoint if you spend a week on it? Is it worth it? What about trimming 10ms or 50ms or 100ms from the response time? Where does it become worth it is up to you and your team.</p>
+<p><img src="https://i.imgur.com/k0t1e.png" alt="Latency"></p>
+<p>It&rsquo;s also relative to the importance of your API. If your API servers &ldquo;Cat of the day pictures&rdquo;, it&rsquo;s not critical to have 99.9% uptime and 5ms response times for users in Africa using 2G networks.</p>
+<p>If your API is some stock market ticker, sure, have high availability, serve things over a distributed network of servers, use caching for popular requests so you don&rsquo;t read from disk every single time (check image above), squeeze out every last ms out of your response time.</p>
+<p>There&rsquo;s plenty of crazy optimizations you can do, some might be sane for your use case some might be insane. Pick carefully.</p>
+<ul>
+<li>Optimize marshling and unmrashiling of JSON/XML</li>
+<li>Stop using padded formats and use raw bytes and well defined protocols</li>
+<li>Stop using TCP and send packages over UDP</li>
+<li>Reduce memory allocations and heap usage</li>
+</ul>
+<h3 id="caches">Caches</h3>
+<p>Crazy things aside, caches are a simple thing to do in most common APIs. Especailly important if your API integrates with another API behind the scenes. Instead of calling the 3rd party API everytime a user calls your API, you can instead cache the result (for a well selected TTL) and even give the user the option to bypass the cache and accept the higher response times. Everyone wins.</p>
+<ul>
+<li>The client gets faster responses and a choice</li>
+<li>Your API makes less calls and processing</li>
+<li>The 3rd party API spends less resources on your</li>
+</ul>
+<h2 id="what-makes-an-api-pretty">What makes an API pretty?</h2>
+<ul>
+<li>Well defined documentation (<a href="https://www.openapis.org/">OpenAPI</a>)
+<ul>
+<li>An accepted standard for defining REST APIs</li>
+<li>Easy to generate language specific clients or mock servers</li>
+<li>Easy to generate HTTP API Client workspaces (for Postman, Insomnia, etc)</li>
+</ul>
+</li>
+<li>Clear use of HTTP methods &amp; status codes</li>
+<li>Consisntent error message format and explanations</li>
+<li>Providing libraries for certain languages</li>
+<li><strong>More documenetation</strong></li>
+</ul>
+<h2 id="what-makes-an-api-nigḩtṃerish">What makes an API ni̡̫̗̝̦ͅg̟͖̲̕ḩ̖̜̙͕t̘͞ṃ̷͎̥͉͍̦ͅe̩̱͚ͅr҉i̵̩̼̪̲̠̥s͘h̴͈̮ͅ?</h2>
+<ul>
+<li><code>518 This API doesn't work on weekends</code></li>
+<li>Trimed responses</li>
+<li>Mixed formats</li>
+<li>Lack of error messages</li>
+<li>Keeping state on failed requests
+<ul>
+<li>Imagine making a POST request to create an object</li>
+<li>The response comes back with an error</li>
+<li>The object is created anyway but with bad values</li>
+<li>Now you have to delete the object yourself before trying to re-create it</li>
+<li>10/10</li>
+</ul>
+</li>
+<li>Global rate limit</li>
+<li>Mismatch between documentation and reality</li>
+<li>Multiple documentation files but none is accurate</li>
+<li>Breaking changes</li>
+</ul>
+
+		</section>
+
+		<div class="post-tags">
+			
+			
+			<nav class="nav tags">
+				<ul class="tags">
+					
+					<li><a href="/tags/technical">technical</a></li>
+					
+					<li><a href="/tags/guide">guide</a></li>
+					
+					<li><a href="/tags/api">api</a></li>
+					
+					<li><a href="/tags/http">http</a></li>
+					
+					<li><a href="/tags/system-design">system-design</a></li>
+					
+					<li><a href="/tags/software">software</a></li>
+					
+					<li><a href="/tags/rant">rant</a></li>
+					
+				</ul>
+			</nav>
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+<hr>2020  © Alexandru-Paul Copil |  <a href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+</footer>
+</div>
+    </body>
+</html>

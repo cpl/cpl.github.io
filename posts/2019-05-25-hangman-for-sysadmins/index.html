@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Hangman, but for sysadmins - Alexandru-Paul Copil</title><meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<meta property="og:description" content="The best way to lose your friends by playing hangman" />
+	<meta name="twitter:description" content="The best way to lose your friends by playing hangman" />
+	<meta name="description" content="The best way to lose your friends by playing hangman" />
+	<meta name="description" content="The best way to lose your friends by playing hangman" />
+
+	<meta property="og:title" content="Hangman, but for sysadmins | Alexandru-Paul Copil" />
+	<meta name="twitter:title" content="Hangman, but for sysadmins | Alexandru-Paul Copil" />
+
+	<meta property="og:image" content=""/>
+	<meta itemprop="name" content="Hangman, but for sysadmins | Alexandru-Paul Copil" />
+	<meta name="application-name" content="Hangman, but for sysadmins | Alexandru-Paul Copil" />
+	<meta property="og:site_name" content="" />
+	<meta property="og:title" content="Hangman, but for sysadmins" />
+<meta property="og:description" content="The best way to lose your friends by playing hangman" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cpl.li/posts/2019-05-25-hangman-for-sysadmins/" />
+<meta property="article:published_time" content="2019-05-25T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-05-25T00:00:00+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Hangman, but for sysadmins"/>
+<meta name="twitter:description" content="The best way to lose your friends by playing hangman"/>
+<link href="https://cpl.li/css/fonts.css" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="https://cpl.li/css/main.css" />
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://cpl.li/">Alexandru-Paul Copil</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/posts">All posts</a>
+		
+		<a href="/about">About</a>
+		
+		<a href="/tags">Tags</a>
+		
+		<a href="https://github.com/cpl">Github</a>
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">Hangman, but for sysadmins</h1>
+			<div class="meta">Posted on May 25, 2019</div>
+		</div>
+		
+
+		<section class="body">
+			<p>If you know what <em>hangman</em> is, skip to the second section.</p>
+<h2 id="what-is-hangman">What is hangman?</h2>
+<hr>
+<p>We all know (or I expect people to know) what is and how to play <em>hangman</em>. It’s a two player (don’t know how you’d play this with more people, but I am sure somebody found a way) game in which one player thinks of a word then draws on a board or piece of paper a series of lines for each letter. After that it’s common to give the first letter and all other instances of it in the words. Let’s take an example. Player one thinks of the words <code>barber</code> and must now draw <code>_ _ _ _ _ _</code> and give away the first letter, <code>B</code> and the next occurrence. <code>B _ _ B _ _</code>.</p>
+<p><img src="/assets/images/hangman.svg" alt="Hangman 1"></p>
+<p>Now the goal of the second player is to guess the word. This can be either by guessing the entire word if you’re confident enough, or by asking if a certain letter is part of the word. A good guess when playing in english is <code>E</code>. In this case it would work and player one must complete all occurrences of <code>E</code> (<code>B _ _ B E _</code>). If the second player guesses wrong (the letter is not part of the word or guesses the wrong word), then player one <em>removes a life</em>. This is done by drawing parts of a stickman on the <em>hanging space</em>. It’s up to the players to decide how many lives there are and how slow/fast the stickman is being drawn.</p>
+<p>Imagine player two guesses wrong by saying <code>O</code>. Player one writes <code>O</code> to the side, to mark it as a used letter and then starts the stickman drawing.</p>
+<p><img src="/assets/images/hangman2.svg" alt="Hangman 2"></p>
+<p>If player two manages to guess all the letters or the word, then player two wins. If player two runs out of lives guessing, then player one wins when the drawing of the stick man is complete.</p>
+<p><img src="/assets/images/hangman3.svg" alt="Hangman 3"></p>
+<h2 id="how-to-pick-a-good-valid-word">How to pick a good, valid word</h2>
+<hr>
+<p>Now, if you’re a software engineer/developer/architect/<!-- raw HTML omitted -->, you might want to use this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ shuf -n1 /usr/share/dict/words
+nonsyllogistic
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ shuf -n5 /usr/share/dict/words
+netlike
+ablepharous
+nontrade
+tulipiferous
+hippodamous
+</code></pre></div><p>The <code>shuf</code> command randomises whatever input you give it. In this case it’s the entire local dictionary that’s usually shipped with UNIX systems. If you don’t find <code>/usr/share/dict/words</code> you might look into other places. If you don’t have <code>shuf</code> as a command, install <code>coreutils</code>.</p>
+<p>But wait, there’s more. We can take this to the next level, how about a random word of 10 chars? Easy.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ egrep -x <span style="color:#e6db74">&#39;.{10}&#39;</span> /usr/share/dict/words
+abalienate
+abaptiston
+abasedness
+abbeystede
+...
+</code></pre></div><p>Or you can select all words in a certain range.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ egrep -x <span style="color:#e6db74">&#39;.{2,4}&#39;</span> /usr/share/dict/words
+aa
+aal
+aam
+Aani
+Aaru
+Ab
+aba
+...
+</code></pre></div><p>In other words, if you want to really defeat your friends (and lose them in the process) use the following command:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ egrep -x <span style="color:#e6db74">&#39;.{20}&#39;</span> /usr/share/dict/words | shuf -n1
+thoracogastroschisis
+</code></pre></div><h2 id="how-to-guess-any-word">How to guess any word</h2>
+<hr>
+<p>The simplest solution would be to use <code>egrep</code> with all the known letters and <code>.</code> for the unknown. Let’s take the <code>b _ _ b e _ </code> case.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ egrep -x <span style="color:#e6db74">&#39;b..be.&#39;</span> /usr/share/dict/words
+barbed
+barbel
+barber
+barbet
+bawbee
+benben
+bibber
+bobbed
+bobber
+bombed
+bomber
+bribee
+briber
+bulbed
+bumbee
+</code></pre></div><p>You could use your  instinct and pick what you think the other person is thinking of. But we could also try to employ some statistics, and get the most common letter for a certain position.</p>
+<p>A more <em>fancy</em> solution is to take the entire word dictionary, create a hashmap using the first letter of the word as the key and then store the rest of the word as a <a href="https://en.wikipedia.org/wiki/Trie">trie</a>. This could help you solve a hangman word in no time, with the most probable letters. The other solution, which would go outside the purpose of this post, would be <strong>RegEx</strong>. Expect a post about <strong>RegEx</strong> in the near future.</p>
+
+		</section>
+
+		<div class="post-tags">
+			
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+<hr>2020  © Alexandru-Paul Copil |  <a href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+</footer>
+</div>
+    </body>
+</html>

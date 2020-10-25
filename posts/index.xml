@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Alexandru-Paul Copil</title>
+    <link>https://cpl.li/posts/</link>
+    <description>Recent content in Posts on Alexandru-Paul Copil</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>© Alexandru-Paul Copil</copyright>
+    <lastBuildDate>Mon, 25 May 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://cpl.li/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>APIs, the good, the bad and the ugly</title>
+      <link>https://cpl.li/posts/2020-05-25-apis-good-bad-ugly/</link>
+      <pubDate>Mon, 25 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2020-05-25-apis-good-bad-ugly/</guid>
+      <description>Unrelated rambling Long time no blog, 2020 is the year that keeps on giving. While some people consider this to be a pretty chaotic and horrible year, I&amp;rsquo;ve been making the best of it.
+ Learning to bake bread and other such things Learning frontend (React) Dipping my toes into GraphQL Quiting my corporate job  The usual.
+Prologue In my past year working in the corproate world, I had to integrate with both internal and external APIs on a daily basis.</description>
+    </item>
+    
+    <item>
+      <title>SQL Murder Mystery</title>
+      <link>https://cpl.li/posts/2019-12-18-sql-murder-mystery/</link>
+      <pubDate>Wed, 18 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2019-12-18-sql-murder-mystery/</guid>
+      <description>This post will not be much of a read, just my &amp;ldquo;logbook&amp;rdquo; from solving the SQL Murder Mystery today.
+ Edit: Had to remove SQL results tables due to poor formatting of the theme. To see original &amp;ldquo;log&amp;rdquo; check out the gist.
+ SPOILER WARNING. This game was fun! I recommend it to any SQL amateur or pro. Give it a go at https://mystery.knightlab.com/.
+ There&amp;rsquo;s been a Murder in SQL City!</description>
+    </item>
+    
+    <item>
+      <title>Hiking Adventures, Part I</title>
+      <link>https://cpl.li/posts/2019-11-04-hiking-part-i/</link>
+      <pubDate>Mon, 04 Nov 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2019-11-04-hiking-part-i/</guid>
+      <description>For the first time since I’ve been in the UK, I decided to go hiking back in August during the bank holiday extended weekend. It was a nice sunny day, hopped on the early 7:45 train to Hope, Peak District. Little did I know that was the start of my new hobby and passion, hiking; as I recently went to Peak District again, done Hope to Edale and the Edale Kinder Scout trails.</description>
+    </item>
+    
+    <item>
+      <title>The official guide to making Țăcălie</title>
+      <link>https://cpl.li/posts/2019-06-02-tacalie/</link>
+      <pubDate>Sun, 02 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2019-06-02-tacalie/</guid>
+      <description>I wouldn’t call Țăcălie a Romanian traditional dish, or a dish at all. Not many Romanians know about it. It’s more of a regional thing. The people who would cook and eat Țăcălie used to be shepherds. It’s also possible that other cultures have a similar dish but I haven’t yet met someone from outside my family that can describe anything similar to Țăcălie.
+Țăcălie is rich in calories and fat and it’s best served hot.</description>
+    </item>
+    
+    <item>
+      <title>HC-08 Bluetooth (LE) with Arduino and macOS</title>
+      <link>https://cpl.li/posts/2019-05-30-bluetooth-hc08-macos/</link>
+      <pubDate>Thu, 30 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2019-05-30-bluetooth-hc08-macos/</guid>
+      <description>I received one of these HC-08 Bluetooth modules for Arduino and other micro controllers. I thought it will be a nice, fun and simple experience. After all everything has or used to have Bluetooth, we are in the age of “IoT”.
+HC-08  While it’s not the best Bluetooth module out there, it’s also not the worst. Connecting it to a micro controller is straightforward. Connect GND to GND, VCC to a 5V power source, the HC-08 TX to the controller RX.</description>
+    </item>
+    
+    <item>
+      <title>Hangman, but for sysadmins</title>
+      <link>https://cpl.li/posts/2019-05-25-hangman-for-sysadmins/</link>
+      <pubDate>Sat, 25 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2019-05-25-hangman-for-sysadmins/</guid>
+      <description>If you know what hangman is, skip to the second section.
+What is hangman?  We all know (or I expect people to know) what is and how to play hangman. It’s a two player (don’t know how you’d play this with more people, but I am sure somebody found a way) game in which one player thinks of a word then draws on a board or piece of paper a series of lines for each letter.</description>
+    </item>
+    
+    <item>
+      <title>How to become admin during exams</title>
+      <link>https://cpl.li/posts/2019-05-15-how-to-admin-exams/</link>
+      <pubDate>Sat, 25 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2019-05-15-how-to-admin-exams/</guid>
+      <description>This is not a CVE writeup or Privilege escalation for Windows, its just a badly configure exam environment and my experience by poking it.
+Context  At The University of Manchester some exams you take may be online. This means that the exam will take place in one of the PC clusters, you’ll be assigned a seat, log in with your username and password in what seems to be a web-login screensaver.</description>
+    </item>
+    
+    <item>
+      <title>Golang Must Know</title>
+      <link>https://cpl.li/posts/2019-04-03-must-know-go/</link>
+      <pubDate>Wed, 03 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2019-04-03-must-know-go/</guid>
+      <description>Introduction  Go or Golang is an OpenSource programming language developed by Google.
+What makes Go special?
+ Fast compiler with many system performance tools Easy concurrency for multicore or network programming Fast garbage collector and runtime reflection Statically typed and machine compiled Modules (to help rid ourselves of the $GOPATH)  With all of its good parts it also has some flaws, just like any programming language:
+ No generics Clunky error handling   Lack of macros Poor vendoring and handling of modules  If you wish to download or read more about Golang there are plenty of official and community docs.</description>
+    </item>
+    
+    <item>
+      <title>Markov Chains in Go</title>
+      <link>https://cpl.li/posts/2019-03-27-markov-chains-go/</link>
+      <pubDate>Wed, 27 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2019-03-27-markov-chains-go/</guid>
+      <description>Introduction  While browsing the golang documentation and packages I stumbled upon something entirely new, a “codewalk” for a markov chain algorithm that generates text based on a “trained” markov chain from user input [1]. This reminded me of the time I studied Markov Chains for a University course but never got to see a software implementation of what it might look. To my surprise it was pretty simple and straightforward.</description>
+    </item>
+    
+    <item>
+      <title>Raspberry Pi - Lite home server</title>
+      <link>https://cpl.li/posts/2019-03-25-raspberry-pi-setup/</link>
+      <pubDate>Mon, 25 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2019-03-25-raspberry-pi-setup/</guid>
+      <description>Introduction  A Raspberry Pi is a pretty nice and average priced SoC. The best thing about the Raspberry Pi is the community and software support behind it. The version I’ll be using today is a Raspberry Pi 3B (2015, v1.2) and as a little extra on top of it a FEZ Hat (Rev 1.1).
+If you never owned one and you’re planning on purchasing one, check out this page for a detailed comparison between all models.</description>
+    </item>
+    
+    <item>
+      <title>A Git Gud Guide</title>
+      <link>https://cpl.li/posts/2019-03-14-git-gud-guide/</link>
+      <pubDate>Thu, 14 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2019-03-14-git-gud-guide/</guid>
+      <description>Target audience  This guide is targeted towards people who have already used git and have some basic knowledge of how it works and which commands exists and what they do. The main purpose is to provide an overview into the good practices behind the OpenSource community.
+Introduction  First things first. This guide assumes some general/basic knowledge regarding git. It was created by Linus Torvalds (creator of the Linux Kernel) and the source code is available here.</description>
+    </item>
+    
+    <item>
+      <title>MBR, LBA, FAT32</title>
+      <link>https://cpl.li/posts/2019-03-12-mbrfat/</link>
+      <pubDate>Tue, 12 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2019-03-12-mbrfat/</guid>
+      <description>Notes before reading  This post is intended to document my experience with FAT32, LBA, MBR within the context of Classic Kernel and the microSD EEMCA controller. Notation regarding addresses and values are in Little Endian (as it is in all references). 13 Mar, Updated based on more hands down experience.  MBR  Introduction MBR (Master Boot Record) is a special sector on a partitioned disk which holds information on the “logical” partitioning of the physical disk and what the underlaying file system is and how &amp;amp; where it stored files and other such entries.</description>
+    </item>
+    
+    <item>
+      <title>Page Replacement Design</title>
+      <link>https://cpl.li/posts/2019-01-31-page-replacement-algo/</link>
+      <pubDate>Thu, 31 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2019-01-31-page-replacement-algo/</guid>
+      <description>NRU  Very crude approximation of LRU
+ This algorithm takes advantage of the R (referenced/read/written) bit and M (modified) bit. On every update cycle (could be every clock interrupt) all pages get their R bit set to 0, to help detect unreferenced pages.
+On a page fault, pages are inspected and separated in 4 classes:
+   Class R M     0 0 0   1 0 1   2 1 0   3 1 1    The page swap algorithm will remove one random page from the lowest available class.</description>
+    </item>
+    
+    <item>
+      <title>Kalah A.I.</title>
+      <link>https://cpl.li/posts/2018-12-16-kalah-ai/</link>
+      <pubDate>Sun, 16 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2018-12-16-kalah-ai/</guid>
+      <description>Kalah Kalah, also known by many as Mancala is one of the oldest games that is still played to the day. The game is very simple in design and mechanics, it involves two players taking turns moving beans/seeds/pebbles on a board or game surface.
+Gameplay The board may vary in the number of holes it has and the number of pebbles each hole starts with. Some games include a &amp;ldquo;pie rule&amp;rdquo; which allows the second player to &amp;ldquo;switch&amp;rdquo; sides with the opponent.</description>
+    </item>
+    
+    <item>
+      <title>My favourite programming font</title>
+      <link>https://cpl.li/posts/2018-11-22-favourite-font/</link>
+      <pubDate>Thu, 22 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2018-11-22-favourite-font/</guid>
+      <description>When you spend half your day in front of a computer, inside an IDE or terminal, I start to make everything feel cozy. Just like when a person moves in a new house, they start decorating. I do the same for each and every machine I own. I set my aliases, paths, scripts, etc. But one thing I must really have in order to feel “at home” on a machine is my favourite font, Source Code Pro.</description>
+    </item>
+    
+    <item>
+      <title>Game review, Fallen London</title>
+      <link>https://cpl.li/posts/2018-11-09-fallen-london-review/</link>
+      <pubDate>Fri, 09 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2018-11-09-fallen-london-review/</guid>
+      <description>“Welcome. Delicious friend!” I don’t believe there is a “right way” or a “single definitions” to what Fallen London is. It is a browser game, but it’s not your average browser game. It’s a role-playing game, but nothing you’ve seen before.
+For me, Fallen London is the best browser, role-playing game with multiplayer interactions and a story that will have you hooked. The game has no visual effects or fancy game mechanics.</description>
+    </item>
+    
+    <item>
+      <title>Good security practices</title>
+      <link>https://cpl.li/posts/2018-11-09-basic-security/</link>
+      <pubDate>Fri, 09 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2018-11-09-basic-security/</guid>
+      <description>Passwords Password Tips  Do not store your password in plain text or on paper Do not share your credentials with other people  This includes your parents, significant other, pets, colleagues, boss/superior   Do not use the same password everywhere  Or the same password with small changes For example  pass1 pass2 pass3 alexGmail alexReddit     Do not use personal details in your password  This makes it vulnerable to dictionary attacks, or social engineering attacks For example:  Name Date of birth Family members Favourite animal Pet names Place of birth Username Favourite numbers Or words in general     Passwords should be more than 16 characters and should contain a varied number of digits, symbols and optional extended ASCII This is how a good password looks like:  7})k6L7+K&amp;gt;jFA(oY-cM)x/4m*pQr*&amp;amp;`X $;Kf&amp;amp;*c=pYCm]tosQF5JVK&amp;gt;eg@&amp;quot;HB%^8 F4cR¯i°TL+CØD2·S»3ÝÇÜm²ÃÜºçèºÐ¬Ó  This one contains extended ASCII     Use special software (or hardware) to generate your passwords.</description>
+    </item>
+    
+    <item>
+      <title>How to prepare for a low-level interview</title>
+      <link>https://cpl.li/posts/2018-11-08-embedded-interview/</link>
+      <pubDate>Thu, 08 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2018-11-08-embedded-interview/</guid>
+      <description>Introduction First thing you should do when pursing a career in low-level systems (kernel development, embedded systems, drivers, firmware, boot loaders, etc.) is to realise that all knowledge you have from high-level languages and systems will amount to almost nothing.
+In other words you should prepare to change your views, mentality and approach when it comes to developing and designing low-level systems. When I was working on my own Operating System (Classic) I started to think and work in base-16, I started to think about what seemed at the time the strangest optimisations, such as aligning my code to cache lines.</description>
+    </item>
+    
+    <item>
+      <title>Designing Classic’s memory allocator</title>
+      <link>https://cpl.li/posts/2018-10-12-memory-allocator/</link>
+      <pubDate>Fri, 12 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://cpl.li/posts/2018-10-12-memory-allocator/</guid>
+      <description>Memory Before even starting to design the memory allocator itself, I had to decide where the heap (memory zone managed by the allocator) will reside in memory.
+As you can see the kernel has its own heap and memory allocator. The user space uses a separate but similar allocator (for security purposes) and the heap is loaded at the end of the initial virtual memory allocated to a task.
+When designing a memory allocator you will have to make all kinds of decision depending on why and where you need malloc.</description>
+    </item>
+    
+  </channel>
+</rss>

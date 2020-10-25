@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Golang Must Know - Alexandru-Paul Copil</title><meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<meta property="og:description" content="What is Go, and how can you make your experience better?" />
+	<meta name="twitter:description" content="What is Go, and how can you make your experience better?" />
+	<meta name="description" content="What is Go, and how can you make your experience better?" />
+	<meta name="description" content="What is Go, and how can you make your experience better?" />
+
+	<meta property="og:title" content="Golang Must Know | Alexandru-Paul Copil" />
+	<meta name="twitter:title" content="Golang Must Know | Alexandru-Paul Copil" />
+
+	<meta property="og:image" content=""/>
+	<meta itemprop="name" content="Golang Must Know | Alexandru-Paul Copil" />
+	<meta name="application-name" content="Golang Must Know | Alexandru-Paul Copil" />
+	<meta property="og:site_name" content="" />
+	<meta property="og:title" content="Golang Must Know" />
+<meta property="og:description" content="What is Go, and how can you make your experience better?" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cpl.li/posts/2019-04-03-must-know-go/" />
+<meta property="article:published_time" content="2019-04-03T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-04-03T00:00:00+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Golang Must Know"/>
+<meta name="twitter:description" content="What is Go, and how can you make your experience better?"/>
+<link href="https://cpl.li/css/fonts.css" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="https://cpl.li/css/main.css" />
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://cpl.li/">Alexandru-Paul Copil</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/posts">All posts</a>
+		
+		<a href="/about">About</a>
+		
+		<a href="/tags">Tags</a>
+		
+		<a href="https://github.com/cpl">Github</a>
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">Golang Must Know</h1>
+			<div class="meta">Posted on Apr 3, 2019</div>
+		</div>
+		
+
+		<section class="body">
+			<p><img src="/assets/images/gopher.png" alt="Golang Mascot, the Gopher"></p>
+<h2 id="introduction">Introduction</h2>
+<hr>
+<p>Go or Golang is an OpenSource programming language developed by Google.</p>
+<p>What makes Go special?</p>
+<ul>
+<li>Fast compiler with many system performance tools</li>
+<li>Easy concurrency for multicore or network programming</li>
+<li>Fast garbage collector and runtime reflection</li>
+<li>Statically typed and machine compiled</li>
+<li>Modules (to help rid ourselves of the <code>$GOPATH</code>)</li>
+</ul>
+<p>With all of its good parts it also has some flaws, just like any programming language:</p>
+<ul>
+<li>No generics</li>
+<li>Clunky error handling</li>
+</ul>
+<ul>
+<li>Lack of macros</li>
+<li>Poor vendoring and handling of modules</li>
+</ul>
+<p>If you wish to <a href="https://golang.org/dl/">download</a> or read more about <a href="https://golang.org">Golang</a> there are plenty of <a href="https://golang.org/doc/">official</a> and community docs.</p>
+<h2 id="improving-your-go-experience">Improving your Go experience</h2>
+<hr>
+<p>While Golang comes with plenty of helper tools, there are other third-party services, community tools or lesser known practices which will definitely save you some time or overall improve your workflow.</p>
+<h3 id="runtime-package">Runtime package</h3>
+<p>Maybe not the most useful thing for everyone, but definitely a standard package that you should be aware of. Understanding what it does helps you better grasp concepts like <strong>goroutines</strong> and some of the “behind the scenes” services of Go.</p>
+<p><a href="https://golang.org/pkg/runtime/">Runtime Package Documentation</a></p>
+<h3 id="godoc">GoDoc</h3>
+<p>When dealing with Golang tools, the best way to figure out its usage is via <code>go help &lt;TOOL NAME&gt;</code>. For example <code>go help doc</code> will tell you all about <code>go doc</code>.</p>
+<p>Calling <code>go doc PACKAGE_NAME</code> will present you with the general package documentation and a list of all the public functions and structs. Calling <code>go doc PACKAGE_NAME/SUB_PACKAGE</code> will list the same but for a sub-package. You can filter this even more by requesting the doc message for a specific function or variable (<code>go doc PACKAGE_NAME.PublicFunction</code>).</p>
+<p>The way GoDoc works is by checking the comments before Public functions, variables or structs and the top comment before your <code>package</code> definition. For example:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#75715e">/*
+</span><span style="color:#75715e">Package foo implements all the needed foo and bar.
+</span><span style="color:#75715e">*/</span>
+package foo
+
+<span style="color:#75715e">// DefaultName is the string &#34;Jon Doe&#34;, used if name is empty string.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> DefaultName <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Jon Doe&#34;</span>
+
+<span style="color:#75715e">// Foo performs bar with special configs.
+</span><span style="color:#75715e"></span>func Foo(name string) {
+	<span style="color:#66d9ef">if</span> name <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;&#34;</span> {
+		name <span style="color:#f92672">=</span> DefaultName
+	}
+	<span style="color:#75715e">// do stuff ...
+</span><span style="color:#75715e"></span>}
+</code></pre></div><p>Note that package comments must start with <code>Package &lt;NAME&gt; something something ...</code> and other comments must start with the name of the function, struct or variable: <code>// Foo does something ...</code>. I’ll admin, this might get annoying at times, but if you’re only experimenting with a function you can make it private or set it’s comment to <code>// Foo ...</code>, this will stop any linter from complaining.</p>
+<p>The best part about having an official and widely accepted standard for writing documentation, is the docs visualisation and readability. For example you can use the tool <code>godoc</code> (not <code>go doc</code>) for starting a local web instance with all the documentation for all packages.</p>
+<p><a href="https://godoc.org/golang.org/x/tools/cmd/godoc">godoc Documentation</a></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">godoc --http localhost:8080
+</code></pre></div><h3 id="pprof">pprof</h3>
+<p>Pprof is a large topic to cover, to put it extremely simply it’s the best performance analysis and debugging tool I’ve ever seen. Not only it offers you loads of insight into possible bottlenecks and flaws you didn’t even know your software had, but it’s also easy to use.</p>
+<p>Just throw this somewhere in your <code>main</code> or <code>init</code>. It will create a <code>cpu.profile</code> file where all the debug data is.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust">	<span style="color:#75715e">// CPU profiler
+</span><span style="color:#75715e"></span>	f, err :<span style="color:#f92672">=</span> os.Create(<span style="color:#e6db74">&#34;cpu.profile&#34;</span>)
+	<span style="color:#66d9ef">if</span> err <span style="color:#f92672">!=</span> nil {
+		log.Fatal(err)
+	}
+	pprof.StartCPUProfile(f)
+	defer pprof.StopCPUProfile()
+</code></pre></div><p>Another way of obtaining <code>pprof</code> data is when running your tests with special flags:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">go test -cpuprofile cpu.profile
+</code></pre></div><p>As always Go has a tool for visualising this, and I really mean visualise! <code>go tool pprof</code> can be used as a cli tool (and it’s not bad to use) or as a pretty modern web interface.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">go tool pprof -http<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;localhost:8080&#34;</span> cpu.profile
+</code></pre></div><p>In the interface you’ll be able to see memory usage, CPU usage, heap allocations, time/line (and you can go to the ASM level).</p>
+<p>For a more in depth guide to using pprof, I recommend this video (Prashant Varansai - Uber, Gopherfest Sprint 2016)</p>
+<!-- raw HTML omitted -->
+<h3 id="code-coverage">Code coverage</h3>
+<p>Golang comes with builtin testing tools and benchmarking which are quite good and easy to use. A lesser known usage of tests is the code coverage. You can run your tests as you’d normally do <code>go test ./...</code> but by adding an extra flag <code>go test -coverprofile cover.out ./...</code>, this will generate a file containing the coverage data and might look something like this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">mode: set
+cpl.li/go/cryptor/crypt/hkdf/hkdf.go:25.64,30.27 2 1
+cpl.li/go/cryptor/crypt/hkdf/hkdf.go:35.2,35.18 1 1
+cpl.li/go/cryptor/crypt/hkdf/hkdf.go:30.27,32.3 1 1
+...
+</code></pre></div><p>Not exactly human readable. That’s why there is a tool! (there always is). Using <code>go tool cover -html=cover.out</code>, will open a webpage in your default browser, showcasing your package coverage as overall percentages and line by line.</p>
+<p><img src="/assets/images/codecov-go.png" alt="Code coverage Go"></p>
+<p>This is very helpful as you may forget writing tests for an edge case.</p>
+<p>Other visualisation tools can be integrated in your deployment pipeline and connected to your CI. For example <a href="https://codecov.io">codecov.io</a> allows you to connect successful builds from Travis-CI and then further deploy only if code coverage is above a threshold.</p>
+<p><img src="/assets/images/codecov-io-circle.png" alt="Codecov circle"></p>
+<h3 id="ioreader-iowriter">io.Reader, io.Writer</h3>
+<p>You probably already encountered these two <strong>interfaces</strong>. They are some of the most common and useful interfaces in Go. With these two you can simply and have your code accessible to others and vice-versa.</p>
+<p>The nice thing about <code>Reader</code> and <code>Writer</code> is the level of abstraction that they provide. For example all you need to know about these two are the following definitions:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Reader</span> interface {
+	Read(p []byte) (n int, err error)
+}
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Writer</span> interface {
+	Write(p []byte) (n int, err error)
+}
+</code></pre></div><p>Or you can have a combination of both:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ReadWriter</span> interface {
+	Reader
+	Writer
+}
+</code></pre></div><p>At first this might not look like much, but having <code>Reader</code> and <code>Writer</code> as the main way of passing a struct around can change everything in your design philosophy. Readers and Writers can be chained together allowing for a nice and easy to read pipeline. For example you could have a <code>Reader</code> for reading a text file into a <code>Writer</code> which compresses the contents of the file and then further passes down its output to another <code>Writer</code> that writes back to a different file.</p>
+<p>Writers and readers can be easily scaled and allow for modular and idiomatic code. Another good use of a <code>Reader</code> that I personally encountered is for any struct that generates output.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#75715e">// create generator
+</span><span style="color:#75715e"></span>generator :<span style="color:#f92672">=</span> example.NewGenerator(seed string)
+
+<span style="color:#75715e">// prepare variables
+</span><span style="color:#75715e"></span>var output0 [<span style="color:#ae81ff">20</span>]byte
+var output1 [<span style="color:#ae81ff">50</span>]byte
+output2 :<span style="color:#f92672">=</span> make([]byte, <span style="color:#ae81ff">100</span>)
+
+<span style="color:#75715e">// fill in variables
+</span><span style="color:#75715e"></span>generator.Read(output0[:])
+generator.Read(output1[:])
+generator.Read(output2)
+</code></pre></div><p>This might replace some design choices where you would end up having either:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust">func (g Generator) Generate(size int) []byte { ... }
+func (g Generator) Generate(out <span style="color:#f92672">*</span>[]byte) { ... }
+</code></pre></div><p>With the <code>Reader</code> or <code>Writer</code> interface you can change what’s happening behind the scenes without having to introduce breaking changes. In the end it’s all a matter of preference but knowing where to use these two interfaces will help you write better Go code.</p>
+<p><a href="https://golang.org/pkg/io/">I/O Package Documentation</a></p>
+<h2 id="things-i-wish-i-knew-sooner">Things I wish I knew sooner</h2>
+<hr>
+<p>I first jumped on the Golang wagon around version 1.6 (Feb 2016), my first experience with it was actually around 1.5 (Aug 2015) but learning the syntax at the time was not something I was up for. After wrapping my head around <strong>for</strong> as the only loop statement, <strong>goroutines</strong> and <strong>channels</strong>, forced tab indentation and the other aspects of <strong>go vet</strong>, and last but not least the lack of a direction for the language, Golang proved to be a nifty language. It enabled me to develop more robust code in less time, with support from the builtin <strong>testing</strong> and <strong>benchmarking</strong> tools, easy to read syntax and formatting, plus the “package manager” was new an interesting for me.</p>
+<p>All in all, Go provided plenty of documentation and <a href="https://tour.golang.org/welcome/1">good ways for newcomers</a> to accommodate. Despite the fact, there are plenty of thing which would have helped me build cleaner and more organised projects.</p>
+<h3 id="remote-import-path">Remote import path</h3>
+<p>Normally go expects its <strong>import</strong> or <strong>get</strong> path to be from one of the known version control providers (e.g. <code>import &quot;github.com/cpl/cryptor&quot;</code>).</p>
+<p>For the same example you can setup a custom import path (<code>import &quot;cpl.li/go/cryptor</code>). You can even enforce your custom path to be used as the <strong>only</strong> path, by placing a comment at the package definition:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#75715e">/*
+</span><span style="color:#75715e">Package cryptor ...
+</span><span style="color:#75715e">*/</span>
+package cryptor <span style="color:#75715e">// import &#34;cpl.li/go/cryptor&#34;
+</span></code></pre></div><h4 id="how-to-setup">How to setup</h4>
+<p>You must have a web-server running on your wanted domain and have control over what it serves. For the example above, when a <code>go get cpl.li/go/cryptor</code> happens, a request for <code>https://cpl.li/go/cryptor?go-get=1</code> is sent and the expected response <strong>must</strong> contain the <code>&lt;meta&gt;</code> tag below:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;go-import&#34;</span> <span style="color:#a6e22e">content</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;import-prefix vcs repo-root&#34;</span>&gt;
+<span style="color:#75715e">&lt;!-- WHERE THE FOLLOWING FIELDS MUST BE REPLACED --&gt;</span>
+&lt;<span style="color:#f92672">meta</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;go-import&#34;</span> <span style="color:#a6e22e">content</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;cpl.li/go/cryptor git https://github.com/cpl/cryptor&#34;</span>&gt;
+</code></pre></div><p>A lesser known aspect of remote import paths is the <code>vcs</code> field, which can replaced with the keyword <code>mod</code> and it’s the preferred description when providing a module.</p>
+<h3 id="modules">Modules</h3>
+<p>As much as I’d like to talk about them, I won’t. Modules are still a new thing and feel like they have plenty of issues and quirky design choices that makes using them not yet worth it. The intention behind it is nice but the implementation … we better talk about them some other time.</p>
+<h3 id="build-tags--options">Build tags &amp; options</h3>
+<p>While Go may not have a nice MACRO system such as the one in C, it still have some build tags which I found useful on multiple occasions.</p>
+<p>Imagine you have a version of your software that is for debugging only, for example you can have a <code>main.go</code> which you just simply compile by saying <code>go build</code> or <code>go build -o exec_name</code>. But did you know you can have another file, for example <code>main_debug.go</code> inside which you can have another <code>func main()</code>? The only thing you’ll need is a special comment at the top of the file <code>// +build debug</code>. This will tell <code>go build</code> to only compile <code>main_debug.go</code> if and only if the <code>debug</code> tag is provided: <code>go build -tags debug -o exec_name_debug</code>.</p>
+<p>The file name can be anything you wish <code>main_foo.go</code>, the only thing to remember is the <code>// +build TAG_NAME</code> must match <code>go build -tags TAG_NAME</code>.</p>
+<p>This is pretty awesome as you can have a debug version of your executables which logs what’s happening and also record pprof stats. While your normal distribution is faster and smaller by not doing these.</p>
+<h2 id="conclusion">Conclusion</h2>
+<hr>
+<p>Golang is a growing language. It has some rough edges but nothing that won’t be fixed in upcoming version. Go 2.0 possibly promises generics. Modules will hopefully get their stuff together soon. I am happy to have learnt Go when I did because now I appreciate all the robust software that I’ve written in it. I can rest assured that they won’t introduce computability breaking changes.</p>
+<p>Bear in mind that programming languages are mere tools, and just like any tool, if it get’s the job done just as good as any other tool then there is no best or better tool. Some are more skilled with a certain tool and less with others. Use whatever helps you solve the problem in an elegant and efficient manner.</p>
+<blockquote>
+<p>Everything can be a hammer &amp; nail if you’re ambitious enough, doesn’t mean they should be.</p>
+</blockquote>
+<h2 id="references">References</h2>
+<hr>
+<ul>
+<li><a href="https://golang.org/cmd/go/">Command go - The Go Programming Language</a></li>
+<li><a href="https://golang.org/pkg/">Packages - The Go Programming Language</a></li>
+</ul>
+
+		</section>
+
+		<div class="post-tags">
+			
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+<hr>2020  © Alexandru-Paul Copil |  <a href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+</footer>
+</div>
+    </body>
+</html>

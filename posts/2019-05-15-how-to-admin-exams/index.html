@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>How to become admin during exams - Alexandru-Paul Copil</title><meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<meta property="og:description" content="Poking around the University exam interface to do unexpected things" />
+	<meta name="twitter:description" content="Poking around the University exam interface to do unexpected things" />
+	<meta name="description" content="Poking around the University exam interface to do unexpected things" />
+	<meta name="description" content="Poking around the University exam interface to do unexpected things" />
+
+	<meta property="og:title" content="How to become admin during exams | Alexandru-Paul Copil" />
+	<meta name="twitter:title" content="How to become admin during exams | Alexandru-Paul Copil" />
+
+	<meta property="og:image" content=""/>
+	<meta itemprop="name" content="How to become admin during exams | Alexandru-Paul Copil" />
+	<meta name="application-name" content="How to become admin during exams | Alexandru-Paul Copil" />
+	<meta property="og:site_name" content="" />
+	<meta property="og:title" content="How to become admin during exams" />
+<meta property="og:description" content="Poking around the University exam interface to do unexpected things" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cpl.li/posts/2019-05-15-how-to-admin-exams/" />
+<meta property="article:published_time" content="2019-05-25T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-05-25T00:00:00+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="How to become admin during exams"/>
+<meta name="twitter:description" content="Poking around the University exam interface to do unexpected things"/>
+<link href="https://cpl.li/css/fonts.css" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" media="screen" href="https://cpl.li/css/main.css" />
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://cpl.li/">Alexandru-Paul Copil</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/posts">All posts</a>
+		
+		<a href="/about">About</a>
+		
+		<a href="/tags">Tags</a>
+		
+		<a href="https://github.com/cpl">Github</a>
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">How to become admin during exams</h1>
+			<div class="meta">Posted on May 25, 2019</div>
+		</div>
+		
+
+		<section class="body">
+			<p>This is not a CVE writeup or Privilege escalation for Windows, its just a badly configure exam environment and my experience by poking it.</p>
+<h2 id="context">Context</h2>
+<hr>
+<p>At The University of Manchester some exams you take may be <em>online</em>. This means that the exam will take place in one of the PC clusters, you’ll be assigned a seat, log in with your username and password in what seems to be a web-login screensaver. After this a Firefox window will open and you’ll be asked to navigate to the <a href="http://online.manchester.ac.uk/">Blackboard page</a> and select the course. There you’ll find the exam paper locked behind a password (5 alpha-numerical long). When the exam starts you get the password and start answering the questions.</p>
+<p><img src="/assets/images/blackboard.png" alt="Blackboard Input Field"></p>
+<h2 id="restrictions">Restrictions</h2>
+<hr>
+<ul>
+<li>Have a single browser window open (you can &ldquo;Open in New Window&rdquo; at any time tho)</li>
+<li>Only access University domains (if only we could proxy or cross site)</li>
+<li>Can only open: Firefox, Internet Explorer, Calculator (if allowed for the current exam)</li>
+</ul>
+<p>The above are the only things somebody expects you to be able to do. Staff wouldn’t want you to let’s say print stuff, or download foreign files, or execute foreign programs … but you can.</p>
+<p>How? It all started with P-drive.</p>
+<h2 id="p-drive">P-Drive</h2>
+<hr>
+<p>P-Drive is a nice web interface provided by the university. It allows students to access (upload, delete, download, rename, etc) files from their Windows file system.</p>
+<p><img src="/assets/images/pdrive.png" alt="P-Drive"></p>
+<p>When I realised I have access to this, I went on and tried to upload files from the local exam machine. <strong>It worked</strong>. No only could I upload files, but this made me realise I don’t need <strong>File Explorer</strong>, I have a browser. These days browsers are like Swiss Multitools, they can do anything. So now, I can browse the filesystem (discovered that the exam machines have the Tor Browser installed … interesting?), users have read permissions pretty much everywhere but can’t write anywhere. Fair is fair, <em>but oh yeah</em>, you can still write/download files to the browser installation directory. Sweet.</p>
+<p>An extra “feature” for CS students, is the shared directory between the Linux and Windows file systems. <code>public_html</code>, not only is it shared between the two, it also has a PHP web server accessing it. Any files you place there are server on the University CS domain (sadly not wishing the <code>manchester.ac.uk</code> domain, if somebody can find a way to load the content from <code>public_html</code> from a <code>manchester.ac.uk</code>, would be nice). Anyway you don’t have to load web-pages to get content on your exam machine, you can simply upload whatever you want on the P-Drive and then download it or view it in the browser.</p>
+<h2 id="run-anything">Run anything</h2>
+<hr>
+<p>I said you can only run Firefox, IE and the Calculator. So did the staff think, in reality you can open any app as long as you use Firefox to open it. You have to love Windows with all its <em>features</em>. I managed to open: Outlook (and connect to my email as it is within <code>manchester.ac.uk</code> domain), Notepad and the Control Panel.</p>
+<blockquote>
+<p>I wanted to run Paint, but they removed it :(</p>
+</blockquote>
+<p>Any executable you upload to P-Drive can then be downloaded and executed. Glorious.</p>
+<h2 id="small-stuff">Small stuff</h2>
+<hr>
+<p>Don’t have calculator access? Or the calculator doesn’t have the <em>computational power</em> you demand? Don’t worry, just use <strong>JavaScript</strong>. Pop open the browser developer console and type in whatever you want.</p>
+<p>Do you want to change that ugly purple wallpaper that burns your retina? Simple,  download your favourite image from P-drive and set it as wallpaper.</p>
+<p><img src="/assets/images/exam_wp.jpeg" alt="Wallpaper Change"></p>
+<p>Do you want a copy of the exam questions but nobody will give it to you? Print them. You can do this in two ways, start the printing service using the browser or save the exam page as <code>.html</code> then upload it to your P-Drive.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>P-Drive access and the weird exam user permissions can easily lead to many issues and exploits. I haven’t done anything malicious but somebody with that intent could easily do it:</p>
+<ul>
+<li>You can upload HTML files to P-Drive with the course content, the page being HTML can be made to look like the blackboard exam theme, making it very hard for anyone else to notice.</li>
+<li>P-Drive could be used as a communication medium between you and somebody on the outside. You could provide the question and they can provide the answers.</li>
+<li>Access to the JavaScript console is also quite exploitable by CS students. Some problems may require you to provide algorithms, with JavaScript available you could test your algorithms before submitting.</li>
+</ul>
+<p>There are endless possibilities with these exploits available. If somebody had the malicious intent, something quite complex could be setup using these.</p>
+
+		</section>
+
+		<div class="post-tags">
+			
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+<hr>2020  © Alexandru-Paul Copil |  <a href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+</footer>
+</div>
+    </body>
+</html>
