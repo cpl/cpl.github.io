@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Italian Cheatsheet</title>
+<style>
+  :root{
+    --bg:#faf7f2; --card:#ffffff; --ink:#22201d; --muted:#8a8178;
+    --line:#e7e0d6; --accent:#1a7a4c; --accent-d:#15623d;
+    --green:#0a7d3f; --green-bg:#e7f5ec; --blue:#0e6b8f; --blue-bg:#e6f1f6;
+    --amber:#b06a00; --amber-bg:#fbf0dd;
+    --it-green:#009246; --it-red:#ce2b37;
+    --shadow:0 1px 3px rgba(0,0,0,.06),0 6px 18px rgba(0,0,0,.05);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45;-webkit-font-smoothing:antialiased}
+  header{padding:26px 20px 12px;text-align:center}
+  .flag{display:inline-block;width:44px;height:29px;border-radius:4px;overflow:hidden;
+    vertical-align:middle;margin-right:10px;box-shadow:var(--shadow)}
+  .flag i{display:inline-block;width:33.34%;height:100%;float:left}
+  .flag .g{background:var(--it-green)} .flag .w{background:#fff} .flag .r{background:var(--it-red)}
+  h1{font-size:1.65rem;margin:.1em 0;display:inline-block;vertical-align:middle}
+  .sub{color:var(--muted);font-size:.9rem;margin:6px auto 0;max-width:680px}
+
+  /* section nav */
+  .nav{position:sticky;top:0;z-index:30;background:rgba(250,247,242,.94);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+    display:flex;gap:6px;overflow-x:auto;padding:10px 14px;scrollbar-width:thin}
+  .nav::-webkit-scrollbar{height:6px}
+  .nav::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
+  .nav-btn{flex:0 0 auto;padding:9px 14px;border:1px solid var(--line);background:#fff;
+    border-radius:999px;font-size:.84rem;cursor:pointer;color:var(--ink);
+    transition:.12s;white-space:nowrap;font-weight:500}
+  .nav-btn:hover{border-color:var(--accent)}
+  .nav-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 16px 70px}
+  .section-head{margin:4px 0 16px}
+  .section-head h2{margin:0 0 4px;font-size:1.35rem}
+  .section-head p{margin:0;color:var(--muted);font-size:.9rem;max-width:760px}
+
+  /* verb controls */
+  .vctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 16px}
+  #search{flex:1 1 220px;max-width:320px;padding:10px 14px;border:1px solid var(--line);
+    border-radius:10px;font-size:.95rem;background:#fff;color:var(--ink)}
+  #search:focus{outline:2px solid var(--accent);border-color:transparent}
+  .tenses{display:flex;flex-wrap:wrap;gap:6px}
+  .tense-btn{padding:7px 12px;border:1px solid var(--line);background:#fff;border-radius:999px;
+    font-size:.8rem;cursor:pointer;color:var(--ink);transition:.12s;white-space:nowrap}
+  .tense-btn:hover{border-color:var(--accent)}
+  .tense-btn.active{background:var(--accent-d);color:#fff;border-color:var(--accent-d)}
+
+  /* grids & cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);overflow:hidden}
+  .card h3{margin:0;padding:13px 16px 11px;display:flex;align-items:baseline;
+    gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+  .verb{font-size:1.2rem;font-weight:700}
+  .gloss{color:var(--muted);font-size:.88rem;font-style:italic}
+  .badges{margin-left:auto;display:flex;gap:6px}
+  .badge{font-size:.64rem;text-transform:uppercase;letter-spacing:.04em;
+    padding:3px 7px;border-radius:6px;font-weight:600}
+  .b-avere{background:var(--blue-bg);color:var(--blue)}
+  .b-essere{background:var(--green-bg);color:var(--green)}
+  .b-reg{background:#f0ece4;color:var(--muted)}
+  .tense-label{padding:9px 16px;font-size:.72rem;text-transform:uppercase;
+    letter-spacing:.06em;color:var(--accent);font-weight:700;background:#f7f3ec}
+
+  table{width:100%;border-collapse:collapse;font-size:.92rem}
+  td,th{padding:7px 14px;border-top:1px solid #f1ece4;text-align:left;vertical-align:top}
+  tr:first-child td{border-top:none}
+  thead th{background:#f7f3ec;border-top:none;font-size:.72rem;text-transform:uppercase;
+    letter-spacing:.05em;color:var(--accent);font-weight:700;position:sticky}
+  .pron{color:var(--muted);width:34%;white-space:nowrap}
+  .form{font-weight:600}
+  .agr{color:var(--it-red);font-weight:600}
+  .it{font-weight:600;color:var(--accent-d)}
+  .en{color:#4a463f}
+  .note{color:var(--muted);font-size:.85rem}
+
+  /* full-width table block */
+  .tblcard{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);overflow:hidden;margin-bottom:18px}
+  .tblcard .cap{padding:13px 16px;font-weight:700;border-bottom:1px solid var(--line);
+    display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .tblcard .cap small{font-weight:400;color:var(--muted);font-style:italic}
+  .scroll{overflow-x:auto}
+  .pairtbl td:first-child{white-space:nowrap}
+  .matrix td,.matrix th{white-space:nowrap}
+  .matrix thead th:first-child,.matrix tbody td:first-child{
+    position:sticky;left:0;background:#fff;z-index:1}
+  .matrix thead th:first-child{background:#f7f3ec;z-index:2}
+  .matrix tbody td:first-child{font-weight:600}
+
+  .tip{background:var(--amber-bg);border:1px solid #f0dcb8;color:#5c4310;
+    border-radius:10px;padding:6px 11px;font-size:.85rem;margin:2px 0}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:760px){.twocol{grid-template-columns:1fr}}
+  @media(max-width:520px){.grid{grid-template-columns:1fr} td,th{padding:7px 11px}}
+  .noresult{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;padding:10px 0 40px}
+  code{background:#f3efe7;padding:1px 6px;border-radius:5px;font-size:.85em;
+    color:var(--it-red);font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <span class="flag"><i class="g"></i><i class="w"></i><i class="r"></i></span>
+  <h1>Italian Cheatsheet</h1>
+  <p class="sub">A learner's quick-reference: verbs, tricky adverbs, countries, easily-confused pairs, numbers, pronouns, and everyday vocabulary.</p>
+</header>
+
+<nav class="nav" id="nav"></nav>
+<div class="wrap" id="wrap"></div>
+<footer>Gender/number agreement everywhere follows the <code>-o/-a/-i/-e</code> pattern. Forms shown in <span class="agr">red</span> change with the subject.</footer>
+
+<script>
+/* ============================ VERBS ============================ */
+const PRON = ["io","tu","lui/lei","noi","voi","loro"];
+const TENSES = ["Presente","Passato prossimo","Imperfetto","Futuro semplice","Condizionale","Imperativo"];
+const AUX = {avere:["ho","hai","ha","abbiamo","avete","hanno"],
+             essere:["sono","sei","è","siamo","siete","sono"]};
+function pp(part,aux,i){
+  if(aux==="avere") return AUX.avere[i]+" "+part;
+  const b=part.slice(0,-1);
+  return AUX.essere[i]+" "+(i>=3?b+"i/e":b+"o/a");
+}
+const VERBS = [
+ {v:"essere",g:"to be",aux:"essere",part:"stato",reg:null,
+  Presente:["sono","sei","è","siamo","siete","sono"],
+  Imperfetto:["ero","eri","era","eravamo","eravate","erano"],
+  "Futuro semplice":["sarò","sarai","sarà","saremo","sarete","saranno"],
+  Condizionale:["sarei","saresti","sarebbe","saremmo","sareste","sarebbero"],
+  Imperativo:["—","sii","sia","siamo","siate","siano"]},
+ {v:"avere",g:"to have",aux:"avere",part:"avuto",reg:null,
+  Presente:["ho","hai","ha","abbiamo","avete","hanno"],
+  Imperfetto:["avevo","avevi","aveva","avevamo","avevate","avevano"],
+  "Futuro semplice":["avrò","avrai","avrà","avremo","avrete","avranno"],
+  Condizionale:["avrei","avresti","avrebbe","avremmo","avreste","avrebbero"],
+  Imperativo:["—","abbi","abbia","abbiamo","abbiate","abbiano"]},
+ {v:"fare",g:"to do / make",aux:"avere",part:"fatto",reg:null,
+  Presente:["faccio","fai","fa","facciamo","fate","fanno"],
+  Imperfetto:["facevo","facevi","faceva","facevamo","facevate","facevano"],
+  "Futuro semplice":["farò","farai","farà","faremo","farete","faranno"],
+  Condizionale:["farei","faresti","farebbe","faremmo","fareste","farebbero"],
+  Imperativo:["—","fa' / fai","faccia","facciamo","fate","facciano"]},
+ {v:"andare",g:"to go",aux:"essere",part:"andato",reg:null,
+  Presente:["vado","vai","va","andiamo","andate","vanno"],
+  Imperfetto:["andavo","andavi","andava","andavamo","andavate","andavano"],
+  "Futuro semplice":["andrò","andrai","andrà","andremo","andrete","andranno"],
+  Condizionale:["andrei","andresti","andrebbe","andremmo","andreste","andrebbero"],
+  Imperativo:["—","va' / vai","vada","andiamo","andate","vadano"]},
+ {v:"stare",g:"to stay / be",aux:"essere",part:"stato",reg:null,
+  Presente:["sto","stai","sta","stiamo","state","stanno"],
+  Imperfetto:["stavo","stavi","stava","stavamo","stavate","stavano"],
+  "Futuro semplice":["starò","starai","starà","staremo","starete","staranno"],
+  Condizionale:["starei","staresti","starebbe","staremmo","stareste","starebbero"],
+  Imperativo:["—","sta' / stai","stia","stiamo","state","stiano"]},
+ {v:"dare",g:"to give",aux:"avere",part:"dato",reg:null,
+  Presente:["do","dai","dà","diamo","date","danno"],
+  Imperfetto:["davo","davi","dava","davamo","davate","davano"],
+  "Futuro semplice":["darò","darai","darà","daremo","darete","daranno"],
+  Condizionale:["darei","daresti","darebbe","daremmo","dareste","darebbero"],
+  Imperativo:["—","da' / dai","dia","diamo","date","diano"]},
+ {v:"dire",g:"to say / tell",aux:"avere",part:"detto",reg:null,
+  Presente:["dico","dici","dice","diciamo","dite","dicono"],
+  Imperfetto:["dicevo","dicevi","diceva","dicevamo","dicevate","dicevano"],
+  "Futuro semplice":["dirò","dirai","dirà","diremo","direte","diranno"],
+  Condizionale:["direi","diresti","direbbe","diremmo","direste","direbbero"],
+  Imperativo:["—","di'","dica","diciamo","dite","dicano"]},
+ {v:"potere",g:"to be able / can",aux:"avere",part:"potuto",reg:null,
+  Presente:["posso","puoi","può","possiamo","potete","possono"],
+  Imperfetto:["potevo","potevi","poteva","potevamo","potevate","potevano"],
+  "Futuro semplice":["potrò","potrai","potrà","potremo","potrete","potranno"],
+  Condizionale:["potrei","potresti","potrebbe","potremmo","potreste","potrebbero"],
+  Imperativo:["—","—","—","—","—","—"]},
+ {v:"volere",g:"to want",aux:"avere",part:"voluto",reg:null,
+  Presente:["voglio","vuoi","vuole","vogliamo","volete","vogliono"],
+  Imperfetto:["volevo","volevi","voleva","volevamo","volevate","volevano"],
+  "Futuro semplice":["vorrò","vorrai","vorrà","vorremo","vorrete","vorranno"],
+  Condizionale:["vorrei","vorresti","vorrebbe","vorremmo","vorreste","vorrebbero"],
+  Imperativo:["—","vogli","voglia","vogliamo","vogliate","vogliano"]},
+ {v:"dovere",g:"to have to / must",aux:"avere",part:"dovuto",reg:null,
+  Presente:["devo","devi","deve","dobbiamo","dovete","devono"],
+  Imperfetto:["dovevo","dovevi","doveva","dovevamo","dovevate","dovevano"],
+  "Futuro semplice":["dovrò","dovrai","dovrà","dovremo","dovrete","dovranno"],
+  Condizionale:["dovrei","dovresti","dovrebbe","dovremmo","dovreste","dovrebbero"],
+  Imperativo:["—","—","—","—","—","—"]},
+ {v:"sapere",g:"to know (facts)",aux:"avere",part:"saputo",reg:null,
+  Presente:["so","sai","sa","sappiamo","sapete","sanno"],
+  Imperfetto:["sapevo","sapevi","sapeva","sapevamo","sapevate","sapevano"],
+  "Futuro semplice":["saprò","saprai","saprà","sapremo","saprete","sapranno"],
+  Condizionale:["saprei","sapresti","saprebbe","sapremmo","sapreste","saprebbero"],
+  Imperativo:["—","sappi","sappia","sappiamo","sappiate","sappiano"]},
+ {v:"vedere",g:"to see",aux:"avere",part:"visto",reg:null,
+  Presente:["vedo","vedi","vede","vediamo","vedete","vedono"],
+  Imperfetto:["vedevo","vedevi","vedeva","vedevamo","vedevate","vedevano"],
+  "Futuro semplice":["vedrò","vedrai","vedrà","vedremo","vedrete","vedranno"],
+  Condizionale:["vedrei","vedresti","vedrebbe","vedremmo","vedreste","vedrebbero"],
+  Imperativo:["—","vedi","veda","vediamo","vedete","vedano"]},
+ {v:"venire",g:"to come",aux:"essere",part:"venuto",reg:null,
+  Presente:["vengo","vieni","viene","veniamo","venite","vengono"],
+  Imperfetto:["venivo","venivi","veniva","venivamo","venivate","venivano"],
+  "Futuro semplice":["verrò","verrai","verrà","verremo","verrete","verranno"],
+  Condizionale:["verrei","verresti","verrebbe","verremmo","verreste","verrebbero"],
+  Imperativo:["—","vieni","venga","veniamo","venite","vengano"]},
+ {v:"uscire",g:"to go out",aux:"essere",part:"uscito",reg:null,
+  Presente:["esco","esci","esce","usciamo","uscite","escono"],
+  Imperfetto:["uscivo","uscivi","usciva","uscivamo","uscivate","uscivano"],
+  "Futuro semplice":["uscirò","uscirai","uscirà","usciremo","uscirete","usciranno"],
+  Condizionale:["uscirei","usciresti","uscirebbe","usciremmo","uscireste","uscirebbero"],
+  Imperativo:["—","esci","esca","usciamo","uscite","escano"]},
+ {v:"prendere",g:"to take",aux:"avere",part:"preso",reg:null,
+  Presente:["prendo","prendi","prende","prendiamo","prendete","prendono"],
+  Imperfetto:["prendevo","prendevi","prendeva","prendevamo","prendevate","prendevano"],
+  "Futuro semplice":["prenderò","prenderai","prenderà","prenderemo","prenderete","prenderanno"],
+  Condizionale:["prenderei","prenderesti","prenderebbe","prenderemmo","prendereste","prenderebbero"],
+  Imperativo:["—","prendi","prenda","prendiamo","prendete","prendano"]},
+ {v:"mettere",g:"to put",aux:"avere",part:"messo",reg:null,
+  Presente:["metto","metti","mette","mettiamo","mettete","mettono"],
+  Imperfetto:["mettevo","mettevi","metteva","mettevamo","mettevate","mettevano"],
+  "Futuro semplice":["metterò","metterai","metterà","metteremo","metterete","metteranno"],
+  Condizionale:["metterei","metteresti","metterebbe","metteremmo","mettereste","metterebbero"],
+  Imperativo:["—","metti","metta","mettiamo","mettete","mettano"]},
+ {v:"parlare",g:"to speak",aux:"avere",part:"parlato",reg:"-are",
+  Presente:["parlo","parli","parla","parliamo","parlate","parlano"],
+  Imperfetto:["parlavo","parlavi","parlava","parlavamo","parlavate","parlavano"],
+  "Futuro semplice":["parlerò","parlerai","parlerà","parleremo","parlerete","parleranno"],
+  Condizionale:["parlerei","parleresti","parlerebbe","parleremmo","parlereste","parlerebbero"],
+  Imperativo:["—","parla","parli","parliamo","parlate","parlino"]},
+ {v:"credere",g:"to believe",aux:"avere",part:"creduto",reg:"-ere",
+  Presente:["credo","credi","crede","crediamo","credete","credono"],
+  Imperfetto:["credevo","credevi","credeva","credevamo","credevate","credevano"],
+  "Futuro semplice":["crederò","crederai","crederà","crederemo","crederete","crederanno"],
+  Condizionale:["crederei","crederesti","crederebbe","crederemmo","credereste","crederebbero"],
+  Imperativo:["—","credi","creda","crediamo","credete","credano"]},
+ {v:"dormire",g:"to sleep",aux:"avere",part:"dormito",reg:"-ire",
+  Presente:["dormo","dormi","dorme","dormiamo","dormite","dormono"],
+  Imperfetto:["dormivo","dormivi","dormiva","dormivamo","dormivate","dormivano"],
+  "Futuro semplice":["dormirò","dormirai","dormirà","dormiremo","dormirete","dormiranno"],
+  Condizionale:["dormirei","dormiresti","dormirebbe","dormiremmo","dormireste","dormirebbero"],
+  Imperativo:["—","dormi","dorma","dormiamo","dormite","dormano"]},
+ {v:"capire",g:"to understand",aux:"avere",part:"capito",reg:"-ire (-isc-)",
+  Presente:["capisco","capisci","capisce","capiamo","capite","capiscono"],
+  Imperfetto:["capivo","capivi","capiva","capivamo","capivate","capivano"],
+  "Futuro semplice":["capirò","capirai","capirà","capiremo","capirete","capiranno"],
+  Condizionale:["capirei","capiresti","capirebbe","capiremmo","capireste","capirebbero"],
+  Imperativo:["—","capisci","capisca","capiamo","capite","capiscano"]}
+];
+
+/* ====================== ADVERBS (frequency / time) ====================== */
+const FREQ = [
+ ["sempre","always"],["spesso","often"],["di solito / solitamente","usually"],
+ ["normalmente","normally"],["a volte / talvolta","sometimes"],
+ ["qualche volta","now and then"],["ogni tanto / di tanto in tanto","every so often"],
+ ["raramente","rarely"],["quasi mai","almost never"],["(non…) mai","never"]
+];
+const WHEN = [
+ ["adesso / ora","now"],["subito","right away"],["già","already"],
+ ["(non…) ancora","not yet / still / again"],["appena","just / as soon as"],
+ ["presto","early / soon"],["tardi","late"],["prima","before / earlier"],
+ ["dopo / poi","after / then"],["finora","so far / until now"],
+ ["ormai","by now / at this point"],["ancora","still / yet / again"]
+];
+const DAYREL = [
+ ["oggi","today"],["ieri","yesterday"],["domani","tomorrow"],
+ ["l'altro ieri","day before yesterday"],["dopodomani","day after tomorrow"],
+ ["stamattina","this morning"],["stasera","this evening"],["stanotte","tonight"]
+];
+
+/* ========================= COUNTRIES ========================= */
+// [English, Italian (with article), nationality m/f, language, capital]
+const COUNTRIES = [
+ ["Italy","l'Italia","italiano / -a","italiano","Roma"],
+ ["France","la Francia","francese","francese","Parigi"],
+ ["Germany","la Germania","tedesco / -a","tedesco","Berlino"],
+ ["Spain","la Spagna","spagnolo / -a","spagnolo","Madrid"],
+ ["Portugal","il Portogallo","portoghese","portoghese","Lisbona"],
+ ["United Kingdom","il Regno Unito","britannico / -a","inglese","Londra"],
+ ["England","l'Inghilterra","inglese","inglese","Londra"],
+ ["Scotland","la Scozia","scozzese","inglese","Edimburgo"],
+ ["Ireland","l'Irlanda","irlandese","inglese / irlandese","Dublino"],
+ ["Netherlands","i Paesi Bassi","olandese","olandese","Amsterdam"],
+ ["Belgium","il Belgio","belga","fr. / ol. / ted.","Bruxelles"],
+ ["Switzerland","la Svizzera","svizzero / -a","it. / fr. / ted.","Berna"],
+ ["Austria","l'Austria","austriaco / -a","tedesco","Vienna"],
+ ["Greece","la Grecia","greco / -a","greco","Atene"],
+ ["Poland","la Polonia","polacco / -a","polacco","Varsavia"],
+ ["Sweden","la Svezia","svedese","svedese","Stoccolma"],
+ ["Norway","la Norvegia","norvegese","norvegese","Oslo"],
+ ["Denmark","la Danimarca","danese","danese","Copenaghen"],
+ ["Finland","la Finlandia","finlandese","finlandese","Helsinki"],
+ ["Iceland","l'Islanda","islandese","islandese","Reykjavík"],
+ ["Russia","la Russia","russo / -a","russo","Mosca"],
+ ["Ukraine","l'Ucraina","ucraino / -a","ucraino","Kiev"],
+ ["Czechia","la Repubblica Ceca","ceco / -a","ceco","Praga"],
+ ["Slovakia","la Slovacchia","slovacco / -a","slovacco","Bratislava"],
+ ["Hungary","l'Ungheria","ungherese","ungherese","Budapest"],
+ ["Romania","la Romania","romeno / -a","romeno","Bucarest"],
+ ["Bulgaria","la Bulgaria","bulgaro / -a","bulgaro","Sofia"],
+ ["Croatia","la Croazia","croato / -a","croato","Zagabria"],
+ ["Slovenia","la Slovenia","sloveno / -a","sloveno","Lubiana"],
+ ["Serbia","la Serbia","serbo / -a","serbo","Belgrado"],
+ ["Albania","l'Albania","albanese","albanese","Tirana"],
+ ["Turkey","la Turchia","turco / -a","turco","Ankara"],
+ ["Luxembourg","il Lussemburgo","lussemburghese","fr. / ted.","Lussemburgo"],
+ ["Malta","Malta","maltese","maltese / inglese","La Valletta"],
+ ["Cyprus","Cipro","cipriota","greco / turco","Nicosia"],
+ ["Estonia","l'Estonia","estone","estone","Tallinn"],
+ ["Latvia","la Lettonia","lettone","lettone","Riga"],
+ ["Lithuania","la Lituania","lituano / -a","lituano","Vilnius"]
+];
+
+/* ===================== CONFUSING PAIRS ===================== */
+// [pair, meaning A, meaning B, tip]
+const PAIRS = [
+ ["sapere / conoscere","know a fact, know how to","be acquainted with (person/place)","<code>so nuotare</code> (I can swim) · <code>conosco Maria</code>"],
+ ["c'è / ci sono","there is (sing.)","there are (plural)","<code>c'è un libro</code> · <code>ci sono due libri</code>"],
+ ["buono / bene","good (adjective)","well (adverb)","<code>un buon caffè</code> · <code>sto bene</code>"],
+ ["bravo / buono","good at / skilled","good, kind","<code>sei bravo!</code> (well done) · <code>è una persona buona</code>"],
+ ["anche / ancora","also, too","still / yet / again","<code>anch'io</code> (me too) · <code>ancora qui?</code> (still here?)"],
+ ["ancora / di nuovo","still / yet","again (a repeat)","<code>non è ancora pronto</code> · <code>fallo di nuovo</code>"],
+ ["molto / troppo","very, a lot","too (much)","<code>molto buono</code> · <code>troppo caro</code> (too expensive)"],
+ ["molto / tanto","very / much","so much / a lot (emphatic)","Often interchangeable; <code>tanto</code> is warmer/emphatic."],
+ ["po' / poco","a bit (<code>un po'</code>)","little, few","<code>un po' di pane</code> · <code>poco tempo</code>"],
+ ["prego / per favore","you're welcome / go ahead","please (a request)","<code>—Grazie! —Prego.</code> · <code>un caffè, per favore</code>"],
+ ["di / da","of / from (origin, possession)","from / by / at (someone's place)","<code>di Roma</code> · <code>vengo da te</code>; <code>dal medico</code>"],
+ ["venire / andare","to come (toward speaker)","to go (away)","<code>vengo da te</code> · <code>vado a casa</code>"],
+ ["portare / prendere","to bring / carry","to take / pick up","<code>porto il vino</code> · <code>prendo il treno</code>"],
+ ["sentire / ascoltare","to hear / feel","to listen (on purpose)","<code>ti sento</code> · <code>ascolto la musica</code>"],
+ ["guardare / vedere","to look at / watch","to see","<code>guardo la TV</code> · <code>vedo il mare</code>"],
+ ["chiedere / domandare","to ask for / request","to ask (a question)","<code>chiedo aiuto</code> · <code>domando l'ora</code>"],
+ ["imparare / insegnare","to learn","to teach","<code>imparo l'italiano</code> · <code>insegno inglese</code>"],
+ ["giocare / suonare","to play (game/sport)","to play (instrument)","<code>gioco a calcio</code> · <code>suono il piano</code>"],
+ ["partire / lasciare","to leave / depart","to leave (something/someone)","<code>parto domani</code> · <code>lascio le chiavi</code>"],
+ ["conoscere / incontrare","to meet (first time) / know","to meet / run into","<code>ho conosciuto Anna</code> · <code>ho incontrato Anna in centro</code>"]
+];
+
+// tricky single words: [word, meaning, usage / example]
+const TRICKY = [
+ ["di solito","usually","Adverbial phrase, usually at the front or before the verb: <code>di solito mi alzo presto</code>. = solitamente, normalmente."],
+ ["sempre","always; increasingly; still","<code>sempre più caro</code> = more and more expensive; <code>vive sempre qui</code> = still lives here; with gerund = keeps -ing."],
+ ["anche","also, too; even","Goes <b>before</b> what it adds: <code>anche io → anch'io</code> (me too), <code>anche oggi</code> (today too)."],
+ ["allora","so / then / well…","Filler + consequence: <code>allora, andiamo?</code> (so, shall we?). 'Back then' = <code>a quei tempi</code>."],
+ ["prossimo","next; (il prossimo) fellow human","<code>la prossima settimana</code> = next week; <code>il prossimo!</code> = next, please; <code>il prossimo</code> = one's neighbour."],
+ ["quindi","so, therefore","States a result/conclusion. ≈ allora, perciò, dunque: <code>piove, quindi resto</code>."],
+ ["magari","maybe; if only!","<code>magari domani</code> (maybe); <code>—Vinci? —Magari!</code> (I wish!)."],
+ ["pure","also; go ahead","<code>vieni pure</code> = do come / feel free; also = even, too."],
+ ["proprio","really; exactly; one's own","<code>è proprio bello</code> (really); <code>non proprio</code> (not exactly); <code>casa propria</code> (one's own)."],
+ ["comunque","anyway; however","Shifts or wraps up a topic: <code>comunque, torniamo al punto</code>."],
+ ["insomma","in short; so-so","<code>insomma, basta!</code> (in short, enough); <code>—Com'è? —Insomma.</code> (meh)."],
+ ["mica","not at all (colloquial)","Reinforces negation: <code>non è mica facile</code> = it's not easy at all."],
+ ["piuttosto","rather; quite","<code>piuttosto che</code> = rather than; <code>è piuttosto caro</code> = quite expensive."],
+ ["invece","instead; whereas","Contrast: <code>io vengo, lui invece resta</code>."],
+ ["intanto","meanwhile","<code>intanto preparo la cena</code>."],
+ ["ecco","here is / there you go","<code>ecco il menù</code>; <code>eccolo!</code> = here it is!"],
+ ["addirittura","even / actually (surprise)","<code>ha addirittura pianto</code> = he even cried."],
+ ["perfino / persino","even","Stronger surprise than anche: <code>è venuto perfino lui</code>."],
+ ["almeno","at least","<code>almeno prova</code> = at least try."],
+ ["soprattutto","above all, especially","<code>mi piace, soprattutto il finale</code>."],
+ ["tuttavia","however, nevertheless","Formal contrast: <code>è caro; tuttavia lo compro</code>."],
+ ["eppure","and yet","Surprising contrast: <code>eppure funziona</code> = and yet it works."],
+ ["purtroppo","unfortunately","Sentence opener: <code>purtroppo non posso</code>."],
+ ["davvero","really, truly","<code>davvero?</code> = really?; <code>mi dispiace davvero</code>."],
+ ["volentieri","gladly, with pleasure","<code>—Vieni? —Volentieri!</code>"]
+];
+
+/* ===================== NUMBERS / DATES / TIME ===================== */
+const CARD = [
+ ["0","zero"],["1","uno"],["2","due"],["3","tre"],["4","quattro"],["5","cinque"],
+ ["6","sei"],["7","sette"],["8","otto"],["9","nove"],["10","dieci"],["11","undici"],
+ ["12","dodici"],["13","tredici"],["14","quattordici"],["15","quindici"],["16","sedici"],
+ ["17","diciassette"],["18","diciotto"],["19","diciannove"],["20","venti"],["21","ventuno"],
+ ["30","trenta"],["40","quaranta"],["50","cinquanta"],["60","sessanta"],["70","settanta"],
+ ["80","ottanta"],["90","novanta"],["100","cento"],["1.000","mille"],["2.000","duemila"],
+ ["1.000.000","un milione"]
+];
+const ORD = [
+ ["1st","primo"],["2nd","secondo"],["3rd","terzo"],["4th","quarto"],["5th","quinto"],
+ ["6th","sesto"],["7th","settimo"],["8th","ottavo"],["9th","nono"],["10th","decimo"]
+];
+const DAYS = [
+ ["Monday","lunedì"],["Tuesday","martedì"],["Wednesday","mercoledì"],["Thursday","giovedì"],
+ ["Friday","venerdì"],["Saturday","sabato"],["Sunday","domenica (f.)"]
+];
+const MONTHS = [
+ ["January","gennaio"],["February","febbraio"],["March","marzo"],["April","aprile"],
+ ["May","maggio"],["June","giugno"],["July","luglio"],["August","agosto"],
+ ["September","settembre"],["October","ottobre"],["November","novembre"],["December","dicembre"]
+];
+const SEASONS = [
+ ["spring","la primavera"],["summer","l'estate (f.)"],["autumn","l'autunno"],["winter","l'inverno"]
+];
+const TIME = [
+ ["What time is it?","Che ore sono? / Che ora è?"],
+ ["It's one o'clock","È l'una"],
+ ["It's two o'clock","Sono le due"],
+ ["It's noon / midnight","È mezzogiorno / È mezzanotte"],
+ ["quarter past three","le tre e un quarto"],
+ ["half past four","le quattro e mezza"],
+ ["quarter to five","le cinque meno un quarto / le quattro e tre quarti"],
+ ["ten past six","le sei e dieci"],
+ ["at what time?","a che ora?"],
+ ["in the morning / pm","di mattina / di pomeriggio"]
+];
+
+/* ===================== PRONOUNS / PREPOSITIONS ===================== */
+const PRONROWS = [
+ ["io","mi","mi","mi","me"],
+ ["tu","ti","ti","ti","te"],
+ ["lui / lei","lo / la","gli / le","si","lui / lei"],
+ ["noi","ci","ci","ci","noi"],
+ ["voi","vi","vi","vi","voi"],
+ ["loro","li / le","gli","si","loro"]
+];
+const POSS = [
+ ["my","il mio / la mia / i miei / le mie"],
+ ["your (sing.)","il tuo / la tua / i tuoi / le tue"],
+ ["his/her/its/your(formal)","il suo / la sua / i suoi / le sue"],
+ ["our","il nostro / la nostra / i nostri / le nostre"],
+ ["your (plural)","il vostro / la vostra / i vostri / le vostre"],
+ ["their","il loro / la loro / i loro / le loro"]
+];
+const PREPS = [
+ ["di","of, from, about","sono di Roma"],
+ ["a","to, at, in (cities)","a Milano; alle otto"],
+ ["da","from, by, at someone's, since","vengo da te; da lunedì"],
+ ["in","in, to (countries/regions)","in Italia; in macchina"],
+ ["con","with","con te"],
+ ["su","on, about","sul tavolo"],
+ ["per","for, through, in order to","per te; per favore"],
+ ["tra / fra","between, among, in (time)","tra noi; fra un'ora"]
+];
+// articulated prepositions: rows preps, cols articles
+const ARTCOLS = ["+ il","+ lo","+ l'","+ la","+ i","+ gli","+ le"];
+const ARTROWS = [
+ ["di","del","dello","dell'","della","dei","degli","delle"],
+ ["a","al","allo","all'","alla","ai","agli","alle"],
+ ["da","dal","dallo","dall'","dalla","dai","dagli","dalle"],
+ ["in","nel","nello","nell'","nella","nei","negli","nelle"],
+ ["su","sul","sullo","sull'","sulla","sui","sugli","sulle"]
+];
+
+/* ===================== QUESTIONS / CONNECTORS ===================== */
+const QWORDS = [
+ ["chi?","who?"],["che / che cosa / cosa?","what?"],["quale / quali?","which?"],
+ ["dove?","where?"],["quando?","when?"],["perché?","why?"],["come?","how?"],
+ ["quanto / -a / -i / -e?","how much / many?"],["di chi?","whose?"],["da dove?","where from?"]
+];
+const CONN = [
+ ["e","and"],["ma / però","but"],["o / oppure","or"],["perché","because"],
+ ["quindi / allora / perciò","so, therefore"],["anche","also, too"],
+ ["invece","instead, whereas"],["mentre","while"],["se","if"],["che","that"],
+ ["siccome / poiché","since, because"],["anche se","even though"],
+ ["comunque","anyway"],["inoltre","moreover"],["appena","as soon as"],
+ ["finché","until / as long as"],["infatti","in fact, indeed"],["cioè","that is, i.e."]
+];
+
+/* ===================== EVERYDAY VOCAB ===================== */
+const GREET = [
+ ["ciao","hi / bye (informal)"],["salve","hello (neutral)"],["buongiorno","good morning"],
+ ["buon pomeriggio","good afternoon"],["buonasera","good evening"],["buonanotte","good night"],
+ ["arrivederci","goodbye (formal)"],["a presto","see you soon"],["a domani","see you tomorrow"],
+ ["per favore / per piacere","please"],["grazie (mille)","thanks (a lot)"],
+ ["prego","you're welcome / go ahead"],["mi scusi / scusa","excuse me (formal/inf.)"],
+ ["mi dispiace","I'm sorry"],["di niente","no problem"],["permesso","may I pass / come in"]
+];
+const PHRASE = [
+ ["Come stai? / Come sta?","How are you? (inf./formal)"],
+ ["Bene, grazie. E tu?","Well, thanks. And you?"],
+ ["Come ti chiami?","What's your name?"],
+ ["Mi chiamo…","My name is…"],
+ ["Piacere!","Nice to meet you!"],
+ ["Non capisco","I don't understand"],
+ ["Parla inglese?","Do you speak English?"],
+ ["Può ripetere, per favore?","Can you repeat, please?"],
+ ["Quanto costa?","How much is it?"],
+ ["Dov'è il bagno?","Where's the bathroom?"],
+ ["Vorrei…","I would like…"],
+ ["Aiuto!","Help!"]
+];
+const COLORS = [
+ ["rosso / -a","red"],["arancione","orange"],["giallo / -a","yellow"],
+ ["verde","green"],["blu *","blue"],["azzurro / -a","light blue"],
+ ["celeste","sky blue"],["viola *","purple"],["rosa *","pink"],
+ ["marrone","brown"],["nero / -a","black"],["bianco / -a","white"],["grigio / -a","grey"]
+];
+const FAMILY = [
+ ["la madre / la mamma","mother / mum"],["il padre / il papà","father / dad"],
+ ["i genitori","parents"],["il figlio / la figlia","son / daughter"],
+ ["il fratello / la sorella","brother / sister"],["il nonno / la nonna","grandfather / grandmother"],
+ ["lo zio / la zia","uncle / aunt"],["il cugino / la cugina","cousin (m/f)"],
+ ["il/la nipote","nephew/niece; grandchild"],["il marito / la moglie","husband / wife"],
+ ["il fidanzato / la fidanzata","boyfriend / girlfriend"],["i parenti","relatives"]
+];
+const BODY = [
+ ["la testa","head"],["i capelli","hair"],["l'occhio / gli occhi","eye / eyes"],
+ ["il naso","nose"],["la bocca","mouth"],["l'orecchio / le orecchie","ear / ears"],
+ ["il collo","neck"],["il braccio / le braccia","arm / arms"],["la mano / le mani","hand / hands"],
+ ["il dito / le dita","finger / fingers"],["la gamba","leg"],["il piede / i piedi","foot / feet"],
+ ["la schiena","back"],["la pancia","belly"],["il cuore","heart"]
+];
+const FOODPHR = [
+ ["Un tavolo per due, per favore","A table for two, please"],
+ ["Il menù, per favore","The menu, please"],
+ ["Vorrei ordinare","I'd like to order"],
+ ["Per me…","For me… (when ordering)"],
+ ["Posso avere…?","Can I have…?"],
+ ["acqua naturale / frizzante","still / sparkling water"],
+ ["È tutto, grazie","That's all, thanks"],
+ ["Il conto, per favore","The bill, please"],
+ ["Sono vegetariano / -a","I'm vegetarian"],
+ ["Buono!","Tasty!"]
+];
+const FOODW = [
+ ["la colazione","breakfast"],["il pranzo","lunch"],["la cena","dinner"],
+ ["l'antipasto","starter"],["il primo","first course"],["il secondo","main course"],
+ ["il contorno","side dish"],["il dolce","dessert"],["il pane","bread"],
+ ["la pasta","pasta"],["il riso","rice"],["la carne","meat"],["il pesce","fish"],
+ ["il pollo","chicken"],["la verdura","vegetables"],["la frutta","fruit"],
+ ["il formaggio","cheese"],["il caffè","coffee"],["il vino","wine"],["la birra","beer"]
+];
+
+/* ============================ RENDERING ============================ */
+const wrap=document.getElementById("wrap");
+const nav=document.getElementById("nav");
+let verbQuery="";
+
+const SECTIONS=[
+ {id:"verbs",label:"Verbs",render:renderVerbs},
+ {id:"adverbs",label:"Adverbs",render:renderAdverbs},
+ {id:"countries",label:"Countries",render:renderCountries},
+ {id:"pairs",label:"Confusing words",render:renderPairs},
+ {id:"numbers",label:"Numbers & dates",render:renderNumbers},
+ {id:"pronouns",label:"Pronouns & preps",render:renderPronouns},
+ {id:"questions",label:"Questions & connectors",render:renderQuestions},
+ {id:"greetings",label:"Greetings & phrases",render:renderGreetings},
+ {id:"vocab",label:"Colors · family · body",render:renderVocab},
+ {id:"food",label:"Food & restaurant",render:renderFood}
+];
+let active="verbs";
+
+SECTIONS.forEach(s=>{
+  const b=document.createElement("button");
+  b.className="nav-btn"+(s.id===active?" active":"");
+  b.textContent=s.label;
+  b.onclick=()=>{active=s.id;
+    [...nav.children].forEach((c,i)=>c.classList.toggle("active",SECTIONS[i].id===s.id));
+    draw();window.scrollTo({top:0,behavior:"smooth"});};
+  nav.appendChild(b);
+});
+
+function head(t,d){return `<div class="section-head"><h2>${t}</h2><p>${d}</p></div>`;}
+
+// generic 2-col table card
+function tbl2(cap,sub,rows,h1,h2){
+  return `<div class="tblcard"><div class="cap">${cap}${sub?` <small>${sub}</small>`:""}</div>
+    <div class="scroll"><table><thead><tr><th>${h1}</th><th>${h2}</th></tr></thead><tbody>${
+    rows.map(r=>`<tr><td class="it">${r[0]}</td><td class="en">${r[1]}</td></tr>`).join("")
+  }</tbody></table></div></div>`;
+}
+
+function draw(){ wrap.innerHTML=""; SECTIONS.find(s=>s.id===active).render(); }
+
+/* ---- verbs ---- */
+function renderVerbs(){
+  wrap.innerHTML = head("Verbs","All 20 verbs, each as a full table: persons (rows) × six core tenses (columns). Filter below to narrow the list. Verbs with <b>essere</b> agree in gender/number on the participle (<span class='agr'>red</span>).")
+   + `<div class="vctl">
+        <input id="search" type="search" placeholder="Filter verbs…" autocomplete="off" value="${verbQuery}">
+      </div>
+      <div id="vtables"></div>`;
+  const si=document.getElementById("search");
+  si.addEventListener("input",()=>{verbQuery=si.value;drawVerbTables();});
+  drawVerbTables();
+}
+function cellPP(verb,i){
+  const form=pp(verb.part,verb.aux,i);
+  return verb.aux==="essere"?form.replace(/(\S+)$/,'<span class="agr">$1</span>'):form;
+}
+const VCOLS=[["Presente","Presente"],["Passato prossimo","Pass. prossimo"],["Imperfetto","Imperfetto"],
+ ["Futuro semplice","Futuro"],["Condizionale","Condizionale"],["Imperativo","Imperativo"]];
+function verbTableHTML(v){
+  const badge=v.reg?`<span class="badge b-reg">${v.reg}</span>`:"";
+  const aux=`<span class="badge b-${v.aux}">aux: ${v.aux}</span>`;
+  const rows=PRON.map((p,i)=>{
+    const tds=VCOLS.map(c=>{
+      const val=c[0]==="Passato prossimo"?cellPP(v,i):v[c[0]][i];
+      return `<td class="form">${val}</td>`;
+    }).join("");
+    return `<tr><td class="pron">${p}</td>${tds}</tr>`;
+  }).join("");
+  return `<div class="tblcard">
+     <div class="cap"><span class="verb">${v.v}</span> <small>${v.g}</small>
+       <span class="badges">${badge}${aux}</span></div>
+     <div class="scroll"><table class="matrix"><thead><tr><th>Person</th>${
+       VCOLS.map(c=>`<th>${c[1]}</th>`).join("")
+     }</tr></thead><tbody>${rows}</tbody></table></div>
+   </div>`;
+}
+function drawVerbTables(){
+  const q=verbQuery.trim().toLowerCase();
+  const list=VERBS.filter(v=>!q||v.v.toLowerCase().includes(q)||v.g.toLowerCase().includes(q));
+  const c=document.getElementById("vtables");
+  if(!list.length){c.innerHTML='<div class="noresult">No verb matches “'+q+'”.</div>';return;}
+  c.innerHTML=list.map(verbTableHTML).join("");
+}
+
+/* ---- adverbs ---- */
+function renderAdverbs(){
+  wrap.innerHTML=head("Adverbs of frequency &amp; time","Small words that change everything — and easy to mix up. Note: <code>mai</code> (never) and <code>ancora</code> (not yet) usually take <code>non</code> before the verb: <code>non vado mai</code>, <code>non è ancora pronto</code>.")
+   +`<div class="grid">
+      ${tbl2("How often?","frequency",FREQ,"Italian","English")}
+      ${tbl2("When? (time words)","",WHEN,"Italian","English")}
+      ${tbl2("Days relative to now","",DAYREL,"Italian","English")}
+    </div>`;
+}
+
+/* ---- countries ---- */
+function renderCountries(){
+  wrap.innerHTML=head("European countries","Country names take an article (<code>l'Italia</code>, <code>la Francia</code>). Use <code>in</code> for going/being in a country: <code>vado in Francia</code>. Nationalities ending in <code>-e</code> (francese, inglese) don't change for gender.")
+   +`<div class="tblcard"><div class="cap">Countries &amp; nationalities <small>${COUNTRIES.length} countries</small></div>
+     <div class="scroll"><table><thead><tr>
+       <th>English</th><th>Italiano</th><th>Nationality</th><th>Language</th><th>Capital</th>
+     </tr></thead><tbody>${
+       COUNTRIES.map(c=>`<tr><td class="en">${c[0]}</td><td class="it">${c[1]}</td>
+         <td>${c[2]}</td><td class="note">${c[3]}</td><td>${c[4]}</td></tr>`).join("")
+     }</tbody></table></div></div>`;
+}
+
+/* ---- pairs ---- */
+function renderPairs(){
+  wrap.innerHTML=head("Confusing words &amp; pairs","Two tables: single 'little words' that trip learners up (di solito, sempre, anche, allora, magari…), and pairs that are easy to swap. Each has a quick rule and example.")
+   +`<div class="tblcard"><div class="cap">Tricky little words <small>${TRICKY.length} words</small></div>
+     <div class="scroll"><table class="pairtbl"><thead><tr>
+       <th>Word</th><th>Meaning</th><th>How to use it</th>
+     </tr></thead><tbody>${
+       TRICKY.map(t=>`<tr><td class="it">${t[0]}</td><td>${t[1]}</td><td class="note">${t[2]}</td></tr>`).join("")
+     }</tbody></table></div></div>
+     <div class="tblcard"><div class="cap">Confusing pairs <small>${PAIRS.length} pairs</small></div>
+     <div class="scroll"><table class="pairtbl"><thead><tr>
+       <th>Pair</th><th>First</th><th>Second</th><th>Example / tip</th>
+     </tr></thead><tbody>${
+       PAIRS.map(p=>`<tr><td class="it">${p[0]}</td><td>${p[1]}</td><td>${p[2]}</td>
+         <td class="note">${p[3]}</td></tr>`).join("")
+     }</tbody></table></div></div>`;
+}
+
+/* ---- numbers ---- */
+function renderNumbers(){
+  wrap.innerHTML=head("Numbers, dates &amp; time","Days and months are <b>not</b> capitalised in Italian. Dates use cardinals except the 1st: <code>il primo maggio</code>, <code>il due maggio</code>.")
+   +`<div class="grid">
+      ${tbl2("Cardinal numbers","",CARD,"#","Italian")}
+      ${tbl2("Ordinal numbers","",ORD,"#","Italian")}
+      ${tbl2("Days of the week","i giorni",DAYS,"English","Italian")}
+      ${tbl2("Months","i mesi",MONTHS,"English","Italian")}
+      ${tbl2("Seasons","le stagioni",SEASONS,"English","Italian")}
+      ${tbl2("Telling the time","l'ora",TIME,"English","Italian")}
+    </div>`;
+}
+
+/* ---- pronouns ---- */
+function renderPronouns(){
+  wrap.innerHTML=head("Pronouns &amp; prepositions","Object pronouns go <b>before</b> the verb: <code>ti vedo</code> (I see you), <code>le parlo</code> (I speak to her). The articulated prepositions below merge a preposition with the article — memorise this grid.")
+   +`<div class="tblcard"><div class="cap">Personal pronouns</div>
+     <div class="scroll"><table><thead><tr>
+       <th>Subject</th><th>Direct obj.</th><th>Indirect obj.</th><th>Reflexive</th><th>After prep.</th>
+     </tr></thead><tbody>${
+       PRONROWS.map(r=>`<tr><td class="it">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td>
+         <td>${r[3]}</td><td>${r[4]}</td></tr>`).join("")
+     }</tbody></table></div></div>
+     <div class="twocol">
+       ${tbl2("Possessives","usually with article",POSS,"English","Italian")}
+       <div class="tblcard"><div class="cap">Simple prepositions</div>
+         <div class="scroll"><table><thead><tr><th>Prep.</th><th>Meaning</th><th>Example</th></tr></thead>
+         <tbody>${PREPS.map(p=>`<tr><td class="it">${p[0]}</td><td>${p[1]}</td><td class="note">${p[2]}</td></tr>`).join("")}</tbody>
+         </table></div></div>
+     </div>
+     <div class="tblcard"><div class="cap">Articulated prepositions <small>preposition + definite article</small></div>
+       <div class="scroll"><table><thead><tr><th></th>${ARTCOLS.map(c=>`<th>${c}</th>`).join("")}</tr></thead>
+       <tbody>${ARTROWS.map(r=>`<tr><td class="it">${r[0]}</td>${r.slice(1).map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}</tbody>
+       </table></div></div>`;
+}
+
+/* ---- questions ---- */
+function renderQuestions(){
+  wrap.innerHTML=head("Question words &amp; connectors","<code>perché</code> means both <em>why</em> and <em>because</em>. <code>che</code> is a workhorse: <em>what</em>, <em>that</em>, and <em>which</em>.")
+   +`<div class="twocol">
+      ${tbl2("Question words","le domande",QWORDS,"Italian","English")}
+      ${tbl2("Connectors","i connettivi",CONN,"Italian","English")}
+    </div>`;
+}
+
+/* ---- greetings ---- */
+function renderGreetings(){
+  wrap.innerHTML=head("Greetings &amp; survival phrases","<code>ciao</code> is informal (both hi and bye); use <code>buongiorno/buonasera</code> and <code>arrivederci</code> with strangers.")
+   +`<div class="twocol">
+      ${tbl2("Greetings &amp; courtesy","",GREET,"Italian","English")}
+      ${tbl2("Useful phrases","",PHRASE,"Italian","English")}
+    </div>`;
+}
+
+/* ---- vocab: colors/family/body ---- */
+function renderVocab(){
+  wrap.innerHTML=head("Colors, family &amp; body","Colors marked <code>*</code> (blu, viola, rosa) are invariable — they never change. Most others agree: <code>una macchina rossa</code>, <code>capelli neri</code>.")
+   +`<div class="grid">
+      ${tbl2("Colors","i colori",COLORS,"Italian","English")}
+      ${tbl2("Family","la famiglia",FAMILY,"Italian","English")}
+      ${tbl2("Body","il corpo",BODY,"Italian","English")}
+    </div>`;
+}
+
+/* ---- food ---- */
+function renderFood(){
+  wrap.innerHTML=head("Food &amp; restaurant","An Italian meal runs antipasto → primo → secondo + contorno → dolce. Order with <code>per me…</code> or <code>vorrei…</code>.")
+   +`<div class="twocol">
+      ${tbl2("At the restaurant","",FOODPHR,"Italian","English")}
+      ${tbl2("Food words","il cibo",FOODW,"Italian","English")}
+    </div>`;
+}
+
+draw();
+</script>
+</body>
+</html>
