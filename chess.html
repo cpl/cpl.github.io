@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chess Opening Missions — Decision-Tree Trainer</title>
+<style>
+  :root{
+    --bg:#eef1f6; --panel:#ffffff; --panel2:#f3f5fa; --ink:#1b2430; --muted:#5f6b7a;
+    --accent:#2f6fed; --good:#178a4e; --warn:#b3760f; --line:#dde2ec; --hl:#e4edff;
+    --light:#ecdcba; --dark:#b88e5e; --from:#f1d96a; --to:#bfe08a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.55 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+  header{padding:22px 22px 8px;border-bottom:1px solid var(--line)}
+  h1{margin:0;font-size:22px;letter-spacing:.2px}
+  header p{margin:6px 0 0;color:var(--muted);max-width:820px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 22px 0}
+  .tab{background:var(--panel);border:1px solid var(--line);color:var(--ink);
+    padding:9px 14px;border-radius:10px;cursor:pointer;font-weight:600;font-size:14px}
+  .tab .side{font-weight:500;color:var(--muted);font-size:12px;margin-left:6px}
+  .tab.active{border-color:var(--accent);background:var(--hl)}
+  .group{margin:14px 22px 0;color:var(--muted);font-size:12px;text-transform:uppercase;
+    letter-spacing:.6px;width:100%}
+  .wrap{display:grid;grid-template-columns:minmax(320px,1fr) minmax(360px,1.05fr);
+    gap:22px;padding:22px;align-items:start;max-width:1220px;margin:0 auto}
+  @media(max-width:900px){.wrap{grid-template-columns:1fr}}
+  @media(min-width:901px){.sticky-col{position:sticky;top:14px;align-self:start}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .card+.card{margin-top:16px}
+  h2{font-size:16px;margin:0 0 8px}
+  h3{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0 0 8px}
+  .summary{color:var(--muted)}
+  .missions{list-style:none;margin:8px 0 0;padding:0}
+  .missions li{padding:8px 10px;background:var(--panel2);border-left:3px solid var(--accent);
+    border-radius:8px;margin-bottom:8px;font-size:14px}
+  .missions li b{color:var(--ink)}
+  /* board */
+  .board-wrap{display:flex;flex-direction:column;align-items:center}
+  .board{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);
+    width:min(92vw,440px);aspect-ratio:1/1;border:6px solid #0b0d11;border-radius:8px;
+    overflow:hidden;box-shadow:0 8px 22px rgba(40,55,80,.16)}
+  .sq{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;
+    min-height:0;font-size:min(8.5vw,40px);line-height:1;user-select:none}
+  .sq.l{background:var(--light)} .sq.d{background:var(--dark)}
+  .sq.from::after,.sq.to::after{content:"";position:absolute;inset:0;opacity:.55}
+  .sq.from::after{background:var(--from)} .sq.to::after{background:var(--to)}
+  .pc{position:relative;z-index:2}
+  .pc.w{color:#fafafa;text-shadow:0 0 1px #000,0 1px 2px rgba(0,0,0,.6),0 0 3px #000}
+  .pc.b{color:#15171c;text-shadow:0 0 1px #cfd3da,0 1px 1px rgba(255,255,255,.25)}
+  .coord{position:absolute;font-size:10px;font-weight:700;opacity:.55;z-index:3}
+  .coord.file{right:3px;bottom:1px} .coord.rank{left:3px;top:1px}
+  .controls{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;justify-content:center}
+  button.ctl{background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    padding:9px 14px;border-radius:9px;cursor:pointer;font-weight:600}
+  button.ctl:hover{border-color:var(--accent)} button.ctl:disabled{opacity:.4;cursor:default}
+  .turn{margin-top:10px;color:var(--muted);font-size:13px;text-align:center}
+  /* choices */
+  .choices{margin-top:16px}
+  .choices .chead{font-size:13px;color:var(--muted);margin-bottom:8px}
+  .choices .chead.you{color:var(--good)} .choices .chead.opp{color:var(--warn)}
+  .choicebtns{display:flex;flex-wrap:wrap;gap:8px}
+  .choice{background:var(--panel2);border:1px solid var(--line);color:var(--ink);text-align:left;
+    padding:9px 12px;border-radius:10px;cursor:pointer;font-size:14px;line-height:1.3}
+  .choice:hover{border-color:var(--accent);background:var(--hl)}
+  .choice b{font-size:15px} .choice small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+  .choice.main{border-color:var(--good)}
+  .choice.main b::after{content:" ★";color:var(--good);font-size:11px}
+  .endline{color:var(--muted);font-style:italic;padding:6px 0}
+  /* move list */
+  .moves{display:flex;flex-wrap:wrap;gap:4px 6px;font-variant-numeric:tabular-nums;margin-top:4px}
+  .mvnum{color:var(--muted);align-self:center;font-size:13px}
+  .mv{padding:3px 7px;border-radius:6px;cursor:pointer;font-weight:600;font-size:13px;border:1px solid transparent}
+  .mv:hover{background:var(--panel2)} .mv.cur{background:var(--hl);border-color:var(--accent)}
+  .note{margin-top:14px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:12px 14px;min-height:64px;font-size:14px}
+  .note .tag{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;
+    letter-spacing:.5px;padding:2px 8px;border-radius:20px;margin-bottom:6px}
+  .tag.mission{background:#e3edff;color:#2f6fed}
+  .tag.react{background:#fbeccd;color:#a8700f}
+  .tag.idea{background:#d8f3e3;color:#0f8043}
+  /* decision tree map */
+  .tree, .tree ul{list-style:none;margin:0;padding:0}
+  .tree ul{margin-left:14px;border-left:1px dashed var(--line);padding-left:10px}
+  .tree li{margin:3px 0;position:relative}
+  .tnode{display:inline-block;padding:3px 8px;border-radius:7px;cursor:pointer;font-weight:600;
+    font-size:13px;font-variant-numeric:tabular-nums;border:1px solid transparent}
+  .tnode small{font-weight:500;color:var(--muted)}
+  .tnode.tw{background:#23262e} .tnode.tb{background:#191b21;border-color:#2a2f3a}
+  .tnode:hover{border-color:var(--accent)}
+  .tnode.onpath{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .tnode.tip{outline:2px solid var(--good);outline-offset:1px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:10px}
+  .legend i{font-style:normal;border-bottom:2px solid}
+  footer{color:var(--muted);text-align:center;padding:8px 22px 30px;font-size:12px}
+  kbd{background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12px}
+  .sub{font-weight:400;color:var(--muted);font-size:13px}
+  /* condensed decision tree */
+  .tree,.tree ul{list-style:none;margin:0;padding:0}
+  .tree ul{margin-left:12px;border-left:1px solid var(--line);padding-left:10px;margin-top:2px}
+  .tree li{margin:5px 0}
+  .seg{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+  .chip{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;padding:2px 7px;border-radius:6px;
+    cursor:pointer;border:1px solid var(--line);border-left:3px solid var(--line);background:var(--panel2);color:var(--ink)}
+  .chip.mission{border-left-color:var(--accent)} .chip.react{border-left-color:var(--warn)} .chip.idea{border-left-color:var(--good)}
+  .chip:hover{background:var(--hl)}
+  .chip.onpath{background:var(--hl);border-color:var(--accent)}
+  .chip.tip{box-shadow:0 0 0 2px var(--good)}
+  .pill{font-size:11px;color:var(--muted);font-style:italic;background:#eef2f9;padding:1px 8px;border-radius:10px}
+  .endflag{color:var(--good);font-weight:800}
+  .forkcap{font-size:11px;font-weight:700;letter-spacing:.3px;margin:6px 0 2px;text-transform:uppercase}
+  .forkcap.you{color:var(--good)} .forkcap.opp{color:var(--warn)}
+  /* mission path */
+  .mintro{color:var(--muted);font-size:13px;margin-bottom:6px}
+  .mstep{display:flex;gap:10px;padding:7px 6px 7px 4px;cursor:pointer;border-radius:8px}
+  .mstep:hover{background:var(--panel2)}
+  .mstep .dot{flex:0 0 auto;width:11px;height:11px;border-radius:50%;margin-top:5px;border:2px solid var(--line);background:#fff}
+  .mstep.mission .dot{border-color:var(--accent);background:var(--accent)}
+  .mstep.react .dot{border-color:var(--warn);background:var(--warn)}
+  .mstep.idea .dot{border-color:var(--good);background:var(--good)}
+  .mstep b{font-size:14px}
+  .mtag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:1px 6px;border-radius:10px;margin-left:4px;vertical-align:1px}
+  .mtag.mission{background:#e3edff;color:#2f6fed} .mtag.react{background:#fbeccd;color:#a8700f} .mtag.idea{background:#d8f3e3;color:#0f8043}
+  .mtext{color:var(--muted);font-size:12.5px;margin-top:3px;line-height:1.45}
+  .decision{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+  .dechead{font-size:12px;font-weight:800;letter-spacing:.3px;margin-bottom:8px}
+  .dechead.you{color:var(--good)} .dechead.opp{color:var(--warn)} .dechead.done{color:var(--muted)}
+  .deccard{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);
+    border-radius:10px;padding:8px 11px;margin-bottom:8px;cursor:pointer;color:var(--ink)}
+  .deccard:hover{border-color:var(--accent);background:var(--hl)}
+  .deccard.main{border-color:var(--good)}
+  .deccard b{font-size:15px}
+  .deccard.main b::after{content:" ★";color:var(--good);font-size:11px}
+</style>
+</head>
+<body>
+<header>
+  <h1>♟ Chess Opening Missions</h1>
+  <p>Openings as <b>missions</b> — squares to control, pieces to develop, and <i>if&nbsp;X&nbsp;then&nbsp;Y</i> reactions.
+  In the play area you <b>branch the line yourself</b>: at every move, pick a continuation. The
+  <b>decision-tree map</b> on the left shows the whole repertoire — click any node to jump there.
+  Keys: <kbd>→</kbd> main line · <kbd>←</kbd> back.</p>
+</header>
+
+<div class="tabs" id="tabs"></div>
+
+<div class="wrap">
+  <div>
+    <div class="card">
+      <h2 id="opTitle"></h2>
+      <p class="summary" id="opSummary"></p>
+      <h3 style="margin-top:14px">Core missions</h3>
+      <ul class="missions" id="opMissions"></ul>
+    </div>
+    <div class="card">
+      <h2>Mission path <span class="sub">— your current line, decision by decision</span></h2>
+      <div id="missionpath"></div>
+    </div>
+    <div class="card">
+      <h2>All lines <span class="sub">— branch points only; click any move to jump</span></h2>
+      <div id="treemap"></div>
+      <div class="legend">
+        <span><i style="border-color:var(--accent)">Mission</i> your goal</span>
+        <span><i style="border-color:var(--warn)">Reaction</i> what you answer</span>
+        <span><i style="border-color:var(--good)">Idea</i> the plan</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sticky-col">
+    <div class="card">
+      <div class="board-wrap">
+        <div class="board" id="board"></div>
+        <div class="controls">
+          <button class="ctl" id="bBack">◀ Back</button>
+          <button class="ctl" id="bRestart">⟲ Restart line</button>
+          <button class="ctl" id="bMain">Main line ▶▶</button>
+        </div>
+        <div class="turn" id="turn"></div>
+      </div>
+      <div class="choices" id="choices"></div>
+      <h3 style="margin-top:16px">Line so far</h3>
+      <div class="moves" id="moves"></div>
+      <div class="note" id="note"></div>
+    </div>
+  </div>
+</div>
+
+<footer>Self-contained · no internet required · model lines for study, not engine-exhaustive theory. The ★ marks the main recommendation at each branch.</footer>
+
+<script>
+/* ============ tree builders ============ */
+function mv(san,from,to,side,type,label,note){return{san,from,to,side,type,label,note};}
+function nd(m,kids){m.children=kids||[];return m;}
+const L=(...k)=>k;            // children list shorthand
+
+/* ===================== OPENINGS (decision trees) ===================== */
+const OPENINGS=[
+/* ---------------- LONDON SYSTEM (White) ---------------- */
+{
+ id:"london",name:"London System",side:"white",group:"White system",
+ summary:"One reusable setup against almost everything Black does. Build a small central fortress, get the dark-squared bishop out early, fight for e5, then aim the pieces at Black's king. Adapt the plan to Black's structure rather than memorising lines.",
+ missions:[
+  "<b>Bishop out before e3:</b> always play Bf4 first, so it never gets buried behind your own pawns.",
+  "<b>Build the triangle:</b> pawns on c3–d4–e3 form a centre that's very hard to break.",
+  "<b>Fight for e5:</b> Nf3 + Nbd2 control it; landing a knight on e5 is the dream outpost.",
+  "<b>Load the battery:</b> Bd3 behind the f4/g3 bishop aims at h7 — the Greek-gift attack (Bxh7+).",
+  "<b>Knight reroute:</b> Nbd2–f1–g3 (or Nf3–e5) brings a knight to the kingside attack.",
+  "<b>Keep the good bishop alive:</b> meet ...Bd6 with Bg3; vs ...g6 setups play h3 so it has the h2 retreat.",
+  "<b>Meet ...Qb6 calmly:</b> guard b2 with Qc1 — it also keeps your strong f4-bishop. Don't panic, and don't sacrifice the pawn.",
+  "<b>Break with e4 (or c4) when ready:</b> once developed, open the centre against an uncastled or passive king.",
+  "<b>It's a system, not a gambit:</b> same setup vs ...d5, ...Nf6, ...g6 — recognise the structure, pick the matching plan."
+ ],
+ tree:L(
+  nd(mv("d4","d2","d4","w","mission","1.d4","Claim the centre and free the c1-bishop's diagonal."),L(
+    /* ===== Black plays 1...d5 ===== */
+    nd(mv("d5","d7","d5","b","react","1...d5","Classical: Black meets you head-on."),L(
+      nd(mv("Bf4","c1","f4","w","mission","2.Bf4","Bishop OUTSIDE the pawn chain before e3 — the heart of the London."),L(
+        /* 2...Nf6 classical */
+        nd(mv("Nf6","g8","f6","b","react","2...Nf6","Develops and eyes e4."),L(
+          nd(mv("e3","e2","e3","w","idea","3.e3","Now e3 is safe — start the c3–d4–e3 triangle."),L(
+            nd(mv("e6","e7","e6","b","react","3...e6","Solid, but locks in Black's own light bishop."),L(
+              nd(mv("Nf3","g1","f3","w","mission","4.Nf3","Control e5; prepare to castle."),L(
+                nd(mv("c5","c7","c5","b","react","4...c5","The standard freeing break at d4."),L(
+                  nd(mv("c3","c2","c3","w","idea","5.c3","Complete the triangle; d4 is bulletproof."),L(
+                    nd(mv("Nc6","b8","c6","b","react","5...Nc6","Piles on d4."),L(
+                      nd(mv("Nbd2","b1","d2","w","mission","6.Nbd2","Supports an e4 break and keeps the c-pawn free; reroute via f1–g3 or to e5."),L(
+                        nd(mv("Bd6","f8","d6","b","react","6...Bd6","Offers to trade off your strong bishop."),L(
+                          nd(mv("Bg3","f4","g3","w","idea","7.Bg3","Sidestep the trade — keep the good bishop, still eyeing the kingside."),L(
+                            nd(mv("O-O","e8","g8","b","react","7...O-O","Black castles into the attacking zone."),L(
+                              nd(mv("Bd3","f1","d3","w","mission","8.Bd3","Load the battery aimed at h7."),L(
+                                nd(mv("b6","b7","b6","b","react","8...b6","Black develops the queenside bishop."),L(
+                                  nd(mv("Ne5","f3","e5","w","mission","9.Ne5","Mission complete: a dominant, supported knight on e5. With Bd3+Bg3+Ne5 all aimed at the king, the Greek-gift Bxh7+ is in the air."))
+                                ))
+                              ))
+                            ))
+                          ))
+                        ))
+                      ))
+                    ))
+                  ))
+                ))
+              ))
+            )),
+            /* 3...Bf5 copycat */
+            nd(mv("Bf5","c8","f5","b","react","3...Bf5","Black copies your bishop development."),L(
+              nd(mv("Bd3","f1","d3","w","idea","4.Bd3","Challenge the copycat bishop at once."),L(
+                nd(mv("Bxd3","f5","d3","b","react","4...Bxd3","Black trades."),L(
+                  nd(mv("Qxd3","d1","d3","w","idea","5.Qxd3","Queen recaptures, eyeing b5/h7 — White has an easy, pleasant game."))
+                ))
+              ))
+            ))
+          ))
+        )),
+        /* 2...c5 / Qb6 challenge */
+        nd(mv("c5","c7","c5","b","react","2...c5","Black strikes d4 immediately."),L(
+          nd(mv("e3","e2","e3","w","idea","3.e3","Hold d4, keep the structure."),L(
+            nd(mv("Qb6","d8","b6","b","react","3...Qb6","The critical test: hits b2 and d4 at once."),L(
+              nd(mv("Qc1","d1","c1","w","mission","4.Qc1","Stay calm: Qc1 quietly defends b2 AND keeps your good f4-bishop — no need to sacrifice or grovel. (Note: the old 4.Nc3 cxd4 5.exd4 Qxb2?! is NOT a trap — 6.Nb5 fails to 6...Qb4+, so just guard b2 instead.)"),L(
+                nd(mv("Nc6","b8","c6","b","react","4...Nc6","Black develops and keeps pressing d4."),L(
+                  nd(mv("Nf3","g1","f3","w","idea","5.Nf3","Develop; support d4 and e5."),L(
+                    nd(mv("Bf5","c8","f5","b","react","5...Bf5","Black gets the bishop out too."),L(
+                      nd(mv("c3","c2","c3","w","idea","6.c3","Finish the triangle — b2 is solid and your bishop is alive."),L(
+                        nd(mv("e6","e7","e6","b","react","6...e6","A balanced middlegame: White kept the structure and the strong f4-bishop."))
+                      ))
+                    ))
+                  ))
+                ))
+              ))
+            ))
+          ))
+        ))
+      ))
+    )),
+    /* ===== Black plays 1...Nf6 (Indian move orders) ===== */
+    nd(mv("Nf6","g8","f6","b","react","1...Nf6","Indian move order — Black delays ...d5."),L(
+      nd(mv("Bf4","c1","f4","w","mission","2.Bf4","Bishop out anyway — the London works against Indian setups too."),L(
+        /* fianchetto / KID setup */
+        nd(mv("g6","g7","g6","b","react","2...g6","King's-Indian-style fianchetto."),L(
+          nd(mv("e3","e2","e3","w","idea","3.e3","Solid triangle setup."),L(
+            nd(mv("Bg7","f8","g7","b","react","3...Bg7","The fianchettoed bishop eyes your centre."),L(
+              nd(mv("h3","h2","h3","w","mission","4.h3","Give the bishop a safe home: if ...Nh5 hits f4, you retreat Bh2 and stay alive. Also stops ...Bg4/...Ng4."),L(
+                nd(mv("O-O","e8","g8","b","react","4...O-O","Black castles."),L(
+                  nd(mv("Nf3","g1","f3","w","idea","5.Nf3","Develop, eye e5."),L(
+                    nd(mv("d6","d7","d6","b","react","5...d6","Prepares ...e5 / ...Nbd7."),L(
+                      nd(mv("Be2","f1","e2","w","idea","6.Be2","Modest but solid; castle next."),L(
+                        nd(mv("Nbd7","b8","d7","b","react","6...Nbd7","Black develops."),L(
+                          nd(mv("O-O","e1","g1","w","mission","7.O-O","Castle, then aim for the c4 or e4 break to open the position against the fianchetto."))
+                        ))
+                      ))
+                    ))
+                  ))
+                ))
+              ))
+            ))
+          ))
+        )),
+        /* 2...e6 transposition */
+        nd(mv("e6","e7","e6","b","react","2...e6","Heading for classical structures."),L(
+          nd(mv("e3","e2","e3","w","idea","3.e3","Triangle."),L(
+            nd(mv("c5","c7","c5","b","react","3...c5","The freeing break."),L(
+              nd(mv("Nf3","g1","f3","w","idea","4.Nf3","Develop — this transposes back into the main classical London structures."))
+            ))
+          ))
+        ))
+      ))
+    ))
+  ))
+ )
+},
+/* ---------------- SLAV (Black vs d4) ---------------- */
+{
+ id:"slav",name:"Slav Defense",side:"black",group:"vs 1.d4",
+ summary:"A rock-solid answer to the Queen's Gambit. Support d5 with ...c6 (not ...e6), so the light-squared bishop can escape to f5 before you ever lock it in. Aim for a sound, equal middlegame.",
+ missions:[
+  "<b>Support d5 the smart way:</b> ...c6 holds the centre without burying your light bishop.",
+  "<b>Free the problem bishop:</b> get it to f5 (or g4) BEFORE playing ...e6 — the soul of the Slav.",
+  "<b>Grab and hold c4 when useful:</b> ...dxc4, develop with tempo; meet a4 with the bishop already out.",
+  "<b>Keep the structure sound:</b> the Slav rarely loses by force — play for safe equality, then outplay.",
+  "<b>Open lines with ...e6/...c5 later</b> once the pieces are developed."
+ ],
+ tree:L(
+  nd(mv("d4","d2","d4","w","react","1.d4","White claims the centre."),L(
+    nd(mv("d5","d7","d5","b","mission","1...d5","Meet d4 head-on."),L(
+      nd(mv("c4","c2","c4","w","react","2.c4","Queen's Gambit — pressure on d5."),L(
+        nd(mv("c6","c7","c6","b","mission","2...c6","The Slav: defend d5 with the c-pawn, keeping the c8-bishop's diagonal open."),L(
+          /* 3.Nf3 */
+          nd(mv("Nf3","g1","f3","w","react","3.Nf3","Develop, control e5."),L(
+            nd(mv("Nf6","g8","f6","b","mission","3...Nf6","Second defender of d5."),L(
+              /* 4.Nc3 main */
+              nd(mv("Nc3","b1","c3","w","react","4.Nc3","More pressure on d5."),L(
+                nd(mv("dxc4","d5","c4","b","idea","4...dxc4","Release the tension and grab the pawn — to develop the bishop with tempo."),L(
+                  nd(mv("a4","a2","a4","w","react","5.a4","Stops ...b5 from holding the pawn."),L(
+                    nd(mv("Bf5","c8","f5","b","mission","5...Bf5","THE Slav idea: bishop escapes to f5 before ...e6 can lock it in."),L(
+                      nd(mv("e3","e2","e3","w","react","6.e3","Opens lines to recapture on c4."),L(
+                        nd(mv("e6","e7","e6","b","idea","6...e6","Now ...e6 is perfect — the bishop is already outside."),L(
+                          nd(mv("Bxc4","f1","c4","w","react","7.Bxc4","White regains the pawn."),L(
+                            nd(mv("Bb4","f8","b4","b","mission","7...Bb4","Pin the knight, finish development, castle next — comfortable equality."))
+                          ))
+                        ))
+                      ))
+                    ))
+                  ))
+                ))
+              )),
+              /* 4.e3 quiet */
+              nd(mv("e3","e2","e3","w","react","4.e3","The quiet line — but it shuts in White's OWN c1-bishop."),L(
+                nd(mv("Bf5","c8","f5","b","idea","4...Bf5","Get YOUR bishop out first — the good Slav bishop you must never trap."),L(
+                  nd(mv("cxd5","c4","d5","w","react","5.cxd5","The critical try: open the c-file and set up Qb3 hitting b7 and d5."),L(
+                    nd(mv("cxd5","c6","d5","b","react","5...cxd5","Recapture toward the centre."),L(
+                      nd(mv("Qb3","d1","b3","w","react","6.Qb3","Double attack — hitting b7 and d5 at once."),L(
+                        nd(mv("Qb6","d8","b6","b","mission","6...Qb6","The key defence: cover b7 and offer the queen trade. After 7.Qxb6 axb6 the open a-file gives you a comfortable, equal endgame — getting the bishop to f5 was worth it."))
+                      ))
+                    ))
+                  ))
+                ))
+              ))
+            ))
+          )),
+          /* 3.cxd5 exchange */
+          nd(mv("cxd5","c4","d5","w","react","3.cxd5","The Exchange Slav — symmetrical, drawish structure."),L(
+            nd(mv("cxd5","c6","d5","b","idea","3...cxd5","Recapture toward the centre; the c-file battle decides the edge."),L(
+              nd(mv("Nc3","b1","c3","w","react","4.Nc3","Develop."),L(
+                nd(mv("Nf6","g8","f6","b","mission","4...Nf6","Guard d5."),L(
+                  nd(mv("Nf3","g1","f3","w","react","5.Nf3","Develop."),L(
+                    nd(mv("Nc6","b8","c6","b","mission","5...Nc6","Toward the centre, eyeing d4 and the c-file."),L(
+                      nd(mv("Bf4","c1","f4","w","react","6.Bf4","Bishop out (White's own London idea)."),L(
+                        nd(mv("Bf5","c8","f5","b","mission","6...Bf5","Mirror the good move — bishop out before ...e6. Equal."))
+                      ))
+                    ))
+                  ))
+                ))
+              ))
+            ))
+          ))
+        ))
+      ))
+    ))
+  ))
+ )
+},
+/* ---------------- KING'S INDIAN (Black vs d4) ---------------- */
+{
+ id:"kid",name:"King's Indian Defense",side:"black",group:"vs 1.d4",
+ summary:"A fighting, asymmetrical defense. Let White build a big centre, fianchetto on g7, then strike back — usually ...e5 and a kingside pawn storm (...f5–f4, ...g5–g4) while White attacks the queenside.",
+ missions:[
+  "<b>Fianchetto first:</b> ...g6 and ...Bg7 build a dragon on the long diagonal at White's centre.",
+  "<b>Invite the big centre, then hit it:</b> ...d6 and ...e5 (or ...c5) challenge White's pawns.",
+  "<b>Know which side is yours:</b> when the centre locks (d5), you attack the KINGSIDE, White the queenside.",
+  "<b>The thematic break is ...f5:</b> reroute the f6-knight (...Ne8/...Nd7), then storm ...f5–f4, ...g5–g4.",
+  "<b>Counter an over-extended centre with ...c5:</b> vs the Four Pawns Attack, undermine immediately."
+ ],
+ tree:L(
+  nd(mv("d4","d2","d4","w","react","1.d4","White takes the centre."),L(
+    nd(mv("Nf6","g8","f6","b","mission","1...Nf6","Control e4, stay flexible."),L(
+      nd(mv("c4","c2","c4","w","react","2.c4","More space."),L(
+        nd(mv("g6","g7","g6","b","mission","2...g6","Begin the fianchetto — the KID signature."),L(
+          /* 3.Nc3 main paths */
+          nd(mv("Nc3","b1","c3","w","react","3.Nc3","Supports e4."),L(
+            nd(mv("Bg7","f8","g7","b","mission","3...Bg7","The dragon bishop rakes the long diagonal."),L(
+              nd(mv("e4","e2","e4","w","react","4.e4","The big classical centre — let him build it, then attack it."),L(
+                nd(mv("d6","d7","d6","b","idea","4...d6","Restrain e5 and prepare your own ...e5/...c5 break (hypermodern: surround, don't occupy)."),L(
+                  /* Classical */
+                  nd(mv("Nf3","g1","f3","w","react","5.Nf3","Guards e5/d4."),L(
+                    nd(mv("O-O","e8","g8","b","mission","5...O-O","King safety before opening the centre."),L(
+                      nd(mv("Be2","f1","e2","w","react","6.Be2","Classical main; castle next."),L(
+                        nd(mv("e5","e7","e5","b","mission","6...e5","The thematic strike at d4."),L(
+                          nd(mv("O-O","e1","g1","w","react","7.O-O","White castles."),L(
+                            nd(mv("Nc6","b8","c6","b","idea","7...Nc6","Pressure d4, provoking White to resolve it."),L(
+                              nd(mv("d5","d4","d5","w","react","8.d5","White locks the centre, gains queenside space."),L(
+                                nd(mv("Ne7","c6","e7","b","mission","8...Ne7","Reroute! Knight heads for g6/f5 and clears the f-pawn. Plan: ...Ne8/...Nd7, then ...f5–f4 and a kingside storm — you attack the king, White the queenside."))
+                              ))
+                            ))
+                          ))
+                        ))
+                      ))
+                    ))
+                  )),
+                  /* Four Pawns Attack */
+                  nd(mv("f4","f2","f4","w","react","5.f4","The Four Pawns Attack — a huge but over-extended front."),L(
+                    nd(mv("O-O","e8","g8","b","mission","5...O-O","Get safe before opening lines."),L(
+                      nd(mv("Nf3","g1","f3","w","react","6.Nf3","Braces the centre."),L(
+                        nd(mv("c5","c7","c5","b","idea","6...c5","Strike! Hit d4 at once and refuse to let White consolidate the monster centre."),L(
+                          nd(mv("d5","d4","d5","w","react","7.d5","White pushes by."),L(
+                            nd(mv("e6","e7","e6","b","mission","7...e6","Keep hammering — pry the centre open while White is under-developed. Dynamic counterplay, pure KID."))
+                          ))
+                        ))
+                      ))
+                    ))
+                  ))
+                ))
+              ))
+            ))
+          )),
+          /* 3.Nf3 Fianchetto */
+          nd(mv("Nf3","g1","f3","w","react","3.Nf3","Heading for the calm Fianchetto setup."),L(
+            nd(mv("Bg7","f8","g7","b","mission","3...Bg7","Dragon bishop."),L(
+              nd(mv("g3","g2","g3","w","react","4.g3","The Fianchetto Variation — White neutralises your g7-bishop."),L(
+                nd(mv("O-O","e8","g8","b","mission","4...O-O","Castle into safety."),L(
+                  nd(mv("Bg2","f1","g2","w","react","5.Bg2","Bishops face off on the long diagonal."),L(
+                    nd(mv("d6","d7","d6","b","idea","5...d6","Prepare ...e5 without allowing e5 by White."),L(
+                      nd(mv("O-O","e1","g1","w","react","6.O-O","White castles."),L(
+                        nd(mv("Nbd7","b8","d7","b","idea","6...Nbd7","Flexible — supports ...e5 and keeps the c-pawn free (better than ...Nc6 here)."),L(
+                          nd(mv("Nc3","b1","c3","w","react","7.Nc3","Develop."),L(
+                            nd(mv("e5","e7","e5","b","mission","7...e5","The break — a sound, flexible game on equal terms."))
+                          ))
+                        ))
+                      ))
+                    ))
+                  ))
+                ))
+              ))
+            ))
+          ))
+        ))
+      ))
+    ))
+  ))
+ )
+},
+/* ---------------- HORWITZ / ENGLISH DEFENSE (Black vs d4) ---------------- */
+{
+ id:"horwitz",name:"Horwitz Defense",side:"black",group:"vs 1.d4",
+ summary:"The Horwitz Defense is 1.d4 e6; played with ...b6 and ...Bb7 it becomes the English Defense, fianchettoing the queen's bishop onto the long diagonal aimed at e4 and g2. Let White grab a big centre, then pressure it with ...Bb4 and the thematic ...f5. Sharp and provocative — Black accepts a slightly looser game in return for active piece play and the initiative.",
+ missions:[
+  "<b>Stay flexible:</b> 1...e6 reveals little — keep White guessing about ...d5, ...b6 or ...Bb4.",
+  "<b>Fianchetto the queen's bishop:</b> ...b6 and ...Bb7 put your main weapon on the long diagonal, hitting e4 and g2.",
+  "<b>Provoke, then puncture:</b> invite c4/d4/e4, then undermine the centre with ...Bb4 and ...f5.",
+  "<b>Pin to pile on e4:</b> ...Bb4 pins the c3-knight to the king, multiplying the pressure on e4.",
+  "<b>Accept double-edged play:</b> the English Defense fights for piece activity and the initiative — at the cost of a slightly looser game.",
+  "<b>Know the transposition:</b> after 2.e4 you can head to a French with ...d5 — but ...b6 keeps it independent."
+ ],
+ tree:L(
+  nd(mv("d4","d2","d4","w","react","1.d4","White claims the centre."),L(
+    nd(mv("e6","e7","e6","b","mission","1...e6","The Horwitz move: flexible, hiding your plan and preparing ...b6/...Bb7."),L(
+      /* 2.c4 main */
+      nd(mv("c4","c2","c4","w","react","2.c4","White grabs more space — the main try."),L(
+        nd(mv("b6","b7","b6","b","mission","2...b6","The English Defense plan: prepare ...Bb7 on the long diagonal."),L(
+          /* 3.e4 big centre */
+          nd(mv("e4","e2","e4","w","react","3.e4","White builds the full centre — exactly what you want to attack."),L(
+            nd(mv("Bb7","c8","b7","b","mission","3...Bb7","The bishop hits e4 down the long diagonal."),L(
+              /* 4.Bd3 gambit line */
+              nd(mv("Bd3","f1","d3","w","react","4.Bd3","Defends e4 and develops."),L(
+                nd(mv("Nc6","b8","c6","b","mission","4...Nc6","A signature English-Defense move: pile on d4 and provoke White into committing. (The sharp 4...f5 5.exf5 Bxg2 gambit exists, but it's objectively dubious — White is better after 6.Qh5+ g6 7.fxg6 Bg7 8.gxh7+. Prefer the sound move.)"),L(
+                  nd(mv("Ne2","g1","e2","w","react","5.Ne2","Props up d4 without blocking the f-pawn."),L(
+                    nd(mv("Bb4+","f8","b4","b","idea","5...Bb4+","Develop with a check, disrupting White's coordination."),L(
+                      nd(mv("Nbc3","b1","c3","w","react","6.Nbc3","Block the check and reinforce e4."),L(
+                        nd(mv("f5","f7","f5","b","mission","6...f5","Now the thematic strike — with pieces developed, challenge e4 on sound terms."))
+                      ))
+                    ))
+                  ))
+                ))
+              )),
+              /* 4.Nc3 Bb4 f3 positional */
+              nd(mv("Nc3","b1","c3","w","react","4.Nc3","Develops and adds a defender to e4."),L(
+                nd(mv("Bb4","f8","b4","b","mission","4...Bb4","Pin the knight to the king — now e4 is really under fire."),L(
+                  nd(mv("f3","f2","f3","w","react","5.f3","The solid defense: prop up e4 with the f-pawn."),L(
+                    nd(mv("f5","f7","f5","b","idea","5...f5","Strike anyway — challenge e4 before White consolidates."),L(
+                      nd(mv("exf5","e4","f5","w","react","6.exf5","White takes."),L(
+                        nd(mv("Nh6","g8","h6","b","mission","6...Nh6","Recapture plan: ...Nxf5 next, regaining the pawn with an active knight and the bishop pair pointing at White's king."))
+                      ))
+                    ))
+                  ))
+                ))
+              ))
+            ))
+          )),
+          /* 3.Nf3 quiet */
+          nd(mv("Nf3","g1","f3","w","react","3.Nf3","Quiet — White declines the big centre."),L(
+            nd(mv("Bb7","c8","b7","b","mission","3...Bb7","Develop the fianchetto bishop."),L(
+              nd(mv("g3","g2","g3","w","react","4.g3","White fianchettos to contest your b7-bishop."),L(
+                nd(mv("f5","f7","f5","b","idea","4...f5","Grab kingside space, Dutch-style — a flexible, fighting setup with equal chances."))
+              ))
+            ))
+          ))
+        ))
+      )),
+      /* 2.e4 transposition / independent */
+      nd(mv("e4","e2","e4","w","react","2.e4","White takes the full centre — this can transpose to a French (...d5)."),L(
+        nd(mv("b6","b7","b6","b","idea","2...b6","Stay independent: the English Defense without c4 (or play ...d5 for a French)."),L(
+          nd(mv("Bd3","f1","d3","w","react","3.Bd3","Develops, defends e4."),L(
+            nd(mv("Bb7","c8","b7","b","mission","3...Bb7","Bishop on the long diagonal, eyeing e4 and g2."),L(
+              nd(mv("Nc3","b1","c3","w","react","4.Nc3","Adds a defender to e4."),L(
+                nd(mv("Bb4","f8","b4","b","mission","4...Bb4","Pin the knight and pressure e4 — with ...Qh4 and ...f5 ideas to follow."))
+              ))
+            ))
+          ))
+        ))
+      ))
+    ))
+  ))
+ )
+},
+/* ---------------- CARO-KANN (Black vs e4) ---------------- */
+{
+ id:"caro",name:"Caro-Kann Defense",side:"black",group:"vs 1.e4",
+ summary:"The solid, low-risk answer to 1.e4. Challenge the centre with ...d5 supported by ...c6 — and unlike the French, your light-squared bishop gets OUT to f5 before ...e6 locks it in. Aim for a sound structure and a safe endgame.",
+ missions:[
+  "<b>Prepare ...d5 with support:</b> ...c6 backs the central strike without blocking your bishop.",
+  "<b>Free the light bishop to f5:</b> develop it before ...e6, avoiding the French's classic ‘bad bishop’.",
+  "<b>Release tension and develop:</b> ...dxe4 then natural moves; no weaknesses to nurse.",
+  "<b>Vs the Advance (3.e5):</b> play ...Bf5 immediately, then ...e6 and the ...c5 break.",
+  "<b>Vs the Exchange:</b> easy development, quick equality.",
+  "<b>Play for the long game:</b> the Caro rarely gets mated — outlast sharper openings."
+ ],
+ tree:L(
+  nd(mv("e4","e2","e4","w","react","1.e4","White grabs the centre."),L(
+    nd(mv("c6","c7","c6","b","mission","1...c6","Prepare ...d5 with support, keeping the c8-bishop's diagonal open."),L(
+      nd(mv("d4","d2","d4","w","react","2.d4","White builds the big centre."),L(
+        nd(mv("d5","d7","d5","b","mission","2...d5","Strike at the centre — the Caro's whole point."),L(
+          /* 3.Nc3 Classical */
+          nd(mv("Nc3","b1","c3","w","react","3.Nc3","Defends e4, invites the trade."),L(
+            nd(mv("dxe4","d5","e4","b","idea","3...dxe4","Release the tension and develop with tempo."),L(
+              nd(mv("Nxe4","c3","e4","w","react","4.Nxe4","Recaptures."),L(
+                nd(mv("Bf5","c8","f5","b","mission","4...Bf5","THE Caro move: bishop OUT before ...e6, hitting the knight."),L(
+                  nd(mv("Ng3","e4","g3","w","react","5.Ng3","Attacks the bishop."),L(
+                    nd(mv("Bg6","f5","g6","b","idea","5...Bg6","Keep the good bishop on its diagonal."),L(
+                      nd(mv("h4","h2","h4","w","react","6.h4","White tries to harass the bishop."),L(
+                        nd(mv("h6","h7","h6","b","mission","6...h6","Make luft so the bishop keeps a safe retreat (g6–h7)."),L(
+                          nd(mv("Nf3","g1","f3","w","react","7.Nf3","Develop."),L(
+                            nd(mv("Nd7","b8","d7","b","idea","7...Nd7","Develop, prepare ...Ngf6 — a famously solid Caro structure."))
+                          ))
+                        ))
+                      ))
+                    ))
+                  ))
+                ))
+              ))
+            ))
+          )),
+          /* 3.e5 Advance */
+          nd(mv("e5","e4","e5","w","react","3.e5","The Advance — White grabs space and locks the centre."),L(
+            nd(mv("Bf5","c8","f5","b","mission","3...Bf5","Get the bishop OUT now, before ...e6 locks it in — the #1 Caro idea."),L(
+              nd(mv("Nf3","g1","f3","w","react","4.Nf3","Develop."),L(
+                nd(mv("e6","e7","e6","b","idea","4...e6","Now safe — the bishop is already outside."),L(
+                  nd(mv("Be2","f1","e2","w","react","5.Be2","Modest development."),L(
+                    nd(mv("c5","c6","c5","b","mission","5...c5","Strike at d4 — the standard freeing break."))
+                  ))
+                ))
+              ))
+            ))
+          )),
+          /* 3.exd5 Exchange */
+          nd(mv("exd5","e4","d5","w","react","3.exd5","The Exchange — symmetrical, easy for Black."),L(
+            nd(mv("cxd5","c6","d5","b","idea","3...cxd5","Recapture, smooth development ahead."),L(
+              nd(mv("Bd3","f1","d3","w","react","4.Bd3","A common setup."),L(
+                nd(mv("Nc6","b8","c6","b","mission","4...Nc6","Develop, contest the centre."),L(
+                  nd(mv("c3","c2","c3","w","react","5.c3","Supports d4."),L(
+                    nd(mv("Nf6","g8","f6","b","idea","5...Nf6","Comfortable equality, no weaknesses."))
+                  ))
+                ))
+              ))
+            ))
+          ))
+        ))
+      ))
+    ))
+  ))
+ )
+},
+/* ---------------- SICILIAN (Black vs e4) ---------------- */
+{
+ id:"sicilian",name:"Sicilian Defense",side:"black",group:"vs 1.e4",
+ summary:"The most ambitious answer to 1.e4. Instead of mirroring, ...c5 fights for d4 and unbalances the game, playing for a win with the black pieces. Two repertoires shown: the flexible Najdorf and the quick-developing Accelerated Dragon.",
+ missions:[
+  "<b>Unbalance, don't symmetrise:</b> ...c5 takes the game out of dry equality and plays for a win.",
+  "<b>Trade the d-pawn for the c-pawn:</b> ...cxd4 opens the half-open c-file — your attacking highway.",
+  "<b>Najdorf ...a6:</b> control b5, then choose ...e5 or ...e6 depending on White's setup.",
+  "<b>Accelerated Dragon ...g6:</b> fast fianchetto aiming for an early ...d5 in one move.",
+  "<b>Counter wing attacks on the other wing:</b> vs an English-Attack pawn storm, hit back with ...b5 on the queenside.",
+  "<b>Respect the Maroczy Bind (c4):</b> develop patiently, then free yourself with ...Nxd4 and ...Be6/...a5."
+ ],
+ tree:L(
+  nd(mv("e4","e2","e4","w","react","1.e4","White grabs the centre."),L(
+    nd(mv("c5","c7","c5","b","mission","1...c5","The Sicilian — fight for d4 and unbalance the game."),L(
+      nd(mv("Nf3","g1","f3","w","react","2.Nf3","White's main developing move."),L(
+        /* --- Najdorf path --- */
+        nd(mv("d6","d7","d6","b","react","2...d6","Najdorf move order — supports an ...Nf6/...e5 setup."),L(
+          nd(mv("d4","d2","d4","w","react","3.d4","White opens the centre."),L(
+            nd(mv("cxd4","c5","d4","b","idea","3...cxd4","Trade — open the half-open c-file."),L(
+              nd(mv("Nxd4","f3","d4","w","react","4.Nxd4","Recaptures."),L(
+                nd(mv("Nf6","g8","f6","b","mission","4...Nf6","Hit e4, forcing White to defend it."),L(
+                  nd(mv("Nc3","b1","c3","w","react","5.Nc3","Defends e4, develops."),L(
+                    nd(mv("a6","a7","a6","b","mission","5...a6","The Najdorf move: control b5 and stay flexible for ...e5 or ...e6."),L(
+                      /* 6.Be2 classical */
+                      nd(mv("Be2","f1","e2","w","react","6.Be2","Quiet, classical main."),L(
+                        nd(mv("e5","e7","e5","b","mission","6...e5","Seize the centre — the Najdorf point."),L(
+                          nd(mv("Nb3","d4","b3","w","react","7.Nb3","Retreats; the knight eyes a5/c5."),L(
+                            nd(mv("Be7","f8","e7","b","idea","7...Be7","Develop, prepare to castle."),L(
+                              nd(mv("O-O","e1","g1","w","react","8.O-O","White castles."),L(
+                                nd(mv("O-O","e8","g8","b","idea","8...O-O","Safe king, rich middlegame with chances for both."))
+                              ))
+                            ))
+                          ))
+                        ))
+                      )),
+                      /* 6.Be3 English Attack */
+                      nd(mv("Be3","c1","e3","w","react","6.Be3","The English Attack — White plans f3, Qd2, g4, O-O-O and a kingside storm."),L(
+                        nd(mv("e5","e7","e5","b","idea","6...e5","Gain the centre and kick the knight."),L(
+                          nd(mv("Nb3","d4","b3","w","react","7.Nb3","Retreat."),L(
+                            nd(mv("Be6","c8","e6","b","mission","7...Be6","Develop and brace for f3+g4 — you'll counter on the queenside with ...b5–b4."))
+                          ))
+                        ))
+                      ))
+                    ))
+                  ))
+                ))
+              ))
+            ))
+          ))
+        )),
+        /* --- Accelerated Dragon path --- */
+        nd(mv("Nc6","b8","c6","b","react","2...Nc6","Accelerated Dragon move order."),L(
+          nd(mv("d4","d2","d4","w","react","3.d4","Open the centre."),L(
+            nd(mv("cxd4","c5","d4","b","idea","3...cxd4","Open the c-file."),L(
+              nd(mv("Nxd4","f3","d4","w","react","4.Nxd4","Recaptures."),L(
+                nd(mv("g6","g7","g6","b","mission","4...g6","Fianchetto fast — the Accelerated Dragon, aiming to play ...d5 in one go."),L(
+                  /* 5.Nc3 main */
+                  nd(mv("Nc3","b1","c3","w","react","5.Nc3","Develops, controls d5."),L(
+                    nd(mv("Bg7","f8","g7","b","mission","5...Bg7","The dragon bishop."),L(
+                      nd(mv("Be3","c1","e3","w","react","6.Be3","Develops, supports d4."),L(
+                        nd(mv("Nf6","g8","f6","b","idea","6...Nf6","Hit e4."),L(
+                          nd(mv("Bc4","f1","c4","w","react","7.Bc4","Aims at f7 and clamps d5."),L(
+                            nd(mv("Qa5","d8","a5","b","mission","7...Qa5","The accurate move — don't castle straight into White's Be3+Qd2+Bh6 attack. Qa5 hits e4/c3 and prepares ...Ng4 and ...O-O with real counterplay."))
+                          ))
+                        ))
+                      ))
+                    ))
+                  )),
+                  /* 5.c4 Maroczy Bind */
+                  nd(mv("c4","c2","c4","w","react","5.c4","The Maroczy Bind — a big space clamp that stops ...d5."),L(
+                    nd(mv("Bg7","f8","g7","b","mission","5...Bg7","Develop calmly vs the bind; plan ...Nf6, ...O-O, ...d6, then ...Nxd4 and ...Be6/...a5 to free yourself."),L(
+                      nd(mv("Be3","c1","e3","w","react","6.Be3","Develops."),L(
+                        nd(mv("Nf6","g8","f6","b","idea","6...Nf6","Develop, eye e4/d5."),L(
+                          nd(mv("Nc3","b1","c3","w","react","7.Nc3","Supports the bind."),L(
+                            nd(mv("O-O","e8","g8","b","idea","7...O-O","Castle; the long maneuvering battle against the clamp begins."))
+                          ))
+                        ))
+                      ))
+                    ))
+                  ))
+                ))
+              ))
+            ))
+          ))
+        ))
+      ))
+    ))
+  ))
+ )
+},
+/* ---------------- MODERN DEFENSE (Black vs e4) ---------------- */
+{
+ id:"modern",name:"Modern Defense",side:"black",group:"vs 1.e4",
+ summary:"The ultimate hypermodern reply to 1.e4: fianchetto with ...g6 and ...Bg7, hand White a big pawn centre, then tear it down with ...c5, ...e5 or ...d5. Super-flexible and provocative — it delays ...Nf6 (unlike the Pirc) to keep extra options like the ...a6/...b5 Tiger's Modern.",
+ missions:[
+  "<b>Fianchetto first:</b> ...g6 and ...Bg7 aim the bishop straight down the long diagonal at d4.",
+  "<b>Lend the centre, then collect it:</b> let White build c4/d4/e4, then strike with ...c5, ...e5 or ...d5.",
+  "<b>Stay flexible (delay ...Nf6):</b> keep White guessing — that flexibility is the Modern's whole point.",
+  "<b>Tiger's Modern:</b> ...d6, ...a6 and ...b5 expand on the queenside and prep ...Bb7 + ...c5.",
+  "<b>Punish the Austrian (f4):</b> when White over-extends with f4, hit back instantly with ...c5 (or ...e5).",
+  "<b>Gurgenidze:</b> meet a big centre with ...c6 and ...d5, blunting e4 and clamping the light squares."
+ ],
+ tree:L(
+  nd(mv("e4","e2","e4","w","react","1.e4","White grabs the centre."),L(
+    nd(mv("g6","g7","g6","b","mission","1...g6","The Modern: prepare the fianchetto and invite White to overextend."),L(
+      nd(mv("d4","d2","d4","w","react","2.d4","White builds the full centre — exactly the target."),L(
+        nd(mv("Bg7","f8","g7","b","mission","2...Bg7","The bishop rakes the long diagonal, pressuring d4."),L(
+          /* 3.Nc3 main */
+          nd(mv("Nc3","b1","c3","w","react","3.Nc3","Defends e4, develops."),L(
+            /* 3...d6 */
+            nd(mv("d6","d7","d6","b","mission","3...d6","Support a future ...e5/...c5 break and keep the position flexible."),L(
+              /* 4.Be3 Tiger's Modern */
+              nd(mv("Be3","c1","e3","w","react","4.Be3","Popular: prepares Qd2 and long castling."),L(
+                nd(mv("a6","a7","a6","b","mission","4...a6","Tiger's Modern: prepare ...b5 and ...Nd7 without committing the king's knight."),L(
+                  nd(mv("Qd2","d1","d2","w","react","5.Qd2","Connects the rooks, eyes O-O-O."),L(
+                    nd(mv("b5","b7","b5","b","idea","5...b5","Queenside expansion — gain space and prepare ...Bb7."),L(
+                      nd(mv("f3","f2","f3","w","react","6.f3","Braces e4 and supports a kingside pawn storm."),L(
+                        nd(mv("Nd7","b8","d7","b","idea","6...Nd7","Flexible: ...Bb7 and ...c5 next, racing White's attack with your own queenside play. (If White hits back with a4, answer ...b4 to keep the knight out of b5.)"))
+                      ))
+                    ))
+                  ))
+                ))
+              )),
+              /* 4.f4 Austrian Attack */
+              nd(mv("f4","f2","f4","w","react","4.f4","The Austrian Attack — a big, aggressive pawn storm."),L(
+                nd(mv("c5","c7","c5","b","mission","4...c5","Strike at once — the true Modern antidote, hitting d4 before committing ...Nf6 (which would transpose to a Pirc)."),L(
+                  nd(mv("Nf3","g1","f3","w","react","5.Nf3","Defends d4."),L(
+                    nd(mv("cxd4","c5","d4","b","idea","5...cxd4","Open the centre."),L(
+                      nd(mv("Nxd4","f3","d4","w","react","6.Nxd4","Recaptures."),L(
+                        nd(mv("Nc6","b8","c6","b","mission","6...Nc6","Hit the d4-knight — you've reached an active Sicilian-like structure, still flexible with ...Nf6 delayed."))
+                      ))
+                    ))
+                  ))
+                ))
+              )),
+              /* 4.Nf3 classical */
+              nd(mv("Nf3","g1","f3","w","react","4.Nf3","Classical and modest."),L(
+                nd(mv("Nd7","b8","d7","b","idea","4...Nd7","Prepare the ...e5 break."),L(
+                  nd(mv("Be2","f1","e2","w","react","5.Be2","Quiet development."),L(
+                    nd(mv("e5","e7","e5","b","mission","5...e5","The central break, King's-Indian style — challenge d4 and free your game."))
+                  ))
+                ))
+              ))
+            )),
+            /* 3...c6 Gurgenidze */
+            nd(mv("c6","c7","c6","b","idea","3...c6","The Gurgenidze — prepare ...d5 to hit e4 head-on."),L(
+              nd(mv("f4","f2","f4","w","react","4.f4","White grabs space."),L(
+                nd(mv("d5","d7","d5","b","mission","4...d5","Strike e4 immediately, before White consolidates."),L(
+                  nd(mv("e5","e4","e5","w","react","5.e5","White locks the centre."),L(
+                    nd(mv("h5","h7","h5","b","idea","5...h5","Classic Gurgenidze: restrain White's g4 and reroute the knight via h6–f5 to blockade the light squares."))
+                  ))
+                ))
+              ))
+            ))
+          )),
+          /* 3.c4 King's-Indian-style clamp */
+          nd(mv("c4","c2","c4","w","react","3.c4","White claims even more space — a King's-Indian-style clamp."),L(
+            nd(mv("d6","d7","d6","b","mission","3...d6","Keep it flexible and prepare ...e5."),L(
+              nd(mv("Nc3","b1","c3","w","react","4.Nc3","Develops."),L(
+                nd(mv("e5","e7","e5","b","idea","4...e5","Strike at once — this transposes to King's Indian structures where you attack the kingside."),L(
+                  nd(mv("Nf3","g1","f3","w","react","5.Nf3","Pressures e5; a full KID battle from a Modern move order."))
+                ))
+              ))
+            ))
+          ))
+        ))
+      ))
+    ))
+  ))
+ )
+}
+];
+
+/* ===================== BOARD ENGINE ===================== */
+const GLYPH={K:"♚",Q:"♛",R:"♜",B:"♝",N:"♞",P:"♟"};
+const FILES=["a","b","c","d","e","f","g","h"];
+function startBoard(){
+  const b={},back=["R","N","B","Q","K","B","N","R"];
+  FILES.forEach((f,i)=>{b[f+"1"]=back[i];b[f+"2"]="P";b[f+"7"]="p";b[f+"8"]=back[i].toLowerCase();});
+  return b;
+}
+function applyMove(b,m){
+  const pc=b[m.from]; delete b[m.from]; b[m.to]=pc;
+  if(pc&&pc.toUpperCase()==="K"){
+    const ff=m.from.charCodeAt(0),tf=m.to.charCodeAt(0),r=m.from[1];
+    if(Math.abs(tf-ff)===2){
+      if(m.to[0]==="g"){b["f"+r]=b["h"+r];delete b["h"+r];}
+      else if(m.to[0]==="c"){b["d"+r]=b["a"+r];delete b["a"+r];}
+    }
+  }
+}
+function boardForPath(path){const b=startBoard();path.forEach(n=>applyMove(b,n));return b;}
+
+/* ===================== STATE ===================== */
+let opIdx=0;
+let path=[];               // array of nodes (each has .san/.from/.to/.side/.type/.note + .children)
+const $=id=>document.getElementById(id);
+const sideCode=op=>op.side==="white"?"w":"b";
+function curChildren(){return path.length?path[path.length-1].children:OPENINGS[opIdx].tree;}
+function moveNumLabel(plyIndex,side){return (Math.floor(plyIndex/2)+1)+(side==="w"?".":"...");}
+
+/* ===================== RENDER ===================== */
+function renderTabs(){
+  const box=$("tabs");box.innerHTML="";
+  let lastGroup=null;
+  OPENINGS.forEach((op,i)=>{
+    if(op.group!==lastGroup){
+      const g=document.createElement("div");g.className="group";g.textContent=op.group;
+      box.appendChild(g);lastGroup=op.group;
+    }
+    const t=document.createElement("button");
+    t.className="tab"+(i===opIdx?" active":"");
+    t.innerHTML=op.name+'<span class="side">play '+op.side+'</span>';
+    t.onclick=()=>{opIdx=i;path=[];renderAll();};
+    box.appendChild(t);
+  });
+}
+function renderOpening(){
+  const op=OPENINGS[opIdx];
+  $("opTitle").textContent=op.name+"  ·  you play "+op.side;
+  $("opSummary").textContent=op.summary;
+  $("opMissions").innerHTML=op.missions.map(m=>"<li>"+m+"</li>").join("");
+}
+function renderBoard(){
+  const op=OPENINGS[opIdx];
+  const b=boardForPath(path);
+  const flip=(op.side==="black");
+  const last=path.length?path[path.length-1]:null;
+  const ranks=flip?[1,2,3,4,5,6,7,8]:[8,7,6,5,4,3,2,1];
+  const files=flip?["h","g","f","e","d","c","b","a"]:FILES;
+  const board=$("board");board.innerHTML="";
+  ranks.forEach((r,ri)=>files.forEach((f,fi)=>{
+    const sq=f+r,cell=document.createElement("div");
+    cell.className="sq "+((((f.charCodeAt(0)-97)+r)%2!==0)?"l":"d");
+    if(last&&sq===last.from)cell.classList.add("from");
+    if(last&&sq===last.to)cell.classList.add("to");
+    const pc=b[sq];
+    if(pc){const s=document.createElement("span");s.className="pc "+(pc===pc.toUpperCase()?"w":"b");
+      s.textContent=GLYPH[pc.toUpperCase()];cell.appendChild(s);}
+    if(fi===0){const c=document.createElement("span");c.className="coord rank";c.textContent=r;cell.appendChild(c);}
+    if(ri===7){const c=document.createElement("span");c.className="coord file";c.textContent=f;cell.appendChild(c);}
+    board.appendChild(cell);
+  }));
+  const kids=curChildren();
+  $("turn").textContent = path.length===0
+    ? "Starting position — choose White's first move below"
+    : "Move "+path.length+(kids.length?"  ·  "+(kids[0].side==="w"?"White":"Black")+" to move":"  ·  end of this line");
+}
+function renderChoices(){
+  const op=OPENINGS[opIdx],kids=curChildren(),box=$("choices");box.innerHTML="";
+  if(!kids.length){box.innerHTML='<div class="endline">End of line — review the missions, or press Back to try another branch.</div>';return;}
+  const side=kids[0].side, yours=(side===sideCode(op));
+  const head=document.createElement("div");
+  head.className="chead "+(yours?"you":"opp");
+  head.textContent = kids.length>1
+    ? (yours?"Your move — choose a plan:":"Opponent's tries — pick one to study:")
+    : (yours?"Your move:":"Opponent replies:");
+  box.appendChild(head);
+  const btns=document.createElement("div");btns.className="choicebtns";
+  kids.forEach((k,i)=>{
+    const b=document.createElement("button");
+    b.className="choice"+(i===0?" main":"");
+    b.innerHTML="<b>"+k.san+"</b>"+(k.label?"<small>"+k.label+"</small>":"");
+    b.onclick=()=>{path.push(k);renderDynamic();};
+    btns.appendChild(b);
+  });
+  box.appendChild(btns);
+}
+function renderMoves(){
+  const box=$("moves");box.innerHTML="";
+  if(!path.length){box.innerHTML='<span class="endline">No moves yet.</span>';return;}
+  path.forEach((m,i)=>{
+    if(m.side==="w"){const n=document.createElement("span");n.className="mvnum";
+      n.textContent=(Math.floor(i/2)+1)+".";box.appendChild(n);}
+    const el=document.createElement("span");
+    el.className="mv"+((i===path.length-1)?" cur":"");
+    el.textContent=m.san;
+    el.onclick=()=>{path=path.slice(0,i+1);renderDynamic();};
+    box.appendChild(el);
+  });
+}
+function renderNote(){
+  const note=$("note");
+  if(!path.length){
+    note.innerHTML='<span class="tag idea">Ready</span><br>Pick a continuation under the board, or click any node in the decision tree on the left. Each move is a <b>mission</b> (your goal), a <b>reaction</b> (what you answer), or an <b>idea</b> (the plan).';
+    return;
+  }
+  const m=path[path.length-1],label={mission:"Mission",react:"Reaction",idea:"Idea"}[m.type];
+  note.innerHTML='<span class="tag '+m.type+'">'+label+'</span> &nbsp;<b>'+
+    moveNumLabel(path.length-1,m.side)+" "+m.san+"</b><br>"+m.note;
+}
+function renderControls(){
+  $("bBack").disabled=(path.length===0);
+  $("bRestart").disabled=(path.length===0);
+  $("bMain").disabled=(curChildren().length===0);
+}
+/* decision-tree map */
+function shortTheme(note){           // derive a line name from a "Name: explanation" note
+  if(!note)return null;
+  const i=note.indexOf(":");
+  if(i>2&&i<=30){const t=note.slice(0,i).trim();if(/[A-Za-z]/.test(t)&&t.length>3)return t;}
+  return null;
+}
+function segOf(node){                // a maximal run of forced (single-child) moves
+  const seg=[node];let c=node;
+  while(c.children&&c.children.length===1){c=c.children[0];seg.push(c);}
+  return seg;
+}
+function jumpTo(p){path=p.slice();renderDynamic();}
+function buildTree(siblings,prefix,container){
+  const ul=document.createElement("ul");ul.className="tree";
+  siblings.forEach(sib=>{
+    const seg=segOf(sib),li=document.createElement("li"),row=document.createElement("div");
+    row.className="seg";let p=prefix.slice(),theme=null;
+    seg.forEach(n=>{
+      p=p.concat([n]);const myPath=p.slice();
+      const onPath=myPath.every((nn,ix)=>path[ix]===nn);
+      const isTip=onPath&&myPath.length===path.length;
+      const chip=document.createElement("span");
+      chip.className="chip t"+n.side+" "+n.type+(onPath?" onpath":"")+(isTip?" tip":"");
+      chip.textContent=moveNumLabel(myPath.length-1,n.side)+" "+n.san;
+      chip.title=n.note||"";chip.onclick=()=>jumpTo(myPath);
+      row.appendChild(chip);
+      if(!theme)theme=shortTheme(n.note);
+    });
+    const end=seg[seg.length-1];
+    if(theme){const pl=document.createElement("span");pl.className="pill";pl.textContent=theme;row.appendChild(pl);}
+    if(!end.children||!end.children.length){const f=document.createElement("span");f.className="endflag";f.textContent="✓";row.appendChild(f);}
+    li.appendChild(row);
+    if(end.children&&end.children.length>1){
+      const side=end.children[0].side,you=(side===sideCode(OPENINGS[opIdx]));
+      const cap=document.createElement("div");cap.className="forkcap "+(you?"you":"opp");
+      cap.textContent=you?"your choice":"opponent’s tries";li.appendChild(cap);
+      buildTree(end.children,p,li);
+    }
+    ul.appendChild(li);
+  });
+  container.appendChild(ul);
+}
+function renderTreeMap(){const c=$("treemap");c.innerHTML="";buildTree(OPENINGS[opIdx].tree,[],c);}
+function renderMissionPath(){
+  const op=OPENINGS[opIdx],box=$("missionpath");box.innerHTML="";
+  if(path.length){
+    path.forEach((m,i)=>{
+      const step=document.createElement("div");step.className="mstep "+m.type;
+      step.innerHTML='<span class="dot"></span><div><b>'+moveNumLabel(i,m.side)+" "+m.san+
+        '</b> <span class="mtag '+m.type+'">'+m.type+'</span><div class="mtext">'+m.note+"</div></div>";
+      step.onclick=()=>{path=path.slice(0,i+1);renderDynamic();};
+      box.appendChild(step);
+    });
+  } else {
+    const intro=document.createElement("div");intro.className="mintro";
+    intro.textContent="Choose a move to start building your mission path — each decision is a step toward the opening’s goals.";
+    box.appendChild(intro);
+  }
+  const kids=curChildren(),dec=document.createElement("div");dec.className="decision";
+  if(kids.length){
+    const you=(kids[0].side===sideCode(op));
+    const h=document.createElement("div");h.className="dechead "+(you?"you":"opp");
+    h.textContent=kids.length>1?(you?"▸ Your decision — choose a plan":"▸ Opponent’s options — pick one to study")
+                               :(you?"▸ Your next move":"▸ Opponent replies");
+    dec.appendChild(h);
+    kids.forEach((k,i)=>{
+      const t=shortTheme(k.note),b=document.createElement("button");
+      b.className="deccard"+(i===0?" main":"");
+      b.innerHTML="<b>"+k.san+"</b>"+(t?' <span class="pill">'+t+"</span>":"")+'<div class="mtext">'+k.note+"</div>";
+      b.onclick=()=>{path.push(k);renderDynamic();};
+      dec.appendChild(b);
+    });
+  } else {
+    const h=document.createElement("div");h.className="dechead done";
+    h.textContent="✓ Mission complete — end of this line. Press Back to explore another branch.";
+    dec.appendChild(h);
+  }
+  box.appendChild(dec);
+}
+
+/* dynamic = things that change as you navigate (not the static opening text) */
+function renderDynamic(){renderBoard();renderChoices();renderMoves();renderNote();renderControls();renderMissionPath();renderTreeMap();}
+function renderAll(){renderTabs();renderOpening();renderDynamic();}
+
+/* controls */
+$("bBack").onclick=()=>{if(path.length){path.pop();renderDynamic();}};
+$("bRestart").onclick=()=>{path=[];renderDynamic();};
+$("bMain").onclick=()=>{const k=curChildren();if(k.length){path.push(k[0]);renderDynamic();}};
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowRight"){const k=curChildren();if(k.length){path.push(k[0]);renderDynamic();}e.preventDefault();}
+  if(e.key==="ArrowLeft"){if(path.length){path.pop();renderDynamic();}e.preventDefault();}
+});
+renderAll();
+</script>
+</body>
+</html>
