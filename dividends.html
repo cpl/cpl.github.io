@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prag — RON dividend optimizer</title>
+<style>
+  :root{
+    --bg:#0e1218; --panel:#151b24; --panel2:#1b232e; --line:#283341;
+    --ink:#e8edf4; --dim:#8a97a8; --faint:#5d6877;
+    --brass:#d8a93b; --brass-soft:rgba(216,169,59,.14);
+    --teal:#43b89b; --teal-soft:rgba(67,184,155,.13);
+    --coral:#e6614d; --coral-soft:rgba(230,97,77,.15);
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Inter,sans-serif;
+    --r:10px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(216,169,59,.06), transparent 60%),
+      var(--bg);
+    color:var(--ink); font-family:var(--sans);
+    -webkit-font-smoothing:antialiased; line-height:1.45;
+    padding:28px 20px 64px; max-width:1180px; margin:0 auto;
+  }
+  .eyebrow{font:600 11px/1 var(--mono); letter-spacing:.32em; color:var(--brass);
+    text-transform:uppercase; margin-bottom:10px}
+  header h1{font-size:clamp(30px,5vw,48px); margin:0; letter-spacing:-.02em; font-weight:680}
+  header h1 .x{color:var(--faint); font-weight:400}
+  header p{color:var(--dim); margin:8px 0 0; max-width:62ch; font-size:14.5px}
+
+  .grid{display:grid; grid-template-columns:340px 1fr; gap:18px; margin-top:26px; align-items:start}
+  @media(max-width:880px){.grid{grid-template-columns:1fr}}
+
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:var(--r)}
+  .panel + .panel{margin-top:18px}
+  .panel h2{font:600 11px/1 var(--mono); letter-spacing:.22em; text-transform:uppercase;
+    color:var(--dim); margin:0; padding:15px 18px; border-bottom:1px solid var(--line)}
+  .body{padding:16px 18px}
+
+  label.f{display:block; margin:0 0 14px}
+  label.f:last-child{margin-bottom:0}
+  label.f .lab{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px}
+  label.f .lab span:first-child{font-size:13px; color:var(--ink)}
+  label.f .lab .hint{font:500 11px/1 var(--mono); color:var(--faint)}
+  .field{display:flex; align-items:center; background:var(--panel2); border:1px solid var(--line);
+    border-radius:8px; padding:0 12px; transition:border-color .15s, box-shadow .15s}
+  .field:focus-within{border-color:var(--brass); box-shadow:0 0 0 3px var(--brass-soft)}
+  .field input{flex:1; background:none; border:0; color:var(--ink); font-family:var(--mono);
+    font-size:15px; padding:11px 0; width:100%; outline:none}
+  .field input::-webkit-outer-spin-button,.field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .field input[type=number]{-moz-appearance:textfield}
+  .field .unit{font:500 12px/1 var(--mono); color:var(--faint); padding-left:8px}
+
+  input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:4px; border-radius:3px;
+    background:var(--line); margin:13px 0 2px; outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+    background:var(--brass); cursor:pointer; border:2px solid var(--bg); box-shadow:0 0 0 1px var(--line)}
+  input[type=range]::-moz-range-thumb{width:16px; height:16px; border:2px solid var(--bg); border-radius:50%;
+    background:var(--brass); cursor:pointer}
+  input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px var(--brass-soft)}
+  input[type=range]:focus-visible::-moz-range-thumb{box-shadow:0 0 0 3px var(--brass-soft)}
+  .rangerow{display:flex; justify-content:space-between; font:500 10px/1 var(--mono); color:var(--faint); margin-top:3px}
+
+  .weekwrap{padding:18px 20px 6px}
+  .weeknote{padding:0 20px 18px; font-size:13px; color:var(--dim)}
+  .weeknote b{color:var(--ink)}
+
+  .seg{display:flex; background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:3px; gap:3px}
+  .seg label{flex:1; position:relative}
+  .seg input{position:absolute; opacity:0; pointer-events:none}
+  .seg span{display:block; text-align:center; font-size:12.5px; padding:8px 6px; border-radius:6px;
+    color:var(--dim); cursor:pointer; transition:.15s; user-select:none}
+  .seg input:checked + span{background:var(--brass); color:#1a140a; font-weight:600}
+  .seg input:focus-visible + span{box-shadow:0 0 0 3px var(--brass-soft)}
+  .seg span:hover{color:var(--ink)}
+
+  .derived{display:grid; grid-template-columns:1fr 1fr 1fr; gap:1px; background:var(--line);
+    border:1px solid var(--line); border-radius:8px; overflow:hidden; margin-top:4px}
+  .derived div{background:var(--panel2); padding:9px 10px}
+  .derived .k{font:500 10px/1.3 var(--mono); color:var(--faint); letter-spacing:.04em}
+  .derived .v{font:600 13px/1.2 var(--mono); color:var(--ink); margin-top:3px}
+
+  /* results */
+  .headline{display:flex; flex-wrap:wrap; gap:22px; align-items:flex-end; padding:20px 22px;
+    border-bottom:1px solid var(--line)}
+  .keep .lbl{font:500 11px/1 var(--mono); letter-spacing:.2em; text-transform:uppercase; color:var(--dim)}
+  .keep .big{font:700 clamp(30px,5vw,46px)/1 var(--mono); color:var(--brass); margin-top:8px; letter-spacing:-.01em}
+  .keep .sub{font:500 12px/1 var(--mono); color:var(--faint); margin-top:7px}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-left:auto}
+  .chip{background:var(--panel2); border:1px solid var(--line); border-radius:999px;
+    padding:7px 13px; font:500 12px/1 var(--mono)}
+  .chip b{color:var(--ink); font-weight:600} .chip .t{color:var(--dim)}
+  .chip.tax b{color:var(--coral)}
+
+  .chartwrap{padding:16px 18px 6px}
+  svg{display:block; width:100%; height:auto}
+  .chart-legend{display:flex; flex-wrap:wrap; gap:16px; padding:2px 20px 16px; font:500 11px/1 var(--mono); color:var(--dim)}
+  .chart-legend i{display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:6px; vertical-align:-1px}
+
+  table{width:100%; border-collapse:collapse; font-family:var(--mono); font-size:12.5px}
+  th,td{text-align:right; padding:10px 14px; border-bottom:1px solid var(--line); white-space:nowrap}
+  th{font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); font-weight:600}
+  td:first-child,th:first-child{text-align:left; white-space:normal}
+  tbody tr:last-child td{border-bottom:0}
+  tr.cur{background:var(--brass-soft)}
+  tr.cur td:first-child{color:var(--brass); font-weight:600}
+  .tag{font:600 10px/1 var(--mono); padding:3px 7px; border-radius:5px; letter-spacing:.04em}
+  .tag.safe{background:var(--teal-soft); color:var(--teal)}
+  .tag.dead{background:var(--coral-soft); color:var(--coral)}
+
+  /* advice */
+  .advice{padding:18px 20px}
+  .verdict{display:flex; gap:12px; align-items:flex-start; padding:14px 16px; border-radius:9px;
+    border:1px solid var(--line); background:var(--panel2)}
+  .verdict.warn{border-color:rgba(230,97,77,.5); background:var(--coral-soft)}
+  .verdict.ok{border-color:rgba(67,184,155,.45); background:var(--teal-soft)}
+  .verdict .dot{width:9px; height:9px; border-radius:50%; margin-top:6px; flex:none; background:var(--dim)}
+  .verdict.warn .dot{background:var(--coral)} .verdict.ok .dot{background:var(--teal)}
+  .verdict .h{font-size:14px; font-weight:650; margin:0 0 3px}
+  .verdict p{margin:0; font-size:13px; color:var(--dim)}
+  .verdict p b{color:var(--ink)}
+
+  .options{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px}
+  @media(max-width:560px){.options{grid-template-columns:1fr}}
+  .opt{border:1px solid var(--line); border-radius:9px; padding:14px; background:var(--panel)}
+  .opt .ot{font:500 11px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase; color:var(--dim)}
+  .opt .ov{font:700 18px/1 var(--mono); color:var(--brass); margin:9px 0 2px}
+  .opt .od{font:500 12px/1.4 var(--mono); color:var(--faint)}
+  .opt .delta{margin-top:9px; font:600 12px/1 var(--mono)}
+  .opt .delta.up{color:var(--teal)} .opt .delta.down{color:var(--coral)}
+  button.apply{margin-top:12px; width:100%; background:var(--panel2); color:var(--ink);
+    border:1px solid var(--line); border-radius:7px; padding:8px; font:600 12px var(--mono);
+    cursor:pointer; transition:.15s}
+  button.apply:hover{border-color:var(--brass); color:var(--brass)}
+  button.apply:focus-visible{box-shadow:0 0 0 3px var(--brass-soft); outline:none}
+
+  footer{margin-top:30px; padding-top:18px; border-top:1px solid var(--line); color:var(--faint);
+    font-size:12px; max-width:90ch}
+  footer b{color:var(--dim)}
+  .hidden{display:none !important}
+  @media (prefers-reduced-motion: reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">RON · Dividende · CASS</div>
+  <h1>Prag<span class="x"> — the dividend threshold bench</span></h1>
+</header>
+
+<div class="grid">
+  <!-- LEFT: inputs -->
+  <div>
+    <div class="panel">
+      <h2>Parameters</h2>
+      <div class="body">
+        <label class="f">
+          <div class="lab"><span>Minimum gross wage</span><span class="hint" id="wHint"></span></div>
+          <div class="field"><input id="wage" type="number" value="4050" min="0" step="25"><span class="unit">lei</span></div>
+        </label>
+        <label class="f">
+          <div class="lab"><span>Dividend tax</span><span class="hint">withheld at source</span></div>
+          <div class="field"><input id="divtax" type="number" value="16" min="0" max="100" step="0.5"><span class="unit">%</span></div>
+        </label>
+        <label class="f">
+          <div class="lab"><span>CASS rate</span><span class="hint">health contribution</span></div>
+          <div class="field"><input id="cass" type="number" value="10" min="0" max="100" step="0.5"><span class="unit">%</span></div>
+        </label>
+        <div class="derived" id="thresholds"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>What you're taking out</h2>
+      <div class="body">
+        <div class="seg" role="radiogroup" aria-label="Input mode">
+          <label><input type="radio" name="mode" value="gross" checked><span>Gross dividend</span></label>
+          <label><input type="radio" name="mode" value="company"><span>Company numbers</span></label>
+        </div>
+
+        <div id="grossBlock" style="margin-top:14px">
+          <label class="f">
+            <div class="lab"><span>Gross dividend to distribute</span><span class="hint">before tax</span></div>
+            <div class="field"><input id="gross" type="number" value="70958" min="0" step="500"><span class="unit">lei</span></div>
+            <input id="grossRange" type="range" min="0" max="200000" step="250" value="70958" aria-label="Gross dividend slider">
+            <div class="rangerow"><span>0</span><span id="rangeMax">200.000 lei</span></div>
+          </label>
+        </div>
+
+        <div id="companyBlock" class="hidden" style="margin-top:14px">
+          <div class="seg" role="radiogroup" aria-label="Tax regime" style="margin-bottom:14px">
+            <label><input type="radio" name="regime" value="micro1" checked><span>Micro 1%</span></label>
+            <label><input type="radio" name="regime" value="micro3"><span>Micro 3%</span></label>
+            <label><input type="radio" name="regime" value="profit"><span>Profit 16%</span></label>
+          </div>
+          <label class="f">
+            <div class="lab"><span>Annual revenue</span><span class="hint">turnover</span></div>
+            <div class="field"><input id="revenue" type="number" value="500000" min="0" step="1000"><span class="unit">lei</span></div>
+          </label>
+          <label class="f">
+            <div class="lab"><span>Deductible expenses</span><span class="hint">excl. profit tax</span></div>
+            <div class="field"><input id="expenses" type="number" value="380000" min="0" step="1000"><span class="unit">lei</span></div>
+          </label>
+          <label class="f">
+            <div class="lab"><span>Share of profit to distribute</span><span class="hint" id="poolHint"></span></div>
+            <div class="field"><input id="distpct" type="number" value="100" min="0" max="100" step="5"><span class="unit">%</span></div>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: results -->
+  <div>
+    <div class="panel">
+      <h2>Result</h2>
+      <div class="headline">
+        <div class="keep">
+          <div class="lbl">You keep</div>
+          <div class="big" id="keep">—</div>
+          <div class="sub" id="keepSub"></div>
+        </div>
+        <div class="chips" id="chips"></div>
+      </div>
+      <div class="chartwrap"><div id="chart"></div></div>
+      <div class="chart-legend">
+        <span><i style="background:var(--brass)"></i>What you keep</span>
+        <span><i style="background:var(--faint)"></i>If CASS were 0</span>
+        <span><i style="background:var(--coral-soft);border:1px solid var(--coral)"></i>Dead zone</span>
+        <span><i style="background:var(--teal-soft);border:1px solid var(--teal)"></i>No CASS</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Your working week</h2>
+      <div class="weekwrap"><div id="week"></div></div>
+      <div class="weeknote" id="weeknote"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Recommendation</h2>
+      <div class="advice" id="advice"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Strategies side by side</h2>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th>Strategy</th><th>Gross</th><th>Net div.</th><th>CASS</th><th>You keep</th><th>Total tax</th><th>Eff.</th>
+          </tr></thead>
+          <tbody id="scenarios"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer id="footnote"></footer>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const fmt = n => new Intl.NumberFormat('ro-RO',{maximumFractionDigits:0}).format(Math.round(n||0));
+const lei = n => fmt(n) + ' lei';
+const pc  = n => (n*100).toFixed(2).replace('.',',') + '%';
+const num = el => { const v = parseFloat($(el).value); return isFinite(v) ? Math.max(0,v) : 0; };
+
+// ---- core fiscal model ----
+function params(){
+  return { W:num('#wage'), t:num('#divtax')/100, c:num('#cass')/100 };
+}
+function cassFor(net,{W,c}){
+  if(net < 6*W)  return 0;
+  if(net < 12*W) return c*6*W;
+  if(net < 24*W) return c*12*W;
+  return c*24*W;
+}
+// take-home as a function of GROSS dividend
+function takeHome(gross,p){
+  const net = gross*(1-p.t);
+  return net - cassFor(net,p);
+}
+function deadZones(p){            // expressed in NET dividend
+  const {W,c}=p;
+  return [
+    {th:6*W,  end:6*W  + c*6*W,  cassLow:0,        cassHigh:c*6*W },
+    {th:12*W, end:12*W + c*6*W,  cassLow:c*6*W,    cassHigh:c*12*W},
+    {th:24*W, end:24*W + c*12*W, cassLow:c*12*W,   cassHigh:c*24*W},
+  ];
+}
+
+// ---- evaluate one distribution ----
+function evaluate(gross,p,companyTax=0){
+  const divTax = gross*p.t;
+  const net    = gross - divTax;
+  const cass   = cassFor(net,p);
+  const keep   = net - cass;
+  const totalTax = companyTax + divTax + cass;
+  return {gross,divTax,net,cass,keep,companyTax,totalTax,
+          effDiv: gross>0 ? (divTax+cass)/gross : 0};
+}
+
+// ---- company layer ----
+function companyLayer(p){
+  const mode = $('input[name=mode]:checked').value;
+  if(mode==='gross'){
+    return { active:false, pool:Infinity, companyTax:0, gross:num('#gross') };
+  }
+  const regime = $('input[name=regime]:checked').value;
+  const rev=num('#revenue'), exp=num('#expenses');
+  let companyTax=0, netProfit=0;
+  if(regime==='micro1'||regime==='micro3'){
+    const rate = regime==='micro1'?0.01:0.03;
+    companyTax = rate*rev;
+    netProfit  = Math.max(0, rev - exp - companyTax);
+  } else {
+    const pbt = Math.max(0, rev - exp);
+    companyTax = 0.16*pbt;
+    netProfit  = pbt - companyTax;
+  }
+  const pool = netProfit;
+  const gross = pool * (num('#distpct')/100);
+  return { active:true, pool, companyTax, gross, regime };
+}
+
+// ---- chart (single SVG: take-home curve over gross, with bands) ----
+function chart(p, curGross){
+  const {t}=p, dz=deadZones(p), W=p.W;
+  const g6=6*W/(1-t), g12=12*W/(1-t), g24=24*W/(1-t);
+  const xMax = Math.max(g24*1.18, curGross*1.12, g6*2.2);
+  const yMax = xMax*(1-t)*1.02;
+  const Wd=1000,H=320, m={l:64,r:18,t:18,b:34};
+  const px=g=>m.l+(g/xMax)*(Wd-m.l-m.r);
+  const py=v=>H-m.b-(v/yMax)*(H-m.t-m.b);
+  let s=`<svg viewBox="0 0 ${Wd} ${H}" role="img" aria-label="Take-home dividend vs gross distributed">`;
+
+  // no-CASS green band 0..g6
+  s+=`<rect x="${px(0)}" y="${m.t}" width="${px(g6)-px(0)}" height="${H-m.t-m.b}" fill="var(--teal-soft)"/>`;
+  // dead-zone bands (convert net th/end to gross)
+  dz.forEach(z=>{
+    const x0=px(z.th/(1-t)), x1=px(z.end/(1-t));
+    s+=`<rect x="${x0}" y="${m.t}" width="${x1-x0}" height="${H-m.t-m.b}" fill="var(--coral-soft)"/>`;
+  });
+  // y gridlines
+  for(let i=0;i<=4;i++){ const v=yMax*i/4; s+=`<line x1="${m.l}" y1="${py(v)}" x2="${Wd-m.r}" y2="${py(v)}" stroke="var(--line)" stroke-width="1"/>`;
+    s+=`<text x="${m.l-8}" y="${py(v)+4}" text-anchor="end" font-family="var(--mono)" font-size="10" fill="var(--faint)">${fmt(v/1000)}k</text>`; }
+  // threshold dashed verticals + labels
+  [{g:g6,z:dz[0]},{g:g12,z:dz[1]},{g:g24,z:dz[2]}].forEach(({g,z})=>{
+    if(g>xMax) return;
+    s+=`<line x1="${px(g)}" y1="${m.t}" x2="${px(g)}" y2="${H-m.b}" stroke="var(--coral)" stroke-width="1" stroke-dasharray="3 4" opacity=".55"/>`;
+    s+=`<text x="${px(g)}" y="${m.t-5}" text-anchor="middle" font-family="var(--mono)" font-size="9.5" fill="var(--dim)">+CASS ${fmt(z.cassHigh)}</text>`;
+  });
+  // "if CASS were 0" reference diagonal (net line)
+  s+=`<line x1="${px(0)}" y1="${py(0)}" x2="${px(xMax)}" y2="${py(xMax*(1-t))}" stroke="var(--faint)" stroke-width="1.25" stroke-dasharray="2 4"/>`;
+  // take-home curve
+  const N=400; let d='';
+  for(let i=0;i<=N;i++){ const g=xMax*i/N; d+=(i?'L':'M')+px(g).toFixed(1)+' '+py(takeHome(g,p)).toFixed(1)+' '; }
+  s+=`<path d="${d}" fill="none" stroke="var(--brass)" stroke-width="2.4" stroke-linejoin="round"/>`;
+  // current marker
+  if(curGross>0 && curGross<=xMax){
+    const cy=py(takeHome(curGross,p));
+    s+=`<line x1="${px(curGross)}" y1="${m.t}" x2="${px(curGross)}" y2="${H-m.b}" stroke="var(--ink)" stroke-width="1" opacity=".5"/>`;
+    s+=`<circle cx="${px(curGross)}" cy="${cy}" r="5" fill="var(--brass)" stroke="var(--bg)" stroke-width="2"/>`;
+    const lblX=Math.min(px(curGross)+10, Wd-m.r-120);
+    s+=`<g><rect x="${lblX}" y="${cy-30}" width="118" height="22" rx="5" fill="var(--panel2)" stroke="var(--line)"/>`;
+    s+=`<text x="${lblX+8}" y="${cy-15}" font-family="var(--mono)" font-size="11" fill="var(--brass)">keep ${fmt(takeHome(curGross,p))}</text></g>`;
+  }
+  // x ticks
+  for(let i=0;i<=5;i++){ const g=xMax*i/5; s+=`<text x="${px(g)}" y="${H-12}" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="var(--faint)">${fmt(g/1000)}k</text>`; }
+  s+=`<text x="${Wd-m.r}" y="${H-12}" text-anchor="end" font-family="var(--mono)" font-size="9.5" fill="var(--faint)">gross dividend →</text>`;
+  s+=`</svg>`;
+  return s;
+}
+
+// ---- recommendation ----
+function advise(curGross,p,pool){
+  const {t}=p, dz=deadZones(p);
+  const net=curGross*(1-t);
+  const grossOf=netv=>netv/(1-t);
+  let v={cls:'',h:'',p:''}, opts=[];
+
+  // locate
+  let zone=null;            // dead zone we're inside
+  for(const z of dz){ if(net>z.th && net<z.end){ zone=z; break; } }
+
+  if(net<dz[0].th){
+    const head=dz[0].th-net, gHead=grossOf(dz[0].th-1)-curGross;
+    v={cls:'ok',h:'No CASS owed — you\'re under the first threshold.',
+       p:`You can take up to about <b>${lei(grossOf(dz[0].th-1))}</b> gross (net just under ${lei(dz[0].th)}) before any CASS kicks in — roughly <b>${lei(gHead>0?gHead:0)}</b> more, still CASS-free.`};
+  } else if(zone){
+    const underGross=grossOf(zone.th-1);            // just below threshold
+    const overGross =grossOf(zone.end);             // break-even
+    const keepNow=takeHome(curGross,p);
+    const keepUnder=takeHome(underGross,p);
+    const keepOver =takeHome(overGross,p);
+    v={cls:'warn',h:'You\'re in a dead zone — taking this much costs you CASS without keeping more.',
+       p:`Right here you keep <b>${lei(keepNow)}</b>. Just below the threshold you'd keep <b>${lei(keepUnder)}</b> from less gross. You only come out ahead again once you clear <b>${lei(overGross)}</b> gross.`};
+    opts=[
+      {ot:'Take less — stay under',gross:underGross,keep:keepUnder,base:keepNow,
+       od:`net just under ${lei(zone.th)} · defer the rest to a later year`},
+      {ot:'Take more — clear the zone',gross:overGross,keep:keepOver,base:keepNow,
+       od:`break-even point · beyond this every leu helps again`},
+    ];
+  } else {
+    // safe inside a band — find next threshold
+    const next=dz.find(z=>net<z.th);
+    if(next){
+      const headGross=grossOf(next.th-1)-curGross;
+      v={cls:'ok',h:'Efficient spot — you\'re clear of the dead zones in this band.',
+         p:`You can still take about <b>${lei(headGross>0?headGross:0)}</b> more gross before the next CASS jump at net ${lei(next.th)} (which would add <b>${lei(next.cassHigh-next.cassLow)}</b>).`};
+    } else {
+      v={cls:'ok',h:'Top band — CASS is capped.',
+         p:`Above net ${lei(dz[2].th)} the CASS base is frozen at <b>${lei(dz[2].cassHigh)}</b>, so additional dividends carry only the ${pc(t)} dividend tax. No further thresholds to dodge.`};
+    }
+  }
+
+  // feasibility note if company-limited
+  if(pool!==Infinity){
+    opts=opts.filter(o=>o.gross<=pool+1);
+    if(opts.length===0 && zone){
+      v.p+=` <b>Note:</b> your distributable pool (${lei(pool)}) doesn't reach the break-even, so stay under the threshold.`;
+    }
+  }
+
+  let html=`<div class="verdict ${v.cls}"><div class="dot"></div><div><div class="h">${v.h}</div><p>${v.p}</p></div></div>`;
+  if(opts.length){
+    html+=`<div class="options">`;
+    for(const o of opts){
+      const d=o.keep-o.base, up=d>=0;
+      html+=`<div class="opt"><div class="ot">${o.ot}</div>
+        <div class="ov">${lei(o.gross)}</div>
+        <div class="od">${o.od}</div>
+        <div class="delta ${up?'up':'down'}">${up?'▲':'▼'} keep ${up?'+':''}${lei(Math.abs(d)*Math.sign(d))} vs now</div>
+        <button class="apply" data-g="${Math.round(o.gross)}">Use this amount</button></div>`;
+    }
+    html+=`</div>`;
+  }
+  return html;
+}
+
+// ---- scenarios table ----
+function scenarios(curGross,p,companyTax){
+  const {W,t}=p, dz=deadZones(p);
+  const rows=[
+    {name:'Stay CASS-free',         net:dz[0].th-1, tag:'safe'},
+    {name:'Fill band 1 (6–12×)',    net:dz[1].th-1, tag:'safe'},
+    {name:'Fill band 2 (12–24×)',   net:dz[2].th-1, tag:'safe'},
+  ];
+  const curNet=curGross*(1-t);
+  let inDead=dz.some(z=>curNet>z.th&&curNet<z.end);
+  rows.push({name:'Your plan', net:curNet, cur:true, tag:inDead?'dead':'safe'});
+  let html='';
+  for(const r of rows){
+    const g=r.net/(1-t);
+    const e=evaluate(g,p, r.cur?companyTax:0);
+    html+=`<tr class="${r.cur?'cur':''}">
+      <td>${r.name} <span class="tag ${r.tag}">${r.tag==='dead'?'DEAD':'OK'}</span></td>
+      <td>${fmt(g)}</td><td>${fmt(e.net)}</td><td>${fmt(e.cass)}</td>
+      <td>${fmt(e.keep)}</td><td>${fmt(e.divTax+e.cass)}</td><td>${pc(e.effDiv)}</td></tr>`;
+  }
+  return html;
+}
+
+// ---- working week: how much of a 40h week you labour for the state ----
+function workingWeek(p,e){
+  const base=e.keep+e.totalTax;
+  const gov = base>0 ? e.totalTax/base : 0;
+  const days=['Mon','Tue','Wed','Thu','Fri'], HPD=8, total=days.length*HPD;
+  const govH=gov*total;
+  const Wd=1000,H=150,m={l:14,r:14,t:42}, innerW=Wd-m.l-m.r, barH=46, barY=m.t;
+  const x=h=>m.l+(h/total)*innerW;
+  let s=`<svg viewBox="0 0 ${Wd} ${H}" role="img" aria-label="Your working week split between you and the state">`;
+  s+=`<text x="${m.l}" y="24" font-family="var(--mono)" font-size="12.5" font-weight="600" fill="var(--coral)">FOR THE STATE · ${govH.toFixed(1)}h <tspan fill="var(--faint)" font-weight="400">(${pc(gov)})</tspan></text>`;
+  s+=`<text x="${Wd-m.r}" y="24" text-anchor="end" font-family="var(--mono)" font-size="12.5" font-weight="600" fill="var(--brass)">WORK YOU KEEP · ${(total-govH).toFixed(1)}h <tspan fill="var(--faint)" font-weight="400">(${pc(1-gov)})</tspan></text>`;
+  s+=`<rect x="${m.l}" y="${barY}" width="${innerW}" height="${barH}" rx="7" fill="var(--brass)"/>`;
+  if(govH>0) s+=`<rect x="${m.l}" y="${barY}" width="${Math.max(0,x(govH)-m.l)}" height="${barH}" rx="7" fill="var(--coral)"/>`;
+  for(let i=0;i<=days.length;i++){
+    const xx=x(i*HPD);
+    if(i>0&&i<days.length) s+=`<line x1="${xx}" y1="${barY}" x2="${xx}" y2="${barY+barH}" stroke="var(--bg)" stroke-width="2" opacity=".55"/>`;
+    if(i<days.length) s+=`<text x="${x(i*HPD+HPD/2)}" y="${barY+barH+19}" text-anchor="middle" font-family="var(--mono)" font-size="11" fill="var(--dim)">${days[i]}</text>`;
+  }
+  if(govH>0.05 && govH<total){
+    const cx=x(govH);
+    s+=`<line x1="${cx}" y1="${barY-7}" x2="${cx}" y2="${barY+barH+7}" stroke="var(--ink)" stroke-width="1.5"/>`;
+    s+=`<circle cx="${cx}" cy="${barY-7}" r="3.5" fill="var(--ink)"/>`;
+  }
+  s+=`</svg>`;
+  return s;
+}
+function weekNote(p,e){
+  const base=e.keep+e.totalTax, gov=base>0?e.totalTax/base:0;
+  const days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  let govH=gov*40, di=Math.min(4,Math.floor(govH/8)), hin=govH-di*8;
+  let hh=9+Math.floor(hin), mm=Math.round((hin-Math.floor(hin))*60);
+  if(mm===60){mm=0;hh++;}
+  const tstr=`${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+  if(gov<=0) return `No tax on this amount — the whole week is yours.`;
+  if(gov>=1) return `Every hour this week goes to tax — nothing reaches you.`;
+  return `Picture a Mon–Fri, 9-to-5 week. Your money only starts working for <b>you</b> around <b>${days[di]}, ${tstr}</b>. Everything earned before that clears the tax bill — collected, not earned.`;
+}
+
+// ---- render ----
+function render(){
+  const p=params();
+  // derived thresholds panel
+  $('#thresholds').innerHTML=[
+    ['6× wage',6*p.W, p.c*6*p.W],['12× wage',12*p.W,p.c*12*p.W],['24× wage',24*p.W,p.c*24*p.W]
+  ].map(([k,th,cs])=>`<div><div class="k">${k} · CASS</div><div class="v">${fmt(th)}→${fmt(cs)}</div></div>`).join('');
+  $('#wHint').textContent = `6× = ${fmt(6*p.W)} lei`;
+
+  const co=companyLayer(p);
+  const curGross=Math.max(0,co.gross);
+  if(co.active) $('#poolHint').textContent = `pool ${fmt(co.pool)} lei`;
+
+  // sync the gross slider (only relevant in direct gross mode)
+  if(!co.active){
+    const ceil=Math.max(Math.ceil((24*p.W/(1-p.t))*1.3/1000)*1000, curGross, 50000);
+    const rEl=$('#grossRange');
+    rEl.max=ceil; rEl.value=Math.min(curGross,ceil);
+    $('#rangeMax').textContent=fmt(ceil)+' lei';
+  }
+
+  const e=evaluate(curGross,p,co.companyTax);
+
+  $('#keep').textContent=lei(e.keep);
+  $('#keepSub').textContent = co.active
+    ? `from ${lei(co.pool)} distributable · ${pc(co.pool>0?e.totalTax/(co.pool+co.companyTax):0)} of pre-tax profit lost to tax`
+    : `effective rate ${pc(e.effDiv)} on the dividend`;
+
+  let chips=[];
+  if(co.active) chips.push(`<span class="chip tax"><span class="t">Company tax</span> <b>${fmt(co.companyTax)}</b></span>`);
+  chips.push(`<span class="chip tax"><span class="t">Dividend ${pc(p.t)}</span> <b>${fmt(e.divTax)}</b></span>`);
+  chips.push(`<span class="chip tax"><span class="t">CASS</span> <b>${fmt(e.cass)}</b></span>`);
+  chips.push(`<span class="chip"><span class="t">Total tax</span> <b>${fmt(e.totalTax)}</b></span>`);
+  $('#chips').innerHTML=chips.join('');
+
+  $('#chart').innerHTML=chart(p,curGross);
+  $('#week').innerHTML=workingWeek(p,e);
+  $('#weeknote').innerHTML=weekNote(p,e);
+  $('#advice').innerHTML=advise(curGross,p,co.pool);
+  $('#scenarios').innerHTML=scenarios(curGross,p,co.companyTax);
+
+  // wire apply buttons
+  document.querySelectorAll('button.apply').forEach(b=>b.addEventListener('click',()=>{
+    const g=+b.dataset.g;
+    if(co.active){ // translate to share of pool
+      $('#distpct').value = co.pool>0 ? Math.min(100,Math.round(g/co.pool*100)) : 0;
+    } else {
+      $('#gross').value = g;
+    }
+    render();
+  }));
+
+  $('#footnote').innerHTML = `<b>Assumptions.</b> CASS is bracketed on the <b>net</b> dividend (after the dividend tax), per current ANAF guidance; bands are 6 / 12 / 24 minimum wages with a flat charge each. Dividend tax is withheld at source and isn't part of the Declarația unică — only CASS is. Micro tax is applied to revenue; profit tax to revenue minus expenses. Default figures reflect mid-2026 Romania (16% dividend tax, 10% CASS, 4.050 lei wage — note the wage rises to 4.325 lei from 1 July 2026, which shifts every threshold up). This is a planning aid, not tax advice — confirm the wage and distribution year that apply to you with a contabil.`;
+}
+
+// events
+$('#grossRange').addEventListener('input',ev=>{ $('#gross').value=ev.target.value; });
+document.addEventListener('input',e=>{ if(e.target.matches('input')) render(); });
+document.addEventListener('change',e=>{
+  if(e.target.name==='mode'){
+    const company=$('input[name=mode]:checked').value==='company';
+    $('#companyBlock').classList.toggle('hidden',!company);
+    $('#grossBlock').classList.toggle('hidden',company);
+  }
+  render();
+});
+render();
+</script>
+</body>
+</html>
