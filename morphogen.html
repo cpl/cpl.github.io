@@ -3,248 +3,175 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Morphogen — force-matrix particle life</title>
+<title>Morphogen II — force + reaction matrices</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
   :root{
-    --ink:#0A0D13;            /* canvas + page base */
-    --panel:#10141C;          /* panel surface */
-    --raised:#161B26;         /* control surface / matrix zero */
-    --line:#222A38;           /* hairlines */
-    --line-soft:#1A2030;
-    --text:#DCE2EC;
-    --muted:#727D90;
-    --faint:#49526A;
-    --accent:#E9B44C;         /* amber signal */
-    --accent-dim:#8a6a2a;
-    --attract:#46D08D;        /* matrix positive */
-    --repel:#E04668;          /* matrix negative */
+    --ink:#0A0D13; --panel:#10141C; --raised:#161B26;
+    --line:#222A38; --line-soft:#1A2030;
+    --text:#DCE2EC; --muted:#727D90; --faint:#49526A;
+    --accent:#E9B44C; --accent-dim:#8a6a2a;
+    --attract:#46D08D; --repel:#E04668;
     --mono:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     --disp:"Space Grotesk", ui-sans-serif, system-ui, sans-serif;
     --sans:ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     --r:10px;
   }
-
   *{ box-sizing:border-box; }
   html,body{ height:100%; }
   body{
     margin:0;
-    background:
-      radial-gradient(1200px 600px at 78% -10%, #121a27 0%, transparent 60%),
-      var(--ink);
-    color:var(--text);
-    font-family:var(--sans);
-    -webkit-font-smoothing:antialiased;
-    overflow:hidden;
+    background:radial-gradient(1200px 600px at 78% -10%, #121a27 0%, transparent 60%), var(--ink);
+    color:var(--text); font-family:var(--sans); -webkit-font-smoothing:antialiased; overflow:hidden;
   }
+  .shell{ height:100dvh; display:grid; grid-template-rows:auto 1fr; }
 
-  /* ---------- shell ---------- */
-  .shell{
-    height:100dvh;
-    display:grid;
-    grid-template-rows:auto 1fr;
-  }
-
-  header.bar{
-    display:flex; align-items:center; gap:18px;
-    padding:14px 20px;
+  header.bar{ display:flex; align-items:center; gap:18px; padding:14px 20px;
     border-bottom:1px solid var(--line);
-    background:linear-gradient(var(--panel), color-mix(in srgb, var(--panel) 70%, transparent));
-  }
+    background:linear-gradient(var(--panel), color-mix(in srgb, var(--panel) 70%, transparent)); }
   .brand{ display:flex; flex-direction:column; gap:2px; min-width:0; }
-  .eyebrow{
-    font-family:var(--mono);
-    font-size:10px; letter-spacing:.22em; text-transform:uppercase;
-    color:var(--accent); font-weight:500;
-  }
-  .title{
-    font-family:var(--disp); font-weight:600; font-size:21px; line-height:1;
-    letter-spacing:-.01em;
-  }
+  .eyebrow{ font-family:var(--mono); font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--accent); font-weight:500; }
+  .title{ font-family:var(--disp); font-weight:600; font-size:21px; line-height:1; letter-spacing:-.01em; }
+  .title small{ font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:.04em; margin-left:8px; }
   .bar-spacer{ flex:1 1 auto; }
-
-  .status{
-    display:flex; align-items:center; gap:14px;
-    font-family:var(--mono); font-size:11px; color:var(--muted);
-  }
+  .status{ display:flex; align-items:center; gap:11px; font-family:var(--mono); font-size:11px; color:var(--muted); }
   .status b{ color:var(--text); font-weight:500; }
-  .dot-live{
-    width:7px; height:7px; border-radius:50%;
-    background:var(--accent); box-shadow:0 0 0 0 var(--accent);
-    animation:pulse 1.8s ease-in-out infinite;
-  }
+  .dot-live{ width:7px; height:7px; border-radius:50%; background:var(--accent);
+    box-shadow:0 0 0 0 var(--accent); animation:pulse 1.8s ease-in-out infinite; }
   .dot-live.paused{ background:var(--faint); animation:none; }
-  @keyframes pulse{
-    0%,100%{ box-shadow:0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
-    50%{ box-shadow:0 0 0 5px transparent; }
-  }
-
+  @keyframes pulse{ 0%,100%{ box-shadow:0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); } 50%{ box-shadow:0 0 0 5px transparent; } }
   .bar-actions{ display:flex; gap:8px; }
 
-  /* ---------- buttons ---------- */
   button{ font-family:var(--mono); cursor:pointer; color:var(--text); }
-  .btn{
-    border:1px solid var(--line);
-    background:var(--raised);
-    color:var(--text);
-    font-size:11px; letter-spacing:.08em; text-transform:uppercase; font-weight:500;
-    padding:9px 14px; border-radius:8px;
-    transition:transform .12s ease, border-color .12s ease, background .12s ease, color .12s ease;
-  }
+  .btn{ border:1px solid var(--line); background:var(--raised); color:var(--text);
+    font-size:11px; letter-spacing:.08em; text-transform:uppercase; font-weight:500; padding:9px 14px; border-radius:8px;
+    transition:transform .12s ease, border-color .12s ease, background .12s ease, color .12s ease; }
   .btn:hover{ border-color:#33405a; transform:translateY(-1px); }
   .btn:active{ transform:translateY(0); }
-  .btn.primary{
-    background:var(--accent); color:#1a1305; border-color:var(--accent); font-weight:600;
-  }
+  .btn.primary{ background:var(--accent); color:#1a1305; border-color:var(--accent); font-weight:600; }
   .btn.primary:hover{ background:#f2c061; }
   .btn.ghost{ background:transparent; }
 
-  /* ---------- main layout ---------- */
-  main{
-    display:grid;
-    grid-template-columns:1fr minmax(320px, 380px);
-    min-height:0;
-  }
-
-  /* canvas field */
-  .field{
-    position:relative;
-    margin:16px 8px 16px 16px;
-    border:1px solid var(--line);
-    border-radius:var(--r);
-    overflow:hidden;
-    background:var(--ink);
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.015), 0 18px 40px -30px #000;
-  }
+  main{ display:grid; grid-template-columns:1fr minmax(330px, 392px); min-height:0; }
+  .field{ position:relative; margin:16px 8px 16px 16px; border:1px solid var(--line); border-radius:var(--r);
+    overflow:hidden; background:var(--ink);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.015), 0 18px 40px -30px #000; }
   .field canvas{ display:block; width:100%; height:100%; }
-  .field .reticle-label{
-    position:absolute; left:12px; top:10px;
-    font-family:var(--mono); font-size:10px; letter-spacing:.2em; text-transform:uppercase;
-    color:var(--faint); pointer-events:none; user-select:none;
-  }
-  .field .corner{
-    position:absolute; width:14px; height:14px; pointer-events:none;
-    border-color:var(--line); 
-  }
+  .reticle-label{ position:absolute; left:12px; top:10px; font-family:var(--mono); font-size:10px;
+    letter-spacing:.2em; text-transform:uppercase; color:var(--faint); pointer-events:none; user-select:none; }
+  .corner{ position:absolute; width:14px; height:14px; pointer-events:none; }
   .c-tl{ top:8px; left:8px; border-top:1px solid var(--line); border-left:1px solid var(--line); }
   .c-tr{ top:8px; right:8px; border-top:1px solid var(--line); border-right:1px solid var(--line); }
   .c-bl{ bottom:8px; left:8px; border-bottom:1px solid var(--line); border-left:1px solid var(--line); }
   .c-br{ bottom:8px; right:8px; border-bottom:1px solid var(--line); border-right:1px solid var(--line); }
 
-  /* control rail */
-  .rail{
-    border-left:1px solid var(--line);
-    background:var(--panel);
-    overflow-y:auto;
-    padding:6px 0 40px;
-  }
+  .rail{ border-left:1px solid var(--line); background:var(--panel); overflow-y:auto; padding:6px 0 48px; }
   .rail::-webkit-scrollbar{ width:10px; }
   .rail::-webkit-scrollbar-thumb{ background:#1d2433; border-radius:8px; border:3px solid var(--panel); }
-
   section.group{ padding:16px 18px; border-bottom:1px solid var(--line-soft); }
-  .group-head{
-    font-family:var(--mono); font-size:10px; letter-spacing:.2em; text-transform:uppercase;
-    color:var(--muted); margin:0 0 14px; display:flex; align-items:center; gap:8px;
-  }
+  .group-head{ font-family:var(--mono); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
+    margin:0 0 14px; display:flex; align-items:center; gap:8px; }
   .group-head::after{ content:""; flex:1; height:1px; background:var(--line-soft); }
 
-  /* sliders */
   .ctl{ margin-bottom:15px; }
   .ctl:last-child{ margin-bottom:0; }
   .ctl-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px; }
   .ctl-label{ font-size:12.5px; color:var(--text); }
   .ctl-val{ font-family:var(--mono); font-size:12px; color:var(--accent); font-weight:500; }
-  input[type=range]{
-    -webkit-appearance:none; appearance:none; width:100%; height:3px; border-radius:3px;
-    background:var(--line); outline:none; margin:0;
-  }
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none; appearance:none; width:15px; height:15px; border-radius:50%;
-    background:var(--text); border:3px solid var(--panel);
-    box-shadow:0 0 0 1px var(--line); cursor:pointer; transition:background .12s, box-shadow .12s;
-  }
+  input[type=range]{ -webkit-appearance:none; appearance:none; width:100%; height:3px; border-radius:3px; background:var(--line); outline:none; margin:0; }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; appearance:none; width:15px; height:15px; border-radius:50%;
+    background:var(--text); border:3px solid var(--panel); box-shadow:0 0 0 1px var(--line); cursor:pointer; transition:background .12s, box-shadow .12s; }
   input[type=range]::-webkit-slider-thumb:hover{ background:var(--accent); box-shadow:0 0 0 1px var(--accent), 0 0 12px -2px var(--accent); }
-  input[type=range]::-moz-range-thumb{
-    width:13px; height:13px; border-radius:50%; background:var(--text);
-    border:3px solid var(--panel); box-shadow:0 0 0 1px var(--line); cursor:pointer;
-  }
+  input[type=range]::-moz-range-thumb{ width:13px; height:13px; border-radius:50%; background:var(--text); border:3px solid var(--panel); box-shadow:0 0 0 1px var(--line); cursor:pointer; }
   input[type=range]:focus-visible::-webkit-slider-thumb{ background:var(--accent); box-shadow:0 0 0 2px var(--accent); }
 
-  /* legend */
   .legend{ display:flex; flex-wrap:wrap; gap:6px 12px; margin-top:4px; }
   .legend .lg{ display:flex; align-items:center; gap:7px; font-family:var(--mono); font-size:11px; color:var(--muted); }
-  .legend .sw{ width:9px; height:9px; border-radius:50%; }
-  .legend .lg b{ color:var(--text); font-weight:500; }
+  .sw{ width:9px; height:9px; border-radius:50%; flex:none; }
 
-  /* toggles */
+  .bars{ display:flex; flex-direction:column; gap:6px; margin-top:14px; }
+  .bar{ display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:10px; color:var(--muted); }
+  .bar .track{ flex:1; height:6px; border-radius:4px; background:var(--line); overflow:hidden; }
+  .bar .fill{ height:100%; border-radius:4px; width:0%; transition:width .3s ease; }
+  .bar .n{ width:36px; text-align:right; color:var(--text); }
+
   .toggles{ display:flex; gap:8px; }
-  .toggle{
-    flex:1; border:1px solid var(--line); background:var(--raised); border-radius:8px;
-    padding:9px 0; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
-    transition:.12s; display:flex; flex-direction:column; align-items:center; gap:4px;
-  }
+  .toggle{ flex:1; border:1px solid var(--line); background:var(--raised); border-radius:8px; padding:9px 0;
+    font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); transition:.12s;
+    display:flex; flex-direction:column; align-items:center; gap:4px; }
   .toggle .state{ font-size:9px; letter-spacing:.14em; color:var(--faint); }
   .toggle[aria-pressed="true"]{ border-color:var(--accent-dim); color:var(--text); background:color-mix(in srgb, var(--accent) 10%, var(--raised)); }
   .toggle[aria-pressed="true"] .state{ color:var(--accent); }
   .toggle:hover{ border-color:#33405a; }
 
-  /* matrix */
-  .mhint{ font-size:11.5px; line-height:1.55; color:var(--muted); margin:0 0 12px; }
+  .seg{ display:flex; gap:4px; background:var(--raised); border:1px solid var(--line); border-radius:9px; padding:4px; }
+  .segb{ flex:1; border:none; background:transparent; color:var(--muted); font-family:var(--mono); font-size:11px;
+    letter-spacing:.06em; text-transform:uppercase; padding:8px 0; border-radius:6px; transition:.12s; }
+  .segb.active{ background:color-mix(in srgb, var(--accent) 16%, var(--raised)); color:var(--text); box-shadow:inset 0 0 0 1px var(--accent-dim); }
+  .segb:hover:not(.active){ color:var(--text); }
+
+  .mhint{ font-size:11.5px; line-height:1.55; color:var(--muted); margin:12px 0; }
+  .mhint b{ color:var(--text); font-weight:500; }
   .mhint .up{ color:var(--attract); } .mhint .dn{ color:var(--repel); }
   .matrix-wrap{ overflow-x:auto; padding-bottom:4px; }
   .matrix{ display:inline-grid; gap:4px; user-select:none; touch-action:none; }
-  .mhead{
-    display:flex; align-items:center; justify-content:center;
-    font-family:var(--mono); font-size:10px; color:var(--muted);
-  }
+  .mhead{ display:flex; align-items:center; justify-content:center; }
   .swatch{ width:18px; height:18px; border-radius:5px; box-shadow:inset 0 0 0 1px rgba(0,0,0,.35); }
-  .mcell{
-    width:100%; min-width:42px; aspect-ratio:1; border-radius:6px;
-    display:flex; align-items:center; justify-content:center;
-    font-family:var(--mono); font-size:11px; font-weight:500;
-    border:1px solid rgba(255,255,255,.04);
-    cursor:ns-resize; transition:box-shadow .1s;
-    position:relative;
-  }
-  .mcell:hover{ box-shadow:inset 0 0 0 1px rgba(255,255,255,.18); }
-  .mcell.active{ box-shadow:inset 0 0 0 1px var(--accent), 0 0 0 1px var(--accent); }
   .mcorner{ width:18px; height:18px; }
+  .mcell{ width:100%; min-width:42px; aspect-ratio:1; border-radius:6px; display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:11px; font-weight:500; border:1px solid rgba(255,255,255,.04); position:relative; transition:box-shadow .1s; }
+  .fcell{ cursor:ns-resize; }
+  .fcell:hover{ box-shadow:inset 0 0 0 1px rgba(255,255,255,.18); }
+  .fcell.active{ box-shadow:inset 0 0 0 1px var(--accent), 0 0 0 1px var(--accent); }
+  .rcell{ background:var(--raised); cursor:pointer; }
+  .rcell:hover{ box-shadow:inset 0 0 0 1px rgba(255,255,255,.18); }
+  .rcell .chip{ width:58%; height:58%; border-radius:5px; box-shadow:inset 0 0 0 1px rgba(0,0,0,.35); }
+  .rcell .none{ color:var(--faint); font-size:13px; }
 
   .mbtns{ display:flex; gap:8px; margin-top:14px; }
   .mbtns .btn{ flex:1; padding:9px 0; }
-
   .axis-note{ font-family:var(--mono); font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); margin:10px 0 2px; }
 
-  /* responsive */
-  @media (max-width: 880px){
+  .ctl.dim, .seg.dim{ opacity:.34; pointer-events:none; }
+  .chemnote{ font-size:11px; line-height:1.55; color:var(--muted); margin:14px 0 0; padding:11px 13px;
+    border:1px solid var(--line-soft); border-radius:8px; background:var(--raised); }
+  .chemnote b{ color:var(--text); }
+
+  .select{ width:100%; appearance:none; -webkit-appearance:none; background-color:var(--raised); color:var(--text);
+    border:1px solid var(--line); border-radius:9px; padding:11px 36px 11px 13px; font-family:var(--mono); font-size:12.5px; cursor:pointer;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%23727D90' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat:no-repeat; background-position:right 13px center; transition:border-color .12s; }
+  .select:hover{ border-color:#33405a; }
+  .select:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .select optgroup{ color:var(--muted); }
+  .presetDesc{ font-size:11.5px; line-height:1.55; color:var(--muted); margin:12px 0 0; }
+  .presetDesc b{ color:var(--text); font-weight:500; }
+
+  @media (max-width: 900px){
     main{ grid-template-columns:1fr; grid-template-rows:minmax(280px, 46dvh) 1fr; }
     .field{ margin:12px 12px 6px; }
     .rail{ border-left:none; border-top:1px solid var(--line); }
     header.bar{ flex-wrap:wrap; }
   }
-  @media (prefers-reduced-motion: reduce){
-    *{ transition:none !important; animation:none !important; }
-  }
-  .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important; } }
 </style>
 </head>
 <body>
 <div class="shell">
   <header class="bar">
     <div class="brand">
-      <span class="eyebrow">Force-matrix particle life</span>
-      <span class="title">Morphogen</span>
+      <span class="eyebrow">Force + reaction matrices</span>
+      <span class="title">Morphogen<small>II · chemistry</small></span>
     </div>
     <div class="bar-spacer"></div>
     <div class="status" aria-live="polite">
       <span class="dot-live" id="liveDot"></span>
-      <span id="statState">running</span>
-      <span>·</span>
-      <span><b id="statFps">60</b> fps</span>
-      <span>·</span>
-      <span><b id="statCount">1200</b> cells</span>
+      <span id="statState">running</span><span>·</span>
+      <span><b id="statFps">60</b> fps</span><span>·</span>
+      <span><b id="statCount">1200</b> cells</span><span>·</span>
+      <span><b id="statRx">0</b> rx/s</span>
     </div>
     <div class="bar-actions">
       <button class="btn primary" id="btnPlay">Pause</button>
@@ -261,6 +188,31 @@
     </div>
 
     <div class="rail">
+      <!-- SCENE -->
+      <section class="group">
+        <h2 class="group-head">Scene</h2>
+        <select class="select" id="presetSel" aria-label="Preset scene">
+          <optgroup label="Pure force (no chemistry)">
+            <option value="primordial">Primordial soup</option>
+            <option value="worms">Worms &amp; chains</option>
+            <option value="membranes">Membranes &amp; nuclei</option>
+          </optgroup>
+          <optgroup label="Transmute (convert)">
+            <option value="rps">Rock · paper · scissors</option>
+            <option value="waves">Spiral waves</option>
+          </optgroup>
+          <optgroup label="Bud (create)">
+            <option value="predprey">Predator &amp; prey</option>
+            <option value="mitosis">Mitosis colonies</option>
+          </optgroup>
+          <optgroup label="—">
+            <option value="blank">Blank canvas</option>
+            <option value="custom">Custom (edited)</option>
+          </optgroup>
+        </select>
+        <p class="presetDesc" id="presetDesc"></p>
+      </section>
+
       <!-- POPULATION -->
       <section class="group">
         <h2 class="group-head">Population</h2>
@@ -269,59 +221,80 @@
           <input type="range" id="sTypes" min="2" max="6" step="1" value="4" />
         </div>
         <div class="ctl">
-          <div class="ctl-top"><span class="ctl-label">Cells</span><span class="ctl-val" id="vCount">1200</span></div>
+          <div class="ctl-top"><span class="ctl-label">Starting cells</span><span class="ctl-val" id="vCount">1200</span></div>
           <input type="range" id="sCount" min="200" max="4000" step="100" value="1200" />
         </div>
         <div class="legend" id="legend"></div>
+        <div class="bars" id="bars"></div>
       </section>
 
       <!-- PHYSICS -->
       <section class="group">
         <h2 class="group-head">Physics</h2>
-        <div class="ctl">
-          <div class="ctl-top"><span class="ctl-label">Sensing radius</span><span class="ctl-val" id="vRmax">80&nbsp;px</span></div>
-          <input type="range" id="sRmax" min="30" max="160" step="1" value="80" />
+        <div class="ctl"><div class="ctl-top"><span class="ctl-label">Sensing radius</span><span class="ctl-val" id="vRmax">80&nbsp;px</span></div>
+          <input type="range" id="sRmax" min="30" max="160" step="1" value="80" /></div>
+        <div class="ctl"><div class="ctl-top"><span class="ctl-label">Force strength</span><span class="ctl-val" id="vForce">6.0</span></div>
+          <input type="range" id="sForce" min="0.5" max="12" step="0.1" value="6" /></div>
+        <div class="ctl"><div class="ctl-top"><span class="ctl-label">Friction</span><span class="ctl-val" id="vFric">0.50</span></div>
+          <input type="range" id="sFric" min="0" max="1" step="0.01" value="0.5" /></div>
+        <div class="ctl"><div class="ctl-top"><span class="ctl-label">Repel zone</span><span class="ctl-val" id="vBeta">0.30</span></div>
+          <input type="range" id="sBeta" min="0.1" max="0.6" step="0.01" value="0.3" /></div>
+        <div class="ctl"><div class="ctl-top"><span class="ctl-label">Time step</span><span class="ctl-val" id="vSpeed">1.00&times;</span></div>
+          <input type="range" id="sSpeed" min="0.2" max="2" step="0.05" value="1" /></div>
+      </section>
+
+      <!-- MATRICES -->
+      <section class="group">
+        <h2 class="group-head">Interaction matrices</h2>
+        <div class="seg" role="tablist">
+          <button class="segb active" id="tabForce">Force</button>
+          <button class="segb" id="tabReact">Reaction</button>
         </div>
-        <div class="ctl">
-          <div class="ctl-top"><span class="ctl-label">Force strength</span><span class="ctl-val" id="vForce">6.0</span></div>
-          <input type="range" id="sForce" min="0.5" max="12" step="0.1" value="6" />
+        <p class="mhint" id="hintForce">Sets how the <b>row</b> type is pulled by the <b>column</b> type. Drag <span class="up">up to attract</span>, <span class="dn">down to repel</span>. Double-click clears.</p>
+        <p class="mhint" id="hintReact" style="display:none">When the <b>row</b> type touches the <b>column</b> type, it tends toward the cell's product. Click to cycle the product, right-click to go back, double-click for <b>none</b>.</p>
+        <div class="matrix-wrap">
+          <div class="axis-note" style="text-align:center">on contact with →</div>
+          <div class="matrix" id="forceGrid"></div>
+          <div class="matrix" id="reactGrid" style="display:none"></div>
         </div>
-        <div class="ctl">
-          <div class="ctl-top"><span class="ctl-label">Friction</span><span class="ctl-val" id="vFric">0.50</span></div>
-          <input type="range" id="sFric" min="0" max="1" step="0.01" value="0.5" />
+        <div class="mbtns" id="forceBtns">
+          <button class="btn" id="btnFRand">Randomize</button>
+          <button class="btn" id="btnFSym">Symmetric</button>
+          <button class="btn ghost" id="btnFZero">Clear</button>
         </div>
-        <div class="ctl">
-          <div class="ctl-top"><span class="ctl-label">Repel zone</span><span class="ctl-val" id="vBeta">0.30</span></div>
-          <input type="range" id="sBeta" min="0.1" max="0.6" step="0.01" value="0.3" />
-        </div>
-        <div class="ctl">
-          <div class="ctl-top"><span class="ctl-label">Time step</span><span class="ctl-val" id="vSpeed">1.00&times;</span></div>
-          <input type="range" id="sSpeed" min="0.2" max="2" step="0.05" value="1" />
+        <div class="mbtns" id="reactBtns" style="display:none">
+          <button class="btn" id="btnRRand">Randomize</button>
+          <button class="btn" id="btnRCycle">Cycle</button>
+          <button class="btn ghost" id="btnRClear">Clear</button>
         </div>
       </section>
 
-      <!-- MATRIX -->
-      <section class="group">
-        <h2 class="group-head">Interaction matrix</h2>
-        <p class="mhint">Each cell sets how the <b>row</b> type responds to the <b>column</b> type. Drag <span class="up">up to attract</span>, <span class="dn">down to repel</span>. Double-click to neutralize.</p>
-        <div class="matrix-wrap">
-          <div class="axis-note" style="text-align:center">affected by →</div>
-          <div class="matrix" id="matrix"></div>
+      <!-- CHEMISTRY -->
+      <section class="group" id="chemGroup">
+        <h2 class="group-head">Chemistry</h2>
+        <div class="toggles" style="margin-bottom:14px">
+          <button class="toggle" id="tReact" aria-pressed="true">Reactions<span class="state">on</span></button>
         </div>
-        <div class="mbtns">
-          <button class="btn" id="btnMRand">Randomize</button>
-          <button class="btn" id="btnMSym">Symmetric</button>
-          <button class="btn ghost" id="btnMZero">Clear</button>
+        <div class="seg" id="modeSeg" style="margin-bottom:16px">
+          <button class="segb active" id="modeTrans">Transmute</button>
+          <button class="segb" id="modeBud">Bud</button>
         </div>
+        <div class="ctl" id="ctlRadius"><div class="ctl-top"><span class="ctl-label">Contact radius</span><span class="ctl-val" id="vReactR">16&nbsp;px</span></div>
+          <input type="range" id="sReactR" min="4" max="48" step="1" value="16" /></div>
+        <div class="ctl" id="ctlRate"><div class="ctl-top"><span class="ctl-label">Reaction rate</span><span class="ctl-val" id="vRate">0.030</span></div>
+          <input type="range" id="sRate" min="0" max="0.3" step="0.005" value="0.03" /></div>
+        <div class="ctl dim" id="ctlDecay"><div class="ctl-top"><span class="ctl-label">Cell decay</span><span class="ctl-val" id="vDecay">0.0030</span></div>
+          <input type="range" id="sDecay" min="0" max="0.02" step="0.0005" value="0.003" /></div>
+        <div class="ctl dim" id="ctlMax"><div class="ctl-top"><span class="ctl-label">Max cells</span><span class="ctl-val" id="vMax">4000</span></div>
+          <input type="range" id="sMax" min="1000" max="8000" step="100" value="4000" /></div>
+        <p class="chemnote" id="chemNote"></p>
       </section>
 
       <!-- RENDER -->
       <section class="group">
         <h2 class="group-head">Render</h2>
-        <div class="ctl">
-          <div class="ctl-top"><span class="ctl-label">Dot size</span><span class="ctl-val" id="vSize">2.4</span></div>
-          <input type="range" id="sSize" min="1" max="5" step="0.1" value="2.4" />
-        </div>
+        <div class="ctl"><div class="ctl-top"><span class="ctl-label">Dot size</span><span class="ctl-val" id="vSize">2.4</span></div>
+          <input type="range" id="sSize" min="1" max="5" step="0.1" value="2.4" /></div>
         <div class="toggles">
           <button class="toggle" id="tTrails" aria-pressed="true">Trails<span class="state">on</span></button>
           <button class="toggle" id="tGlow" aria-pressed="true">Glow<span class="state">on</span></button>
@@ -335,145 +308,181 @@
 <script>
 "use strict";
 (() => {
-  // ---------- palette ----------
   const TYPE_COLORS = ['#FF5C7A','#4ADE80','#56A8FF','#FFD24A','#C77DFF','#2DD4BF'];
   const TYPE_NAMES  = ['Red','Green','Blue','Amber','Violet','Teal'];
 
-  // ---------- config ----------
   const cfg = {
     numTypes:4, count:1200,
     rMax:80, forceFactor:6, friction:0.5, beta:0.3, speed:1,
+    // chemistry
+    react:true, spawnMode:false,          // spawnMode false = transmute, true = bud
+    reactRadius:16, reactRate:0.03, decay:0.003, maxCells:4000,
+    // render
     dotSize:2.4, trails:true, glow:true, wrap:true, running:true,
   };
 
-  // ---------- state ----------
-  let matrix = new Float32Array(0);          // numTypes*numTypes, row=affected, col=other
-  let N = 0;
-  let px, py, vx, vy, accx, accy, type;       // typed particle arrays
+  // matrices
+  let forceM = new Float32Array(0);     // float -1..1, row=subject, col=other
+  let reactM = new Int8Array(0);        // -1 = none, else product type. same indexing
+
+  // particles (allocated to capacity = cfg.maxCells)
+  let CAP = 0, N = 0;
+  let px, py, vx, vy, accx, accy, type, flash, convert, sQX, sQY, sQT;
+  let sQN = 0;
+
   let W = 0, H = 0, dpr = 1;
-  let sprites = [];                            // per-type glow sprite canvases
-  let spriteR = 0;
+  let sprites = [], flashSprite = null, spriteR = 0;
 
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d', { alpha:false });
+  const $ = id => document.getElementById(id);
 
   // ---------- color helpers ----------
   function hexRgb(h){ const n = parseInt(h.slice(1),16); return [(n>>16)&255,(n>>8)&255,n&255]; }
   const NEUTRAL = hexRgb('#161B26'), ATTRACT = hexRgb('#46D08D'), REPEL = hexRgb('#E04668');
   function mix(a,b,t){ return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t]; }
   function rgbStr(c){ return `rgb(${c[0]|0},${c[1]|0},${c[2]|0})`; }
-  function forceColor(v){
-    const c = v >= 0 ? mix(NEUTRAL, ATTRACT, Math.min(1,v)) : mix(NEUTRAL, REPEL, Math.min(1,-v));
-    return rgbStr(c);
-  }
+  function forceColor(v){ const c = v>=0 ? mix(NEUTRAL,ATTRACT,Math.min(1,v)) : mix(NEUTRAL,REPEL,Math.min(1,-v)); return rgbStr(c); }
 
-  // ---------- matrix ----------
-  function resizeMatrix(preserve){
+  // ---------- matrices: data ----------
+  function resizeForce(preserve){
     const n = cfg.numTypes, next = new Float32Array(n*n);
-    if (preserve && matrix.length){
-      const old = Math.sqrt(matrix.length)|0;
-      for (let i=0;i<n;i++) for (let j=0;j<n;j++)
-        if (i<old && j<old) next[i*n+j] = matrix[i*old+j];
-    }
-    matrix = next;
+    if (preserve && forceM.length){ const old = Math.sqrt(forceM.length)|0;
+      for (let i=0;i<n;i++) for (let j=0;j<n;j++) if (i<old&&j<old) next[i*n+j] = forceM[i*old+j]; }
+    forceM = next;
   }
-  function randomizeMatrix(){
-    const n = cfg.numTypes;
-    for (let i=0;i<n*n;i++) matrix[i] = Math.round((Math.random()*2-1)*100)/100;
-    buildMatrixUI();
+  function resizeReact(preserve){
+    const n = cfg.numTypes, next = new Int8Array(n*n).fill(-1);
+    if (preserve && reactM.length){ const old = Math.sqrt(reactM.length)|0;
+      for (let i=0;i<n;i++) for (let j=0;j<n;j++) if (i<old&&j<old){ const v = reactM[i*old+j]; next[i*n+j] = (v>=0&&v<n)? v : -1; } }
+    reactM = next;
   }
-  function zeroMatrix(){ matrix.fill(0); buildMatrixUI(); }
-  function symmetrizeMatrix(){
-    const n = cfg.numTypes;
-    for (let i=0;i<n;i++) for (let j=i+1;j<n;j++) matrix[j*n+i] = matrix[i*n+j];
-    buildMatrixUI();
-  }
+  function randomForce(){ const n=cfg.numTypes; for (let k=0;k<n*n;k++) forceM[k]=Math.round((Math.random()*2-1)*100)/100; buildForceGrid(); }
+  function zeroForce(){ forceM.fill(0); buildForceGrid(); }
+  function symForce(){ const n=cfg.numTypes; for (let i=0;i<n;i++) for (let j=i+1;j<n;j++) forceM[j*n+i]=forceM[i*n+j]; buildForceGrid(); }
+  function randomReact(){ const n=cfg.numTypes; for (let k=0;k<n*n;k++) reactM[k]= Math.random()<0.55 ? -1 : (Math.random()*n)|0; buildReactGrid(); }
+  function cycleReact(){ const n=cfg.numTypes; reactM.fill(-1); for (let i=0;i<n;i++) reactM[i*n + ((i+1)%n)] = (i+2)%n; buildReactGrid(); }
+  function clearReact(){ reactM.fill(-1); buildReactGrid(); }
 
-  // ---------- matrix UI ----------
-  const matrixEl = document.getElementById('matrix');
-  function buildMatrixUI(){
-    const n = cfg.numTypes;
-    matrixEl.style.gridTemplateColumns = `18px repeat(${n}, minmax(42px, 1fr))`;
-    matrixEl.innerHTML = '';
+  // ---------- matrices: UI ----------
+  const forceGrid = $('forceGrid'), reactGrid = $('reactGrid');
 
-    // top-left spacer
-    const corner = document.createElement('div'); corner.className = 'mcorner'; matrixEl.appendChild(corner);
-    // column headers (the "other" type)
-    for (let j=0;j<n;j++){
-      const h = document.createElement('div'); h.className = 'mhead';
-      const s = document.createElement('span'); s.className = 'swatch'; s.style.background = TYPE_COLORS[j];
-      h.appendChild(s); matrixEl.appendChild(h);
-    }
-    // rows
-    for (let i=0;i<n;i++){
-      const rh = document.createElement('div'); rh.className = 'mhead';
-      const s = document.createElement('span'); s.className = 'swatch'; s.style.background = TYPE_COLORS[i];
-      rh.appendChild(s); matrixEl.appendChild(rh);
-      for (let j=0;j<n;j++){
-        const cell = document.createElement('div');
-        cell.className = 'mcell';
-        cell.dataset.i = i; cell.dataset.j = j;
-        paintCell(cell, matrix[i*n+j]);
-        matrixEl.appendChild(cell);
-      }
+  function headerRowInto(grid){
+    const corner = document.createElement('div'); corner.className='mcorner'; grid.appendChild(corner);
+    for (let j=0;j<cfg.numTypes;j++){
+      const h=document.createElement('div'); h.className='mhead';
+      const s=document.createElement('span'); s.className='swatch'; s.style.background=TYPE_COLORS[j];
+      h.appendChild(s); grid.appendChild(h);
     }
   }
-  function paintCell(cell, v){
+  function rowSwatchInto(grid, i){
+    const rh=document.createElement('div'); rh.className='mhead';
+    const s=document.createElement('span'); s.className='swatch'; s.style.background=TYPE_COLORS[i];
+    rh.appendChild(s); grid.appendChild(rh);
+  }
+  function gridCols(){ return `18px repeat(${cfg.numTypes}, minmax(42px, 1fr))`; }
+
+  function paintForce(cell, v){
     cell.style.background = forceColor(v);
     cell.textContent = (v>0?'+':'') + v.toFixed(2);
     if (Math.abs(v) < 0.18) cell.style.color = 'var(--faint)';
     else cell.style.color = (v>0 ? '#06210f' : '#2a0710');
   }
+  function buildForceGrid(){
+    const n=cfg.numTypes;
+    forceGrid.style.gridTemplateColumns = gridCols();
+    forceGrid.innerHTML=''; headerRowInto(forceGrid);
+    for (let i=0;i<n;i++){ rowSwatchInto(forceGrid,i);
+      for (let j=0;j<n;j++){ const c=document.createElement('div'); c.className='mcell fcell';
+        c.dataset.i=i; c.dataset.j=j; paintForce(c, forceM[i*n+j]); forceGrid.appendChild(c); } }
+  }
 
-  // drag-to-edit on the matrix
+  function paintReact(cell, p){
+    cell.innerHTML='';
+    if (p < 0){ const s=document.createElement('span'); s.className='none'; s.textContent='–'; cell.appendChild(s); cell.title='no reaction'; }
+    else { const chip=document.createElement('span'); chip.className='chip'; chip.style.background=TYPE_COLORS[p];
+      cell.appendChild(chip); cell.title='becomes '+TYPE_NAMES[p]; }
+  }
+  function buildReactGrid(){
+    const n=cfg.numTypes;
+    reactGrid.style.gridTemplateColumns = gridCols();
+    reactGrid.innerHTML=''; headerRowInto(reactGrid);
+    for (let i=0;i<n;i++){ rowSwatchInto(reactGrid,i);
+      for (let j=0;j<n;j++){ const c=document.createElement('div'); c.className='mcell rcell';
+        c.dataset.i=i; c.dataset.j=j; paintReact(c, reactM[i*n+j]); reactGrid.appendChild(c); } }
+  }
+
+  // force matrix: drag to edit
   let drag = null;
-  matrixEl.addEventListener('pointerdown', e => {
-    const cell = e.target.closest('.mcell'); if (!cell) return;
-    const i = +cell.dataset.i, j = +cell.dataset.j, n = cfg.numTypes;
-    drag = { cell, idx:i*n+j, startY:e.clientY, startVal:matrix[i*n+j] };
-    cell.classList.add('active');
-    cell.setPointerCapture(e.pointerId);
-    e.preventDefault();
+  forceGrid.addEventListener('pointerdown', e => {
+    const cell = e.target.closest('.fcell'); if (!cell) return;
+    const i=+cell.dataset.i, j=+cell.dataset.j, n=cfg.numTypes;
+    drag={ cell, idx:i*n+j, startY:e.clientY, startVal:forceM[i*n+j] };
+    cell.classList.add('active'); cell.setPointerCapture(e.pointerId); e.preventDefault();
   });
-  matrixEl.addEventListener('pointermove', e => {
+  forceGrid.addEventListener('pointermove', e => {
     if (!drag) return;
-    const delta = (drag.startY - e.clientY) / 120;       // up = attract
-    let v = Math.max(-1, Math.min(1, drag.startVal + delta));
-    v = Math.round(v*100)/100;
-    matrix[drag.idx] = v;
-    paintCell(drag.cell, v);
+    let v = Math.max(-1, Math.min(1, drag.startVal + (drag.startY - e.clientY)/120));
+    v = Math.round(v*100)/100; forceM[drag.idx]=v; paintForce(drag.cell, v); markCustom();
   });
-  function endDrag(){ if (drag){ drag.cell.classList.remove('active'); drag = null; } }
-  matrixEl.addEventListener('pointerup', endDrag);
-  matrixEl.addEventListener('pointercancel', endDrag);
-  matrixEl.addEventListener('dblclick', e => {
-    const cell = e.target.closest('.mcell'); if (!cell) return;
-    const n = cfg.numTypes; matrix[(+cell.dataset.i)*n + (+cell.dataset.j)] = 0; paintCell(cell, 0);
+  const endDrag = () => { if (drag){ drag.cell.classList.remove('active'); drag=null; } };
+  forceGrid.addEventListener('pointerup', endDrag);
+  forceGrid.addEventListener('pointercancel', endDrag);
+  forceGrid.addEventListener('dblclick', e => {
+    const cell=e.target.closest('.fcell'); if(!cell) return;
+    const n=cfg.numTypes; forceM[(+cell.dataset.i)*n+(+cell.dataset.j)]=0; paintForce(cell,0); markCustom();
   });
 
-  // ---------- legend ----------
-  const legendEl = document.getElementById('legend');
+  // reaction matrix: click to cycle product
+  function cycleCell(cell, dir){
+    const n=cfg.numTypes, idx=(+cell.dataset.i)*n+(+cell.dataset.j);
+    let p = reactM[idx] + dir;
+    if (p > n-1) p = -1; else if (p < -1) p = n-1;
+    reactM[idx]=p; paintReact(cell, p); markCustom();
+  }
+  reactGrid.addEventListener('click', e => { const c=e.target.closest('.rcell'); if(c) cycleCell(c, +1); });
+  reactGrid.addEventListener('contextmenu', e => { const c=e.target.closest('.rcell'); if(c){ e.preventDefault(); cycleCell(c, -1); } });
+  reactGrid.addEventListener('dblclick', e => { const c=e.target.closest('.rcell'); if(c){ const n=cfg.numTypes; reactM[(+c.dataset.i)*n+(+c.dataset.j)]=-1; paintReact(c,-1); markCustom(); } });
+
+  // ---------- legend + bars ----------
   function buildLegend(){
-    legendEl.innerHTML = '';
-    for (let t=0;t<cfg.numTypes;t++){
-      const el = document.createElement('span'); el.className = 'lg';
-      el.innerHTML = `<span class="sw" style="background:${TYPE_COLORS[t]}"></span>${TYPE_NAMES[t]}`;
-      legendEl.appendChild(el);
-    }
+    const el=$('legend'); el.innerHTML='';
+    for (let t=0;t<cfg.numTypes;t++){ const s=document.createElement('span'); s.className='lg';
+      s.innerHTML=`<span class="sw" style="background:${TYPE_COLORS[t]}"></span>${TYPE_NAMES[t]}`; el.appendChild(s); }
+  }
+  function buildBars(){
+    const el=$('bars'); el.innerHTML='';
+    for (let t=0;t<cfg.numTypes;t++){ const b=document.createElement('div'); b.className='bar';
+      b.innerHTML = `<span class="sw" style="background:${TYPE_COLORS[t]}"></span>`
+        + `<span class="track"><span class="fill" id="fill${t}" style="background:${TYPE_COLORS[t]}"></span></span>`
+        + `<span class="n" id="barn${t}">0</span>`;
+      el.appendChild(b); }
+  }
+  function updateBars(){
+    const n=cfg.numTypes, counts=new Array(n).fill(0);
+    for (let i=0;i<N;i++){ const t=type[i]; if (t<n) counts[t]++; }
+    for (let t=0;t<n;t++){ const f=$('fill'+t), nn=$('barn'+t);
+      if (f) f.style.width = (N? counts[t]/N*100:0).toFixed(1)+'%';
+      if (nn) nn.textContent = counts[t]; }
   }
 
   // ---------- particles ----------
-  function seed(){
-    N = cfg.count;
-    px = new Float32Array(N); py = new Float32Array(N);
-    vx = new Float32Array(N); vy = new Float32Array(N);
-    accx = new Float32Array(N); accy = new Float32Array(N);
-    type = new Uint8Array(N);
-    const w = W||1, h = H||1;
-    for (let i=0;i<N;i++){
-      px[i] = Math.random()*w; py[i] = Math.random()*h;
-      type[i] = (Math.random()*cfg.numTypes)|0;
-    }
+  function ensureCapacity(cap){
+    cap = Math.max(1, cap|0);
+    const o = { px,py,vx,vy,type,flash, N };
+    px=new Float32Array(cap); py=new Float32Array(cap); vx=new Float32Array(cap); vy=new Float32Array(cap);
+    accx=new Float32Array(cap); accy=new Float32Array(cap); type=new Uint8Array(cap); flash=new Float32Array(cap);
+    convert=new Int16Array(cap); sQX=new Float32Array(cap); sQY=new Float32Array(cap); sQT=new Int16Array(cap);
+    CAP=cap;
+    if (o.px){ const m=Math.min(o.N,cap);
+      px.set(o.px.subarray(0,m)); py.set(o.py.subarray(0,m)); vx.set(o.vx.subarray(0,m)); vy.set(o.vy.subarray(0,m));
+      type.set(o.type.subarray(0,m)); flash.set(o.flash.subarray(0,m)); N=m;
+    } else { N=0; }
+  }
+  function reseed(){
+    const n=cfg.numTypes, w=W||1, h=H||1;
+    N = Math.min(cfg.count, CAP);
+    for (let i=0;i<N;i++){ px[i]=Math.random()*w; py[i]=Math.random()*h; vx[i]=0; vy[i]=0; flash[i]=0; type[i]=(Math.random()*n)|0; }
   }
 
   // ---------- glow sprites ----------
@@ -481,167 +490,161 @@
     spriteR = Math.max(4, cfg.dotSize * (cfg.glow ? 5 : 1.6));
     sprites = [];
     for (let t=0;t<cfg.numTypes;t++){
-      const [r,g,b] = hexRgb(TYPE_COLORS[t]);
-      const d = Math.ceil(spriteR*2), c = document.createElement('canvas');
-      c.width = d; c.height = d;
-      const cx = c.getContext('2d'), R = spriteR;
-      if (cfg.glow){
-        const grd = cx.createRadialGradient(R,R, 0, R,R, R);
-        grd.addColorStop(0,   `rgba(255,255,255,0.95)`);
-        grd.addColorStop(0.18,`rgba(${r},${g},${b},1)`);
-        grd.addColorStop(0.5, `rgba(${r},${g},${b},0.35)`);
-        grd.addColorStop(1,   `rgba(${r},${g},${b},0)`);
-        cx.fillStyle = grd; cx.beginPath(); cx.arc(R,R,R,0,6.2832); cx.fill();
-      } else {
-        cx.fillStyle = `rgb(${r},${g},${b})`;
-        cx.beginPath(); cx.arc(R,R, cfg.dotSize, 0, 6.2832); cx.fill();
-      }
+      const [r,g,b]=hexRgb(TYPE_COLORS[t]); const d=Math.ceil(spriteR*2), c=document.createElement('canvas');
+      c.width=d; c.height=d; const cx=c.getContext('2d'), R=spriteR;
+      if (cfg.glow){ const grd=cx.createRadialGradient(R,R,0,R,R,R);
+        grd.addColorStop(0,'rgba(255,255,255,0.95)'); grd.addColorStop(0.18,`rgba(${r},${g},${b},1)`);
+        grd.addColorStop(0.5,`rgba(${r},${g},${b},0.35)`); grd.addColorStop(1,`rgba(${r},${g},${b},0)`);
+        cx.fillStyle=grd; cx.beginPath(); cx.arc(R,R,R,0,6.2832); cx.fill();
+      } else { cx.fillStyle=`rgb(${r},${g},${b})`; cx.beginPath(); cx.arc(R,R,cfg.dotSize,0,6.2832); cx.fill(); }
       sprites.push(c);
     }
+    // white flash sprite for reaction events
+    const fr=Math.max(6, spriteR*1.25), fd=Math.ceil(fr*2), fc=document.createElement('canvas');
+    fc.width=fd; fc.height=fd; const fx=fc.getContext('2d');
+    const fg=fx.createRadialGradient(fr,fr,0,fr,fr,fr);
+    fg.addColorStop(0,'rgba(255,255,255,0.95)'); fg.addColorStop(0.4,'rgba(220,235,255,0.45)'); fg.addColorStop(1,'rgba(180,210,255,0)');
+    fx.fillStyle=fg; fx.beginPath(); fx.arc(fr,fr,fr,0,6.2832); fx.fill();
+    flashSprite = fc; flashSprite._r = fr;
   }
 
-  // ---------- physics ----------
+  // ---------- physics + chemistry ----------
   function frictionFactor(simDt){
-    // friction slider 0..1 -> velocity half-life (log-interpolated, seconds)
     const hl = Math.exp(Math.log(0.20)*(1-cfg.friction) + Math.log(0.01)*cfg.friction);
     return Math.pow(0.5, simDt / hl);
   }
 
-  // reusable grid buffers (reallocated only when sizes change)
-  let gHead=null, gNext=null, gCellX=null, gCellY=null, gVisit=null;
-  let stamp = 1;
+  let gHead=null, gNext=null, gCellX=null, gCellY=null, gVisit=null, stamp=1, reactAccum=0;
 
   function step(){
     if (!N || W<=0 || H<=0) return;
-    const n = cfg.numTypes, rMax = cfg.rMax, beta = cfg.beta;
-    const simDt = 0.016 * cfg.speed;
-    const ff = frictionFactor(simDt);
-    const accelScale = rMax * cfg.forceFactor;
-    const r2max = rMax*rMax, halfW = W*0.5, halfH = H*0.5, wrap = cfg.wrap;
+    const n=cfg.numTypes, rMax=cfg.rMax, beta=cfg.beta;
+    const simDt=0.016*cfg.speed, ff=frictionFactor(simDt), accelScale=rMax*cfg.forceFactor;
+    const r2max=rMax*rMax, halfW=W*0.5, halfH=H*0.5, wrap=cfg.wrap;
+    const react=cfg.react, bud=cfg.spawnMode;
+    const reactR=Math.min(cfg.reactRadius, rMax), reactR2=reactR*reactR, rate=cfg.reactRate;
+    const Ncur=N;
+    if (react) convert.fill(-1, 0, Ncur);
+    sQN = 0; let rcount = 0;
 
-    // spatial grid (cell size >= rMax so neighbours live in adjacent cells)
-    const cols = Math.max(1, Math.floor(W / rMax));
-    const rows = Math.max(1, Math.floor(H / rMax));
-    const cellW = W / cols, cellH = H / rows, nc = cols*rows;
-
-    if (!gNext || gNext.length < N){
-      gNext = new Int32Array(N); gCellX = new Int16Array(N); gCellY = new Int16Array(N);
-    }
-    if (!gHead || gHead.length < nc){
-      gHead = new Int32Array(nc); gVisit = new Int32Array(nc);
-    }
-    const head = gHead, next = gNext, cellX = gCellX, cellY = gCellY, visit = gVisit;
-    for (let c=0;c<nc;c++) head[c] = -1;
-
-    for (let i=0;i<N;i++){
-      let cx = (px[i]/cellW)|0; if (cx<0) cx=0; else if (cx>=cols) cx=cols-1;
-      let cy = (py[i]/cellH)|0; if (cy<0) cy=0; else if (cy>=rows) cy=rows-1;
-      cellX[i]=cx; cellY[i]=cy;
-      const ci = cy*cols+cx;
-      next[i] = head[ci]; head[ci] = i;
+    // spatial grid (cell >= rMax)
+    const cols=Math.max(1, Math.floor(W/rMax)), rows=Math.max(1, Math.floor(H/rMax));
+    const cellW=W/cols, cellH=H/rows, nc=cols*rows;
+    if (!gNext || gNext.length<CAP){ gNext=new Int32Array(CAP); gCellX=new Int16Array(CAP); gCellY=new Int16Array(CAP); }
+    if (!gHead || gHead.length<nc){ gHead=new Int32Array(nc); gVisit=new Int32Array(nc); }
+    const head=gHead, next=gNext, cellX=gCellX, cellY=gCellY, visit=gVisit;
+    for (let c=0;c<nc;c++) head[c]=-1;
+    for (let i=0;i<Ncur;i++){
+      let cx=(px[i]/cellW)|0; if (cx<0) cx=0; else if (cx>=cols) cx=cols-1;
+      let cy=(py[i]/cellH)|0; if (cy<0) cy=0; else if (cy>=rows) cy=rows-1;
+      cellX[i]=cx; cellY[i]=cy; const ci=cy*cols+cx; next[i]=head[ci]; head[ci]=i;
     }
 
-    // pass 1: accumulate forces
-    for (let i=0;i<N;i++){
-      const xi = px[i], yi = py[i], ti = type[i]*n;
-      const cx = cellX[i], cy = cellY[i];
-      let ax = 0, ay = 0;
-      const s = stamp++;                      // unique per particle: dedups wrapped cells
-
-      for (let oy=-1; oy<=1; oy++){
-        let ncy = cy+oy;
-        if (wrap){ if (ncy<0) ncy+=rows; else if (ncy>=rows) ncy-=rows; }
-        else if (ncy<0 || ncy>=rows) continue;
-        for (let ox=-1; ox<=1; ox++){
-          let ncx = cx+ox;
-          if (wrap){ if (ncx<0) ncx+=cols; else if (ncx>=cols) ncx-=cols; }
-          else if (ncx<0 || ncx>=cols) continue;
-          const ci = ncy*cols + ncx;
-          if (visit[ci] === s) continue;      // already swept this cell for particle i
-          visit[ci] = s;
-          let j = head[ci];
-          while (j !== -1){
-            if (j !== i){
-              let dx = px[j]-xi, dy = py[j]-yi;
-              if (wrap){
-                if (dx >  halfW) dx -= W; else if (dx < -halfW) dx += W;
-                if (dy >  halfH) dy -= H; else if (dy < -halfH) dy += H;
-              }
-              const d2 = dx*dx + dy*dy;
-              if (d2 > 0 && d2 < r2max){
-                const d = Math.sqrt(d2), r = d / rMax;
+    // pass 1 — forces + reaction detection
+    for (let i=0;i<Ncur;i++){
+      const xi=px[i], yi=py[i], tiType=type[i], ti=tiType*n;
+      const cx=cellX[i], cy=cellY[i]; let ax=0, ay=0;
+      const s=stamp++;
+      for (let oy=-1;oy<=1;oy++){
+        let ncy=cy+oy; if (wrap){ if (ncy<0) ncy+=rows; else if (ncy>=rows) ncy-=rows; } else if (ncy<0||ncy>=rows) continue;
+        for (let ox=-1;ox<=1;ox++){
+          let ncx=cx+ox; if (wrap){ if (ncx<0) ncx+=cols; else if (ncx>=cols) ncx-=cols; } else if (ncx<0||ncx>=cols) continue;
+          const ci=ncy*cols+ncx; if (visit[ci]===s) continue; visit[ci]=s;
+          let j=head[ci];
+          while (j!==-1){
+            if (j!==i){
+              let dx=px[j]-xi, dy=py[j]-yi;
+              if (wrap){ if (dx>halfW) dx-=W; else if (dx<-halfW) dx+=W; if (dy>halfH) dy-=H; else if (dy<-halfH) dy+=H; }
+              const d2=dx*dx+dy*dy;
+              if (d2>0 && d2<r2max){
+                const d=Math.sqrt(d2), r=d/rMax;
                 let f;
-                if (r < beta){ f = r/beta - 1; }
-                else { f = matrix[ti + type[j]] * (1 - Math.abs(2*r - 1 - beta)/(1 - beta)); }
-                const inv = f / d;
-                ax += dx*inv; ay += dy*inv;
+                if (r<beta) f = r/beta - 1;
+                else f = forceM[ti+type[j]] * (1 - Math.abs(2*r-1-beta)/(1-beta));
+                const inv=f/d; ax+=dx*inv; ay+=dy*inv;
+
+                // reaction on contact (one per cell per frame)
+                if (react && d2<reactR2 && convert[i]<0){
+                  const rule=reactM[ti+type[j]];
+                  if (rule>=0 && Math.random()<rate){
+                    if (bud){ if (N+sQN<CAP){ sQX[sQN]=xi; sQY[sQN]=yi; sQT[sQN]=rule; sQN++; convert[i]=rule; rcount++; } }
+                    else { convert[i]=rule; rcount++; }
+                  }
+                }
               }
             }
-            j = next[j];
+            j=next[j];
           }
         }
       }
-      accx[i] = ax * accelScale;
-      accy[i] = ay * accelScale;
+      accx[i]=ax*accelScale; accy[i]=ay*accelScale;
     }
 
-    // pass 2: integrate
-    for (let i=0;i<N;i++){
-      const nvx = vx[i]*ff + accx[i]*simDt;
-      const nvy = vy[i]*ff + accy[i]*simDt;
-      vx[i] = nvx; vy[i] = nvy;
-      let nx = px[i] + nvx*simDt, ny = py[i] + nvy*simDt;
-      if (wrap){
-        if (nx < 0) nx += W; else if (nx >= W) nx -= W;
-        if (ny < 0) ny += H; else if (ny >= H) ny -= H;
-      } else {
-        if (nx < 0){ nx = 0; vx[i] = -vx[i]*0.6; }
-        else if (nx > W){ nx = W; vx[i] = -vx[i]*0.6; }
-        if (ny < 0){ ny = 0; vy[i] = -vy[i]*0.6; }
-        else if (ny > H){ ny = H; vy[i] = -vy[i]*0.6; }
-      }
-      px[i] = nx; py[i] = ny;
+    // pass 2 — integrate + flash decay
+    for (let i=0;i<Ncur;i++){
+      const nvx=vx[i]*ff+accx[i]*simDt, nvy=vy[i]*ff+accy[i]*simDt; vx[i]=nvx; vy[i]=nvy;
+      let nx=px[i]+nvx*simDt, ny=py[i]+nvy*simDt;
+      if (wrap){ if (nx<0) nx+=W; else if (nx>=W) nx-=W; if (ny<0) ny+=H; else if (ny>=H) ny-=H; }
+      else { if (nx<0){ nx=0; vx[i]=-vx[i]*0.6; } else if (nx>W){ nx=W; vx[i]=-vx[i]*0.6; }
+             if (ny<0){ ny=0; vy[i]=-vy[i]*0.6; } else if (ny>H){ ny=H; vy[i]=-vy[i]*0.6; } }
+      px[i]=nx; py[i]=ny;
+      if (flash[i]>0) flash[i]*=0.86;
     }
+
+    // apply conversions (transmute)
+    if (react && !bud){
+      for (let i=0;i<Ncur;i++){ const p=convert[i]; if (p>=0){ type[i]=p; flash[i]=1; } }
+    }
+    // apply spawns (bud)
+    if (react && bud){
+      for (let s2=0; s2<sQN && N<CAP; s2++){
+        const k=N++;
+        px[k]=sQX[s2]+(Math.random()-0.5)*4; py[k]=sQY[s2]+(Math.random()-0.5)*4;
+        vx[k]=(Math.random()-0.5)*24; vy[k]=(Math.random()-0.5)*24;
+        type[k]=sQT[s2]; flash[k]=1;
+      }
+      // decay: swap-remove deaths so population breathes below the cap
+      const dp=cfg.decay;
+      if (dp>0){ for (let i=0;i<N;){ if (Math.random()<dp){ N--; px[i]=px[N]; py[i]=py[N]; vx[i]=vx[N]; vy[i]=vy[N]; type[i]=type[N]; flash[i]=flash[N]; } else i++; } }
+    }
+
+    reactAccum += rcount;
   }
 
   // ---------- render ----------
   function draw(){
-    if (W<=0 || H<=0) return;
-    // fade or clear
-    if (cfg.trails){
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.fillStyle = 'rgba(10,13,19,0.22)';
-      ctx.fillRect(0,0,W,H);
-    } else {
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.fillStyle = '#0A0D13';
-      ctx.fillRect(0,0,W,H);
-    }
-    // faint reticle
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.strokeStyle = 'rgba(73,82,106,0.10)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(W/2, H/2-7); ctx.lineTo(W/2, H/2+7);
-    ctx.moveTo(W/2-7, H/2); ctx.lineTo(W/2+7, H/2);
-    ctx.stroke();
+    if (W<=0||H<=0) return;
+    if (cfg.trails){ ctx.globalCompositeOperation='source-over'; ctx.fillStyle='rgba(10,13,19,0.22)'; ctx.fillRect(0,0,W,H); }
+    else { ctx.globalCompositeOperation='source-over'; ctx.fillStyle='#0A0D13'; ctx.fillRect(0,0,W,H); }
 
-    // particles
+    ctx.globalCompositeOperation='source-over'; ctx.strokeStyle='rgba(73,82,106,0.10)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(W/2,H/2-7); ctx.lineTo(W/2,H/2+7); ctx.moveTo(W/2-7,H/2); ctx.lineTo(W/2+7,H/2); ctx.stroke();
+
     ctx.globalCompositeOperation = cfg.glow ? 'lighter' : 'source-over';
-    const s = spriteR, d = s*2;
-    for (let i=0;i<N;i++){
-      ctx.drawImage(sprites[type[i]], px[i]-s, py[i]-s, d, d);
+    const s=spriteR, d=s*2;
+    for (let i=0;i<N;i++) ctx.drawImage(sprites[type[i]], px[i]-s, py[i]-s, d, d);
+
+    // reaction flashes (always additive)
+    if (cfg.react && flashSprite){
+      ctx.globalCompositeOperation='lighter';
+      const fr=flashSprite._r, fd=fr*2;
+      for (let i=0;i<N;i++){ const a=flash[i]; if (a>0.04){ ctx.globalAlpha=Math.min(1,a); ctx.drawImage(flashSprite, px[i]-fr, py[i]-fr, fd, fd); } }
+      ctx.globalAlpha=1;
     }
-    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalCompositeOperation='source-over';
   }
 
-  // ---------- loop + fps ----------
-  let lastT = performance.now(), fpsAcc = 0, fpsFrames = 0, fpsShown = 60;
-  const statFps = document.getElementById('statFps');
+  // ---------- loop ----------
+  let lastT=performance.now(), fpsAcc=0, fpsFrames=0;
   function loop(t){
-    const dt = t - lastT; lastT = t;
-    fpsAcc += dt; fpsFrames++;
-    if (fpsAcc >= 500){ fpsShown = Math.round(1000 / (fpsAcc/fpsFrames)); fpsAcc=0; fpsFrames=0; statFps.textContent = fpsShown; }
+    const dt=t-lastT; lastT=t; fpsAcc+=dt; fpsFrames++;
+    if (fpsAcc>=500){
+      $('statFps').textContent = Math.round(1000/(fpsAcc/fpsFrames));
+      $('statCount').textContent = N;
+      $('statRx').textContent = Math.round(reactAccum*1000/fpsAcc);
+      reactAccum=0; fpsAcc=0; fpsFrames=0;
+      updateBars();
+    }
     if (cfg.running) step();
     draw();
     requestAnimationFrame(loop);
@@ -649,92 +652,217 @@
 
   // ---------- resize ----------
   function resize(){
-    const rect = canvas.parentElement.getBoundingClientRect();
-    const newW = Math.max(1, rect.width), newH = Math.max(1, rect.height);
-    dpr = Math.min(2, window.devicePixelRatio || 1);
-    canvas.width = Math.round(newW*dpr); canvas.height = Math.round(newH*dpr);
-    canvas.style.width = newW+'px'; canvas.style.height = newH+'px';
+    const rect=canvas.parentElement.getBoundingClientRect();
+    const newW=Math.max(1,rect.width), newH=Math.max(1,rect.height);
+    dpr=Math.min(2, window.devicePixelRatio||1);
+    canvas.width=Math.round(newW*dpr); canvas.height=Math.round(newH*dpr);
+    canvas.style.width=newW+'px'; canvas.style.height=newH+'px';
     ctx.setTransform(dpr,0,0,dpr,0,0);
-    // rescale existing particles to keep them in frame
-    if (N && W>0 && H>0){
-      const rx = newW/W, ry = newH/H;
-      for (let i=0;i<N;i++){ px[i]*=rx; py[i]*=ry; }
-    }
-    W = newW; H = newH;
-    ctx.fillStyle = '#0A0D13'; ctx.fillRect(0,0,W,H);
+    if (N && W>0 && H>0){ const rx=newW/W, ry=newH/H; for (let i=0;i<N;i++){ px[i]*=rx; py[i]*=ry; } }
+    W=newW; H=newH; ctx.fillStyle='#0A0D13'; ctx.fillRect(0,0,W,H);
   }
 
   // ---------- controls ----------
-  const $ = id => document.getElementById(id);
   function setStatus(){
     $('statState').textContent = cfg.running ? 'running' : 'paused';
     $('liveDot').classList.toggle('paused', !cfg.running);
     $('btnPlay').textContent = cfg.running ? 'Pause' : 'Play';
-    $('statCount').textContent = cfg.count;
+  }
+  function setToggle(id, on){ const el=$(id); el.setAttribute('aria-pressed', on); el.querySelector('.state').textContent = on?'on':'off'; }
+  function markCustom(){ const sel=$('presetSel'); if (sel.value!=='custom'){ sel.value='custom'; $('presetDesc').innerHTML = DESCRIPTIONS.custom; } }
+
+  // table-driven sliders: bound once, also used by syncUI() to reflect preset state
+  const SLIDERS = [
+    { id:'sTypes', val:'vTypes', prop:'numTypes', fmt:v=>v, after:()=>{ resizeForce(true); resizeReact(true); reseed(); makeSprites(); buildForceGrid(); buildReactGrid(); buildLegend(); buildBars(); } },
+    { id:'sCount', val:'vCount', prop:'count', fmt:v=>v, after:reseed },
+    { id:'sRmax', val:'vRmax', prop:'rMax', fmt:v=>v+'&nbsp;px' },
+    { id:'sForce', val:'vForce', prop:'forceFactor', fmt:v=>v.toFixed(1) },
+    { id:'sFric', val:'vFric', prop:'friction', fmt:v=>v.toFixed(2) },
+    { id:'sBeta', val:'vBeta', prop:'beta', fmt:v=>v.toFixed(2) },
+    { id:'sSpeed', val:'vSpeed', prop:'speed', fmt:v=>v.toFixed(2)+'&times;' },
+    { id:'sReactR', val:'vReactR', prop:'reactRadius', fmt:v=>v+'&nbsp;px' },
+    { id:'sRate', val:'vRate', prop:'reactRate', fmt:v=>v.toFixed(3) },
+    { id:'sDecay', val:'vDecay', prop:'decay', fmt:v=>v.toFixed(4) },
+    { id:'sMax', val:'vMax', prop:'maxCells', fmt:v=>v, after:()=>{ ensureCapacity(cfg.maxCells); $('statCount').textContent=N; } },
+    { id:'sSize', val:'vSize', prop:'dotSize', fmt:v=>v.toFixed(1), after:makeSprites },
+  ];
+  for (const s of SLIDERS){
+    const el=$(s.id), out=$(s.val);
+    el.addEventListener('input', () => { const v=parseFloat(el.value); cfg[s.prop]=v; out.innerHTML=s.fmt(v); if (s.after) s.after(); markCustom(); });
+  }
+  function syncUI(){
+    for (const s of SLIDERS){ $(s.id).value=cfg[s.prop]; $(s.val).innerHTML=s.fmt(cfg[s.prop]); }
+    setToggle('tReact', cfg.react); setToggle('tTrails', cfg.trails); setToggle('tGlow', cfg.glow); setToggle('tWrap', cfg.wrap);
+    $('fieldLabel').textContent = cfg.wrap ? 'specimen field · toroidal' : 'specimen field · bounded';
+    updateChemUI();
   }
 
-  function bindSlider(id, valId, fmt, onChange){
-    const el = $(id), out = $(valId);
-    el.addEventListener('input', () => {
-      const v = parseFloat(el.value);
-      out.innerHTML = fmt(v);
-      onChange(v);
-    });
+  $('btnPlay').addEventListener('click', ()=>{ cfg.running=!cfg.running; setStatus(); });
+  $('btnReset').addEventListener('click', reseed);
+  $('btnFRand').addEventListener('click', ()=>{ randomForce(); markCustom(); });
+  $('btnFSym').addEventListener('click', ()=>{ symForce(); markCustom(); });
+  $('btnFZero').addEventListener('click', ()=>{ zeroForce(); markCustom(); });
+  $('btnRRand').addEventListener('click', ()=>{ randomReact(); markCustom(); });
+  $('btnRCycle').addEventListener('click', ()=>{ cycleReact(); markCustom(); });
+  $('btnRClear').addEventListener('click', ()=>{ clearReact(); markCustom(); });
+
+  // matrix tabs
+  function showTab(force){
+    $('tabForce').classList.toggle('active', force); $('tabReact').classList.toggle('active', !force);
+    forceGrid.style.display=force?'':'none'; reactGrid.style.display=force?'none':'';
+    $('hintForce').style.display=force?'':'none'; $('hintReact').style.display=force?'none':'';
+    $('forceBtns').style.display=force?'':'none'; $('reactBtns').style.display=force?'none':'';
   }
+  $('tabForce').addEventListener('click', ()=>showTab(true));
+  $('tabReact').addEventListener('click', ()=>showTab(false));
 
-  bindSlider('sTypes','vTypes', v=>v, v=>{
-    cfg.numTypes = v; resizeMatrix(true); seed(); makeSprites(); buildMatrixUI(); buildLegend();
-  });
-  bindSlider('sCount','vCount', v=>v, v=>{ cfg.count = v; seed(); $('statCount').textContent = v; });
-  bindSlider('sRmax','vRmax', v=>v+'&nbsp;px', v=>{ cfg.rMax = v; });
-  bindSlider('sForce','vForce', v=>v.toFixed(1), v=>{ cfg.forceFactor = v; });
-  bindSlider('sFric','vFric', v=>v.toFixed(2), v=>{ cfg.friction = v; });
-  bindSlider('sBeta','vBeta', v=>v.toFixed(2), v=>{ cfg.beta = v; });
-  bindSlider('sSpeed','vSpeed', v=>v.toFixed(2)+'&times;', v=>{ cfg.speed = v; });
-  bindSlider('sSize','vSize', v=>v.toFixed(1), v=>{ cfg.dotSize = v; makeSprites(); });
-
-  $('btnPlay').addEventListener('click', ()=>{ cfg.running = !cfg.running; setStatus(); });
-  $('btnReset').addEventListener('click', ()=>{ seed(); });
-  $('btnMRand').addEventListener('click', randomizeMatrix);
-  $('btnMSym').addEventListener('click', symmetrizeMatrix);
-  $('btnMZero').addEventListener('click', zeroMatrix);
+  // chemistry mode + state
+  function updateChemUI(){
+    const on=cfg.react, bud=cfg.spawnMode;
+    $('modeSeg').classList.toggle('dim', !on);
+    $('ctlRadius').classList.toggle('dim', !on);
+    $('ctlRate').classList.toggle('dim', !on);
+    $('ctlDecay').classList.toggle('dim', !on || !bud);
+    $('ctlMax').classList.toggle('dim', !on || !bud);
+    $('modeTrans').classList.toggle('active', !bud);
+    $('modeBud').classList.toggle('active', bud);
+    $('chemNote').innerHTML = !on
+      ? 'Reactions are off — cells keep their type and only the force matrix acts.'
+      : bud
+        ? '<b>Bud:</b> a reacting cell stays itself and emits a <b>new</b> cell of the product type, up to <b>Max cells</b>. <b>Cell decay</b> removes cells so the population breathes instead of just filling the cap.'
+        : '<b>Transmute:</b> a reacting cell <b>becomes</b> the product type. Total population stays constant.';
+  }
+  $('modeTrans').addEventListener('click', ()=>{ cfg.spawnMode=false; updateChemUI(); markCustom(); });
+  $('modeBud').addEventListener('click', ()=>{ cfg.spawnMode=true; updateChemUI(); markCustom(); });
+  $('tReact').addEventListener('click', ()=>{ cfg.react=!cfg.react; $('tReact').setAttribute('aria-pressed', cfg.react); $('tReact').querySelector('.state').textContent=cfg.react?'on':'off'; updateChemUI(); markCustom(); });
 
   function bindToggle(id, key, onChange){
-    const el = $(id);
-    el.addEventListener('click', ()=>{
-      cfg[key] = !cfg[key];
-      el.setAttribute('aria-pressed', cfg[key]);
-      el.querySelector('.state').textContent = cfg[key] ? 'on' : 'off';
-      if (onChange) onChange();
-    });
+    const el=$(id);
+    el.addEventListener('click', ()=>{ cfg[key]=!cfg[key]; el.setAttribute('aria-pressed', cfg[key]);
+      el.querySelector('.state').textContent=cfg[key]?'on':'off'; if (onChange) onChange(); });
   }
   bindToggle('tTrails','trails');
   bindToggle('tGlow','glow', makeSprites);
-  bindToggle('tWrap','wrap', ()=>{
-    $('fieldLabel').textContent = cfg.wrap ? 'specimen field · toroidal' : 'specimen field · bounded';
+  bindToggle('tWrap','wrap', ()=>{ $('fieldLabel').textContent = cfg.wrap ? 'specimen field · toroidal' : 'specimen field · bounded'; });
+
+  window.addEventListener('keydown', e=>{
+    if (e.code==='Space' && !/INPUT|BUTTON|TEXTAREA/.test(document.activeElement.tagName)){ e.preventDefault(); cfg.running=!cfg.running; setStatus(); }
   });
 
-  // keyboard: space toggles run
-  window.addEventListener('keydown', e=>{
-    if (e.code === 'Space' && !/INPUT|BUTTON|TEXTAREA/.test(document.activeElement.tagName)){
-      e.preventDefault(); cfg.running = !cfg.running; setStatus();
-    }
+  // ---------- presets ----------
+  // Each scene sets the type count, both matrices, the chemistry mode and the
+  // physics that show it off best. Omitted forces/reactions default to 0 / none.
+  const PRESETS = {
+    primordial: { types:5, react:false, mode:'transmute', rMax:90, force:6, friction:0.5, beta:0.30, count:1500,
+      forces:[
+        [ 0.6,-0.3, 0.2,-0.1, 0.4],
+        [ 0.3, 0.5,-0.4, 0.2,-0.2],
+        [-0.2, 0.4, 0.6,-0.3, 0.1],
+        [ 0.1,-0.2, 0.3, 0.5,-0.4],
+        [-0.4, 0.2,-0.1, 0.3, 0.6],
+      ] },
+    worms: { types:4, react:false, mode:'transmute', rMax:70, force:7, friction:0.42, beta:0.30, count:1400,
+      forces:[
+        [ 0.1, 0.9, 0.0, 0.0],
+        [ 0.0, 0.1, 0.9, 0.0],
+        [ 0.0, 0.0, 0.1, 0.9],
+        [ 0.9, 0.0, 0.0, 0.1],
+      ] },
+    membranes: { types:3, react:false, mode:'transmute', rMax:100, force:7, friction:0.5, beta:0.32, count:1400,
+      forces:[
+        [ 0.7, 0.2,-0.3],
+        [ 0.8,-0.2,-0.1],
+        [-0.3,-0.2, 0.3],
+      ] },
+    rps: { types:3, react:true, mode:'transmute', rate:0.06, reactRadius:18, rMax:100, force:7, friction:0.45, beta:0.28, count:1600,
+      forces:[
+        [ 0.2,-0.6, 0.7],
+        [ 0.7, 0.2,-0.6],
+        [-0.6, 0.7, 0.2],
+      ],
+      reactions:[
+        [-1, 1,-1],
+        [-1,-1, 2],
+        [ 0,-1,-1],
+      ] },
+    waves: { types:4, react:true, mode:'transmute', rate:0.05, reactRadius:16, rMax:90, force:5, friction:0.5, beta:0.30, count:2000,
+      forces:[
+        [ 0.3, 0.2, 0.1, 0.2],
+        [ 0.2, 0.3, 0.2, 0.1],
+        [ 0.1, 0.2, 0.3, 0.2],
+        [ 0.2, 0.1, 0.2, 0.3],
+      ],
+      reactions:[
+        [-1, 1,-1,-1],
+        [-1,-1, 2,-1],
+        [-1,-1,-1, 3],
+        [ 0,-1,-1,-1],
+      ] },
+    predprey: { types:3, react:true, mode:'bud', rate:0.05, decay:0.004, maxCells:4500, reactRadius:18, rMax:90, force:6, friction:0.5, beta:0.30, count:1200,
+      forces:[
+        [ 0.1,-0.1, 0.8],
+        [-0.1, 0.3,-0.1],
+        [-0.6, 0.7, 0.1],
+      ],
+      reactions:[
+        [-1,-1, 0],
+        [-1, 1,-1],
+        [-1, 2,-1],
+      ] },
+    mitosis: { types:3, react:true, mode:'bud', rate:0.05, decay:0.0025, maxCells:5000, reactRadius:16, rMax:80, force:6, friction:0.6, beta:0.30, count:500,
+      forces:[
+        [ 0.8,-0.5,-0.5],
+        [-0.5, 0.8,-0.5],
+        [-0.5,-0.5, 0.8],
+      ],
+      reactions:[
+        [ 0,-1,-1],
+        [-1, 1,-1],
+        [-1,-1, 2],
+      ] },
+    blank: { types:4, react:false, mode:'transmute', rMax:80, force:6, friction:0.5, beta:0.30, count:1200 },
+  };
+  const DESCRIPTIONS = {
+    primordial:'Five types, no chemistry — asymmetric forces settle into drifting clusters and cells. The v1 classic.',
+    worms:'Each type chases the next in a ring and nothing chases back, so cells string into roving worms.',
+    membranes:'One type wraps a shell around clusters of another, forming nucleus-and-membrane cells.',
+    rps:'Spatial rock-paper-scissors: each type chases its prey and is <b>transmuted</b> by its predator, driving endless chasing spirals.',
+    waves:'A four-step dominance cycle (0→1→2→3→0). Contact transmutes one step along the chain, sending spiral waves of colour across the field.',
+    predprey:'A budding ecosystem — green plants regrow, blue herbivores <b>bud</b> near plants, red predators <b>bud</b> near herbivores, and decay culls everyone. Watch the booms and crashes.',
+    mitosis:'Each type attracts its own kind and <b>buds</b> copies on contact, so colonies grow and split toward the cap while decay keeps them churning.',
+    blank:'Empty force matrix and no reactions — a clean slate to build your own scene.',
+    custom:'Custom — edited from a preset. Pick a scene above to reset.',
+  };
+  function applyPreset(key){
+    const p = PRESETS[key]; if (!p) return;
+    cfg.numTypes=p.types; cfg.react=p.react; cfg.spawnMode=(p.mode==='bud');
+    cfg.rMax=p.rMax??80; cfg.forceFactor=p.force??6; cfg.friction=p.friction??0.5; cfg.beta=p.beta??0.30; cfg.speed=p.speed??1;
+    cfg.reactRadius=p.reactRadius??16; cfg.reactRate=p.rate??0.03; cfg.decay=p.decay??0.003; cfg.maxCells=p.maxCells??4000;
+    cfg.count=p.count??1200;
+    resizeForce(false); resizeReact(false);
+    const n=cfg.numTypes;
+    if (p.forces) for (let i=0;i<n;i++) for (let j=0;j<n;j++) forceM[i*n+j]=p.forces[i][j];
+    if (p.reactions) for (let i=0;i<n;i++) for (let j=0;j<n;j++) reactM[i*n+j]=p.reactions[i][j];
+    ensureCapacity(cfg.maxCells); reseed(); makeSprites();
+    buildForceGrid(); buildReactGrid(); buildLegend(); buildBars(); syncUI();
+  }
+  $('presetSel').addEventListener('change', () => {
+    const key=$('presetSel').value;
+    $('presetDesc').innerHTML = DESCRIPTIONS[key] || '';
+    if (key!=='custom') applyPreset(key);
   });
 
   // ---------- boot ----------
   function boot(){
     resize();
-    resizeMatrix(false);
-    randomizeMatrix();      // start with a lively field
-    seed();
-    makeSprites();
-    buildMatrixUI();
-    buildLegend();
+    const start = 'rps';
+    $('presetSel').value = start;
+    $('presetDesc').innerHTML = DESCRIPTIONS[start];
+    applyPreset(start);
     setStatus();
     new ResizeObserver(resize).observe(canvas.parentElement);
     requestAnimationFrame(loop);
   }
-  // wait a tick so layout has measured the field
   requestAnimationFrame(boot);
 })();
 </script>
