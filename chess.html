@@ -199,7 +199,7 @@ const L=(...k)=>k;            // children list shorthand
 const OPENINGS=[
 /* ---------------- LONDON SYSTEM (White) ---------------- */
 {
- id:"london",name:"London System",side:"white",group:"White system",
+ id:"london",name:"London System",side:"white",group:"White openings",
  summary:"One reusable setup against almost everything Black does. Build a small central fortress, get the dark-squared bishop out early, fight for e5, then aim the pieces at Black's king. Adapt the plan to Black's structure rather than memorising lines.",
  missions:[
   "<b>Bishop out before e3:</b> always play Bf4 first, so it never gets buried behind your own pawns.",
@@ -301,6 +301,203 @@ const OPENINGS=[
           nd(mv("e3","e2","e3","w","idea","3.e3","Triangle."),L(
             nd(mv("c5","c7","c5","b","react","3...c5","The freeing break."),L(
               nd(mv("Nf3","g1","f3","w","idea","4.Nf3","Develop — this transposes back into the main classical London structures."))
+            ))
+          ))
+        ))
+      ))
+    ))
+  ))
+ )
+},
+/* ---------------- VIENNA GAMBIT (White) ---------------- */
+{
+ id:"vienna",name:"Vienna Gambit",side:"white",group:"White openings",
+ summary:"An aggressive 1.e4 weapon popularised by GothamChess: 2.Nc3 then 3.f4, striking at e5 and seizing the initiative from move three. Sound, easy to learn and full of traps — develop fast, castle, and hunt the f7-square and Black's king.",
+ missions:[
+  "<b>Spring the gambit:</b> 2.Nc3 then 3.f4 hits e5 at once — sound, ambitious, and a nightmare for the unprepared.",
+  "<b>If ...exf4, push e5!</b> kick the f6-knight, grab a huge centre, and round up the f4-pawn later.",
+  "<b>Vs the best move ...d5:</b> take fxe5 and develop with tempo — Nf3, d4, Bd3, O-O — then play on f7 and the kingside.",
+  "<b>Aim at f7 and the e-file:</b> rapid development and a king-hunt are the whole point of the gambit.",
+  "<b>Punish greed and passivity:</b> the e4-knight is loose and e5/Bc4/Qf3 ideas win material against unprepared opponents.",
+  "<b>Know your three replies:</b> ...d5 (best), ...exf4 (greedy), ...Nc6 (calm) — the plan changes with each."
+ ],
+ tree:L(
+  nd(mv("e4","e2","e4","w","mission","1.e4","Open lines and stake the centre — the gambit starts here."),L(
+    nd(mv("e5","e7","e5","b","react","1...e5","The classical reply, inviting the Vienna."),L(
+      nd(mv("Nc3","b1","c3","w","mission","2.Nc3","Develop and guard e4 — quietly preparing the f4 break."),L(
+        nd(mv("Nf6","g8","f6","b","react","2...Nf6","Black's main move, hitting e4."),L(
+          nd(mv("f4","f2","f4","w","mission","3.f4","The Vienna Gambit! Strike e5 and rip the position open."),L(
+            /* 3...d5 — the best reply */
+            nd(mv("d5","d7","d5","b","react","3...d5","The critical, best answer — counter-strike in the centre instead of grabbing the pawn."),L(
+              nd(mv("fxe5","f4","e5","w","react","4.fxe5","Take the pawn and open the f-file."),L(
+                nd(mv("Nxe4","f6","e4","b","react","4...Nxe4","Black regains the pawn; the knight sits on e4, propped up by d5."),L(
+                  nd(mv("Nf3","g1","f3","w","mission","5.Nf3","The modern main: develop, eye e5/d4 and prepare to castle — no need to rush."),L(
+                    nd(mv("Be7","f8","e7","b","react","5...Be7","Black develops and prepares to castle."),L(
+                      nd(mv("d4","d2","d4","w","idea","6.d4","Build the big centre and open the f1-bishop's path to d3."),L(
+                        nd(mv("O-O","e8","g8","b","react","6...O-O","Black gets the king safe."),L(
+                          nd(mv("Bd3","f1","d3","w","mission","7.Bd3","Aim at h7 and challenge the e4-knight; castle next."),L(
+                            nd(mv("f5","f7","f5","b","react","7...f5","Black props up the e4-knight with the f-pawn."),L(
+                              nd(mv("exf6","e5","f6","w","idea","8.exf6","En passant! Remove the knight's support and tear open the f-file toward f7."),L(
+                                nd(mv("Bxf6","e7","f6","b","react","8...Bxf6","Black regains the pawn — active equality, but White develops easily and attacks the kingside."))
+                              ))
+                            ))
+                          ))
+                        ))
+                      ))
+                    ))
+                  ))
+                ))
+              ))
+            )),
+            /* 3...exf4 — accepted */
+            nd(mv("exf4","e5","f4","b","react","3...exf4","Accepting the gambit — greedy, but now White gets a roaring initiative."),L(
+              nd(mv("e5","e4","e5","w","mission","4.e5","The key thrust: kick the f6-knight and seize a huge space advantage."),L(
+                nd(mv("Ng8","f6","g8","b","react","4...Ng8","The sad retreat — Black is shoved right back home."),L(
+                  nd(mv("Nf3","g1","f3","w","idea","5.Nf3","Develop and prepare d4; the f4-pawn isn't running away."),L(
+                    nd(mv("d6","d7","d6","b","react","5...d6","Black challenges the e5 spearhead."),L(
+                      nd(mv("d4","d2","d4","w","mission","6.d4","A dream centre. You'll round up f4 with Bxf4/g3 later and attack — White is clearly better."))
+                    ))
+                  ))
+                )),
+                nd(mv("Qe7","d8","e7","b","react","4...Qe7","The tricky try: attack e5 while defending the f6-knight."),L(
+                  nd(mv("Qe2","d1","e2","w","mission","5.Qe2","Calmly defend e5 and offer the queen trade — the threats fizzle and your centre stands."),L(
+                    nd(mv("Ng8","f6","g8","b","react","5...Ng8","The knight retreats anyway."),L(
+                      nd(mv("Nf3","g1","f3","w","idea","6.Nf3","Develop with a big centre and the f4-pawn in your sights — comfortable and better for White."))
+                    ))
+                  ))
+                ))
+              ))
+            )),
+            /* 3...Nc6 — calm */
+            nd(mv("Nc6","b8","c6","b","react","3...Nc6","A calm developing move, declining the pawn grab."),L(
+              nd(mv("fxe5","f4","e5","w","react","4.fxe5","Take e5 and open the f-file."),L(
+                nd(mv("Nxe5","c6","e5","b","react","4...Nxe5","Black recaptures with the knight."),L(
+                  nd(mv("d4","d2","d4","w","mission","5.d4","Kick the knight and grab the centre with tempo."),L(
+                    nd(mv("Ng6","e5","g6","b","react","5...Ng6","The knight retreats to the rim."),L(
+                      nd(mv("Nf3","g1","f3","w","idea","6.Nf3","Develop behind a big centre — White has easy, active play and the initiative."))
+                    ))
+                  ))
+                ))
+              ))
+            ))
+          ))
+        ))
+      ))
+    ))
+  ))
+ )
+},
+/* ---------------- RETI OPENING (White) ---------------- */
+{
+ id:"reti",name:"Réti Opening",side:"white",group:"White openings",
+ summary:"Richard Réti's hypermodern flank opening: 1.Nf3 and 2.c4, attacking Black's centre from the wings instead of occupying it. Fianchetto the bishops (often a double fianchetto) onto the long diagonals, stay ultra-flexible, and transpose into whatever structure suits you. Low-risk, strategic, and surprisingly hard to meet.",
+ missions:[
+  "<b>Hypermodern start:</b> 1.Nf3 controls e5 and commits nothing — attack the centre from the flanks, don't occupy it.",
+  "<b>Hit d5 from the side:</b> 2.c4 pressures Black's centre pawn without blocking your own pieces.",
+  "<b>Fianchetto the king's bishop:</b> g3 and Bg2 rake the long light diagonal toward d5/b7/e4.",
+  "<b>Go double-fianchetto:</b> add b3 and Bb2 to dominate both long diagonals — the signature Réti bind.",
+  "<b>Stay fluid:</b> the Réti transposes into Catalan, English and King's-Indian-Attack structures — pick the plan from Black's setup.",
+  "<b>Meet ...d4 by undermining:</b> answer the space grab with e3 (or c5/b4) — the over-extended pawn becomes a target.",
+  "<b>Regain ...dxc4 easily:</b> e3 and Bxc4 (or Na3) win the pawn back with smooth development."
+ ],
+ tree:L(
+  nd(mv("Nf3","g1","f3","w","mission","1.Nf3","The hypermodern move: control e5, develop, and keep every option open."),L(
+    /* 1...d5 — the main Réti */
+    nd(mv("d5","d7","d5","b","react","1...d5","Black grabs the centre classically — inviting the Réti."),L(
+      nd(mv("c4","c2","c4","w","mission","2.c4","The Réti: strike at d5 from the flank without blocking your pieces."),L(
+        /* 2...d4 advance */
+        nd(mv("d4","d5","d4","b","react","2...d4","Black grabs space, pushing the pawn by."),L(
+          nd(mv("e3","e2","e3","w","mission","3.e3","Undermine the advanced pawn at once — it has overreached."),L(
+            nd(mv("Nc6","b8","c6","b","react","3...Nc6","Black props up d4."),L(
+              nd(mv("exd4","e3","d4","w","react","4.exd4","Take it."),L(
+                nd(mv("Nxd4","c6","d4","b","react","4...Nxd4","Recapture."),L(
+                  nd(mv("Nxd4","f3","d4","w","react","5.Nxd4","Trade knights."),L(
+                    nd(mv("Qxd4","d8","d4","b","react","5...Qxd4","Black regains material — but the queen is out early."),L(
+                      nd(mv("Nc3","b1","c3","w","idea","6.Nc3","Develop fast. Material is equal, but White is a step ahead and will gain time with Be3/Rd1 — comfortable hypermodern play."))
+                    ))
+                  ))
+                ))
+              ))
+            ))
+          ))
+        )),
+        /* 2...dxc4 accepted */
+        nd(mv("dxc4","d5","c4","b","react","2...dxc4","Grabbing the gambit pawn — but White regains it with ease."),L(
+          nd(mv("e3","e2","e3","w","mission","3.e3","Open the bishop's path to recapture on c4."),L(
+            nd(mv("Nf6","g8","f6","b","react","3...Nf6","Develop."),L(
+              nd(mv("Bxc4","f1","c4","w","react","4.Bxc4","Pawn regained, bishop actively placed."),L(
+                nd(mv("e6","e7","e6","b","react","4...e6","Black opens his own bishop."),L(
+                  nd(mv("O-O","e1","g1","w","idea","5.O-O","Castle — White has free development and a pleasant edge (a Réti/QGA-style structure)."))
+                ))
+              ))
+            ))
+          ))
+        )),
+        /* 2...e6 -> double fianchetto */
+        nd(mv("e6","e7","e6","b","react","2...e6","Solid and Catalan-like."),L(
+          nd(mv("g3","g2","g3","w","mission","3.g3","Fianchetto the king's bishop onto the long diagonal."),L(
+            nd(mv("Nf6","g8","f6","b","react","3...Nf6","Develop."),L(
+              nd(mv("Bg2","f1","g2","w","react","4.Bg2","The bishop eyes d5, b7 and e4."),L(
+                nd(mv("Be7","f8","e7","b","react","4...Be7","Black develops to castle."),L(
+                  nd(mv("O-O","e1","g1","w","react","5.O-O","King safe."),L(
+                    nd(mv("O-O","e8","g8","b","react","5...O-O","Both sides castle."),L(
+                      nd(mv("b3","b2","b3","w","idea","6.b3","Begin the second fianchetto."),L(
+                        nd(mv("c5","c7","c5","b","react","6...c5","Black claims his share of the centre."),L(
+                          nd(mv("Bb2","c1","b2","w","mission","7.Bb2","The signature Réti double fianchetto: both bishops rake the long diagonals at Black's centre. Flexible, strategic, low-risk."))
+                        ))
+                      ))
+                    ))
+                  ))
+                ))
+              ))
+            ))
+          ))
+        )),
+        /* 2...c6 Slav-like */
+        nd(mv("c6","c7","c6","b","react","2...c6","A Slav-style setup, over-protecting d5."),L(
+          nd(mv("g3","g2","g3","w","mission","3.g3","Fianchetto and keep pressing d5 from afar."),L(
+            nd(mv("Nf6","g8","f6","b","react","3...Nf6","Develop."),L(
+              nd(mv("Bg2","f1","g2","w","react","4.Bg2","Long-diagonal pressure."),L(
+                nd(mv("Bf5","c8","f5","b","react","4...Bf5","Black gets the light bishop out before ...e6."),L(
+                  nd(mv("O-O","e1","g1","w","react","5.O-O","Castle."),L(
+                    nd(mv("e6","e7","e6","b","react","5...e6","Black completes a solid wall."),L(
+                      nd(mv("d3","d2","d3","w","idea","6.d3","Prepare Nbd2 and an e4 break — a King's-Indian-Attack plan against the Slav wall."))
+                    ))
+                  ))
+                ))
+              ))
+            ))
+          ))
+        ))
+      ))
+    )),
+    /* 1...Nf6 — flank/double fianchetto */
+    nd(mv("Nf6","g8","f6","b","react","1...Nf6","A flexible reply, mirroring your hypermodern approach."),L(
+      nd(mv("g3","g2","g3","w","mission","2.g3","Head for a fianchetto (Réti / King's Indian Attack)."),L(
+        nd(mv("g6","g7","g6","b","react","2...g6","Black fianchettoes too."),L(
+          nd(mv("Bg2","f1","g2","w","react","3.Bg2","Bishop to the long diagonal."),L(
+            nd(mv("Bg7","f8","g7","b","react","3...Bg7","Mirror."),L(
+              nd(mv("O-O","e1","g1","w","react","4.O-O","Castle."),L(
+                nd(mv("O-O","e8","g8","b","react","4...O-O","Both kings safe."),L(
+                  nd(mv("c4","c2","c4","w","idea","5.c4","Claim the flank. A fluid Réti–English; choose your break (d4, e4, or queenside) once Black commits."))
+                ))
+              ))
+            ))
+          ))
+        ))
+      ))
+    )),
+    /* 1...c5 — English transposition */
+    nd(mv("c5","c7","c5","b","react","1...c5","Staking the queenside — heading for English structures."),L(
+      nd(mv("c4","c2","c4","w","mission","2.c4","Steer into a Symmetrical English via the Réti move order."),L(
+        nd(mv("Nc6","b8","c6","b","react","2...Nc6","Develop."),L(
+          nd(mv("g3","g2","g3","w","react","3.g3","Fianchetto."),L(
+            nd(mv("g6","g7","g6","b","react","3...g6","Symmetry."),L(
+              nd(mv("Bg2","f1","g2","w","react","4.Bg2","Long-diagonal bishop."),L(
+                nd(mv("Bg7","f8","g7","b","react","4...Bg7","Mirror."),L(
+                  nd(mv("O-O","e1","g1","w","idea","5.O-O","A comfortable Symmetrical English — the Réti's flexibility lets you pick the structure you like best."))
+                ))
+              ))
             ))
           ))
         ))
@@ -782,7 +979,9 @@ function startBoard(){
   return b;
 }
 function applyMove(b,m){
-  const pc=b[m.from]; delete b[m.from]; b[m.to]=pc;
+  const pc=b[m.from];
+  if(pc&&pc.toUpperCase()==="P"&&m.from[0]!==m.to[0]&&!b[m.to]){b[m.to[0]+m.from[1]]&&delete b[m.to[0]+m.from[1]];} // en passant
+  delete b[m.from]; b[m.to]=pc;
   if(pc&&pc.toUpperCase()==="K"){
     const ff=m.from.charCodeAt(0),tf=m.to.charCodeAt(0),r=m.from[1];
     if(Math.abs(tf-ff)===2){
