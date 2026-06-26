@@ -729,6 +729,150 @@ const OPENINGS=[
   ))
  )
 },
+/* ---------------- NIMZO-INDIAN (Black vs d4) ---------------- */
+{
+ id:"nimzo",name:"Nimzo-Indian Defense",side:"black",group:"vs 1.d4",
+ summary:"One of Black's most respected answers to 1.d4. Instead of fighting for e4 with pawns, pin the c3-knight with ...Bb4 and use pieces. The trademark is ...Bxc3, doubling White's c-pawns to create a permanent structural target — then blockade and besiege it. Solid, strategic and rich in clear plans.",
+ missions:[
+  "<b>Pin to fight for e4:</b> ...Bb4 ties down the c3-knight — the piece guarding e4 — so you contest the centre with pieces, not pawns.",
+  "<b>Trade bishop for structure:</b> ...Bxc3 doubles White's c-pawns; those static weaknesses become your long-term target.",
+  "<b>Strike with ...d5 and ...c5:</b> the classical freeing breaks give you a sound Nimzo/QGD structure.",
+  "<b>Vs 4.Qc2 (Classical):</b> White dodges the doubled pawns, so take the bishop pair and blunt it with ...b6, ...Bb7 and ...Ne4.",
+  "<b>Vs 4.a3 (Sämisch):</b> grab the doubled pawns, then blockade with ...c5, ...d5 and ...Nc6 — don't let White's centre roll.",
+  "<b>Low-commitment, high-quality:</b> castle early and keep ...d5/...c5/...b6 flexible — the Nimzo is among Black's soundest defences."
+ ],
+ tree:L(
+  nd(mv("d4","d2","d4","w","react","1.d4","White claims the centre."),L(
+    nd(mv("Nf6","g8","f6","b","mission","1...Nf6","Control e4 and stay flexible."),L(
+      nd(mv("c4","c2","c4","w","react","2.c4","Grab more space."),L(
+        nd(mv("e6","e7","e6","b","mission","2...e6","Open the f8-bishop and prepare ...Bb4 — heading for the Nimzo."),L(
+          nd(mv("Nc3","b1","c3","w","react","3.Nc3","The critical move: White develops the very knight that guards e4 — exactly the piece you want to pin."),L(
+            nd(mv("Bb4","f8","b4","b","mission","3...Bb4","The Nimzo-Indian: pin the c3-knight to the king, fight for e4 and threaten ...Bxc3 to shatter White's pawns. You trade a bishop for lasting structural pressure."),L(
+              /* 4.e3 Rubinstein */
+              nd(mv("e3","e2","e3","w","react","4.e3","The Rubinstein — the most popular, solid set-up."),L(
+                nd(mv("O-O","e8","g8","b","idea","4...O-O","Castle first; keep ...c5/...d5/...b6 all in reserve."),L(
+                  nd(mv("Bd3","f1","d3","w","react","5.Bd3","Develop toward the kingside."),L(
+                    nd(mv("d5","d7","d5","b","mission","5...d5","Strike the centre — a sound Nimzo/QGD hybrid structure."),L(
+                      nd(mv("Nf3","g1","f3","w","react","6.Nf3","Develop."),L(
+                        nd(mv("c5","c7","c5","b","mission","6...c5","Hit d4 — the thematic break. You'll trade on c3 and d4 and play against White's pawns."),L(
+                          nd(mv("O-O","e1","g1","w","react","7.O-O","White castles."),L(
+                            nd(mv("Nc6","b8","c6","b","idea","7...Nc6","Develop and pile on d4."),L(
+                              nd(mv("a3","a2","a3","w","react","8.a3","Question the bishop."),L(
+                                nd(mv("Bxc3","b4","c3","b","mission","8...Bxc3","Take! Saddle White with doubled c-pawns — your permanent target. With ...dxc4 and ...e5 ideas, Black has a clear plan and the better structure."),L(
+                                  nd(mv("bxc3","b2","c3","w","react","9.bxc3","Forced — the doubled, isolated c-pawns are now a long-term weakness for Black to besiege."))
+                                ))
+                              ))
+                            ))
+                          ))
+                        ))
+                      ))
+                    ))
+                  ))
+                ))
+              )),
+              /* 4.Qc2 Classical */
+              nd(mv("Qc2","d1","c2","w","react","4.Qc2","The Classical (Capablanca): recapture on c3 with the queen so White avoids the doubled pawns and keeps the bishop pair in view."),L(
+                nd(mv("O-O","e8","g8","b","idea","4...O-O","Castle — the flexible main reply."),L(
+                  nd(mv("a3","a2","a3","w","react","5.a3","Force the question at once."),L(
+                    nd(mv("Bxc3+","b4","c3","b","mission","5...Bxc3+","Trade — the queen must recapture, so no doubled pawns, but you've won the bishop pair and a tempo."),L(
+                      nd(mv("Qxc3","c2","c3","w","react","6.Qxc3","Queen recaptures."),L(
+                        nd(mv("b6","b7","b6","b","idea","6...b6","Plan ...Bb7, ...d6 and a timed ...Ne4 to blunt the bishop pair and clamp the e4 square."),L(
+                          nd(mv("Bg5","c1","g5","w","react","7.Bg5","Pin the f6-knight to discourage ...Ne4."),L(
+                            nd(mv("Bb7","c8","b7","b","mission","7...Bb7","Develop; with ...d6, ...Nbd7 and a well-timed ...h6/...Ne4, Black neutralises the bishop pair — a rock-solid, equal Nimzo."))
+                          ))
+                        ))
+                      ))
+                    ))
+                  ))
+                ))
+              )),
+              /* 4.a3 Sämisch */
+              nd(mv("a3","a2","a3","w","react","4.a3","The Sämisch — bluntly challenge the bishop, accepting doubled pawns for the bishop pair and a big centre."),L(
+                nd(mv("Bxc3+","b4","c3","b","mission","4...Bxc3+","Take — hand White doubled, isolated c-pawns. Your whole plan is to blockade and attack them."),L(
+                  nd(mv("bxc3","b2","c3","w","react","5.bxc3","Recapture — a broad centre, but a crippled queenside."),L(
+                    nd(mv("c5","c7","c5","b","idea","5...c5","Strike at the base of the doubled pawns and prepare to blockade."),L(
+                      nd(mv("f3","f2","f3","w","react","6.f3","Prepare e4 — White wants the big centre to justify the structure."),L(
+                        nd(mv("d5","d7","d5","b","mission","6...d5","Challenge before e4 lands; after the trades the c4-pawn stays weak. Block the centre, fix the doubled pawns and besiege them — the Sämisch is double-edged but objectively fine for Black."))
+                      ))
+                    ))
+                  ))
+                ))
+              ))
+            ))
+          ))
+        ))
+      ))
+    ))
+  ))
+ )
+},
+/* ---------------- QUEEN'S GAMBIT DECLINED (Black vs d4) ---------------- */
+{
+ id:"qgd",name:"Queen's Gambit Declined",side:"black",group:"vs 1.d4",
+ summary:"The most solid, classical answer to the Queen's Gambit. Decline with ...e6, backing up d5 with a second pawn and opening the dark-squared bishop. Black accepts a slightly passive light-squared bishop in return for a structure that is famously hard to crack — then frees the game with ...c5, ...dxc4 or ...b6 at the right moment.",
+ missions:[
+  "<b>Decline solidly:</b> ...e6 supports d5 and frees the f8-bishop — bedrock-solid and time-tested.",
+  "<b>Mind the problem bishop:</b> the c8-bishop is hemmed in; free it with ...b6/...Bb7 (Tartakower) or ...dxc4 and ...c5.",
+  "<b>Break with ...c5 and ...dxc4:</b> the classical freeing moves that turn solidity into active equality.",
+  "<b>Tartakower setup:</b> ...h6, ...b6, ...Bb7 solves the bad bishop and supports the central breaks — one of Black's soundest systems.",
+  "<b>Vs the Exchange:</b> build the Carlsbad wall with ...c6 and meet the minority attack with ...Re8, ...Nf8 and ...Ne4.",
+  "<b>Vs 4.Bf4/4.Nf3:</b> hit back with the ...c5 break to equalise before White finishes developing."
+ ],
+ tree:L(
+  nd(mv("d4","d2","d4","w","react","1.d4","White claims the centre."),L(
+    nd(mv("d5","d7","d5","b","mission","1...d5","Meet d4 head-on — the most solid, classical reply."),L(
+      nd(mv("c4","c2","c4","w","react","2.c4","The Queen's Gambit — pressure d5."),L(
+        nd(mv("e6","e7","e6","b","mission","2...e6","Decline the gambit: support d5 with the e-pawn and open the f8-bishop. Sturdy and dependable."),L(
+          nd(mv("Nc3","b1","c3","w","react","3.Nc3","Develop and pile on d5."),L(
+            nd(mv("Nf6","g8","f6","b","mission","3...Nf6","A second defender of d5 — the main QGD."),L(
+              /* 4.Bg5 classical -> Tartakower */
+              nd(mv("Bg5","c1","g5","w","react","4.Bg5","The classical main: pin the f6-knight to pile on d5."),L(
+                nd(mv("Be7","f8","e7","b","idea","4...Be7","Break the pin in advance — calm, sturdy development."),L(
+                  nd(mv("e3","e2","e3","w","react","5.e3","Open the f1-bishop."),L(
+                    nd(mv("O-O","e8","g8","b","idea","5...O-O","Castle into safety."),L(
+                      nd(mv("Nf3","g1","f3","w","react","6.Nf3","Develop."),L(
+                        nd(mv("h6","h7","h6","b","idea","6...h6","Question the bishop before choosing a freeing plan."),L(
+                          nd(mv("Bh4","g5","h4","w","react","7.Bh4","Keep the pin."),L(
+                            nd(mv("b6","b7","b6","b","mission","7...b6","The Tartakower: fianchetto with ...Bb7 to solve the bad-bishop problem and support the ...c5/...dxc4 breaks — one of Black's most respected, solid systems."))
+                          ))
+                        ))
+                      ))
+                    ))
+                  ))
+                ))
+              )),
+              /* 4.cxd5 Exchange -> Carlsbad */
+              nd(mv("cxd5","c4","d5","w","react","4.cxd5","The Exchange Variation — clarify the centre and aim for the minority attack (b4-b5)."),L(
+                nd(mv("exd5","e6","d5","b","idea","4...exd5","Recapture toward the centre, keeping the solid d5-pawn — the Carlsbad structure."),L(
+                  nd(mv("Bg5","c1","g5","w","react","5.Bg5","Pin and develop."),L(
+                    nd(mv("c6","c7","c6","b","mission","5...c6","Build the Carlsbad wall — rock-solid. Meet White's minority attack (b4-b5) with ...Re8, ...Nf8 and a timed ...Ne4 plus kingside play."),L(
+                      nd(mv("e3","e2","e3","w","react","6.e3","Develop."),L(
+                        nd(mv("Bf5","c8","f5","b","idea","6...Bf5","Get the light bishop OUT before ...Be7 shuts it in — the key Exchange-QGD nuance for comfortable equality."))
+                      ))
+                    ))
+                  ))
+                ))
+              )),
+              /* 4.Nf3 Harrwitz -> ...c5 */
+              nd(mv("Nf3","g1","f3","w","react","4.Nf3","Flexible — delay the pin."),L(
+                nd(mv("Be7","f8","e7","b","idea","4...Be7","Develop and prepare to castle."),L(
+                  nd(mv("Bf4","c1","f4","w","react","5.Bf4","The modern main (Harrwitz): bishop outside the pawn chain, London-style."),L(
+                    nd(mv("O-O","e8","g8","b","idea","5...O-O","Castle."),L(
+                      nd(mv("e3","e2","e3","w","react","6.e3","Solid setup."),L(
+                        nd(mv("c5","c7","c5","b","mission","6...c5","Strike d4 at once — the principled freeing break. After dxc5 Bxc5 Black is fully equal before White finishes developing."))
+                      ))
+                    ))
+                  ))
+                ))
+              ))
+            ))
+          ))
+        ))
+      ))
+    ))
+  ))
+ )
+},
 /* ---------------- CARO-KANN (Black vs e4) ---------------- */
 {
  id:"caro",name:"Caro-Kann Defense",side:"black",group:"vs 1.e4",
@@ -872,6 +1016,73 @@ const OPENINGS=[
                         nd(mv("Nf6","g8","f6","b","idea","6...Nf6","Develop, eye e4/d5."),L(
                           nd(mv("Nc3","b1","c3","w","react","7.Nc3","Supports the bind."),L(
                             nd(mv("O-O","e8","g8","b","idea","7...O-O","Castle; the long maneuvering battle against the clamp begins."))
+                          ))
+                        ))
+                      ))
+                    ))
+                  ))
+                ))
+              ))
+            ))
+          ))
+        ))
+      ))
+    ))
+  ))
+ )
+},
+/* ---------------- SICILIAN KAN / PAULSEN (Black vs e4) ---------------- */
+{
+ id:"kan",name:"Sicilian Kan (Paulsen)",side:"black",group:"vs 1.e4",
+ summary:"The Kan, part of the Paulsen complex: ...c5, ...e6 and ...a6 — a supremely flexible Sicilian. By delaying ...Nc6 and ...d6, Black keeps the pawns fluid and picks a small-centre or hedgehog setup based on White's plan. ...a6 takes the b5-square from White's pieces and prepares ...b5. Resilient, low-maintenance and hard to attack.",
+ missions:[
+  "<b>...a6 controls b5:</b> the Kan keystone — deny White's knight and bishop the b5-square, and prep your own ...b5.",
+  "<b>Commit to nothing:</b> delay ...Nc6 and ...d6 — keep the pawns fluid and choose your setup from White's.",
+  "<b>Trade the c- for the d-pawn:</b> ...cxd4 opens the half-open c-file, your attacking highway.",
+  "<b>Small-centre / hedgehog plan:</b> ...Qc7, ...d6, ...Be7, ...Nf6, ...Nbd7, ...b6/...Bb7, then break with ...b5 or ...d5.",
+  "<b>Vs the Maroczy Bind (5.c4):</b> don't panic — develop with ...Nf6/...Bb4 and play patiently against the clamp.",
+  "<b>Active ...Bc5 or ...Bd6:</b> the Kan's flexible bishop hits d4 or eyes h2 for kingside pressure."
+ ],
+ tree:L(
+  nd(mv("e4","e2","e4","w","react","1.e4","White grabs the centre."),L(
+    nd(mv("c5","c7","c5","b","mission","1...c5","The Sicilian — fight for d4 and unbalance the game."),L(
+      nd(mv("Nf3","g1","f3","w","react","2.Nf3","White's main developing move."),L(
+        nd(mv("e6","e7","e6","b","mission","2...e6","The Paulsen/Kan move order: flexible — delay ...Nc6 and ...d6, keep the pawns fluid."),L(
+          nd(mv("d4","d2","d4","w","react","3.d4","Open the centre."),L(
+            nd(mv("cxd4","c5","d4","b","idea","3...cxd4","Trade — open the half-open c-file."),L(
+              nd(mv("Nxd4","f3","d4","w","react","4.Nxd4","Recaptures."),L(
+                nd(mv("a6","a7","a6","b","mission","4...a6","THE Kan move: take b5 from White's knight and bishop, prepare ...b5, and commit to nothing yet — the most flexible Sicilian."),L(
+                  /* 5.Bd3 main */
+                  nd(mv("Bd3","f1","d3","w","react","5.Bd3","The flexible main — eye h7 and keep the knight's options open."),L(
+                    nd(mv("Bc5","f8","c5","b","mission","5...Bc5","Hit the d4-knight at once and grab the a7-g1 diagonal before White plays Be3 or c3."),L(
+                      nd(mv("Nb3","d4","b3","w","react","6.Nb3","Kick the bishop and clear the d-file."),L(
+                        nd(mv("Ba7","c5","a7","b","idea","6...Ba7","Tuck the bishop on a7 — still raking g1, immune to b4 tricks."),L(
+                          nd(mv("Qe2","d1","e2","w","react","7.Qe2","Connect the rooks, prepare Be3 and O-O."),L(
+                            nd(mv("Nc6","b8","c6","b","mission","7...Nc6","Develop and stay flexible: ...Nge7, ...d6, ...O-O, then ...b5 — a sound, low-commitment Kan where Black is solid and ready to expand."))
+                          ))
+                        ))
+                      ))
+                    ))
+                  )),
+                  /* 5.Nc3 */
+                  nd(mv("Nc3","b1","c3","w","react","5.Nc3","Natural development toward a classical setup."),L(
+                    nd(mv("Qc7","d8","c7","b","mission","5...Qc7","The Kan main: eye e4/e5, prepare ...b5 and ...Nf6 without blocking the c-pawn."),L(
+                      nd(mv("Bd3","f1","d3","w","react","6.Bd3","Develop, defend e4, aim at h7."),L(
+                        nd(mv("Nf6","g8","f6","b","idea","6...Nf6","Hit e4 and develop toward castling."),L(
+                          nd(mv("O-O","e1","g1","w","react","7.O-O","White castles."),L(
+                            nd(mv("Bd6","f8","d6","b","mission","7...Bd6","The aggressive Kan setup: the bishop fights for h2 and the e5-square. With ...Nc6 and ...e5 (or ...Ne5), Black plays for a kingside initiative."))
+                          ))
+                        ))
+                      ))
+                    ))
+                  )),
+                  /* 5.c4 Maroczy Bind */
+                  nd(mv("c4","c2","c4","w","react","5.c4","The Maroczy Bind — a big space clamp to stop ...b5 and ...d5."),L(
+                    nd(mv("Nf6","g8","f6","b","mission","5...Nf6","Develop and pressure e4; don't fear the bind — play patiently."),L(
+                      nd(mv("Nc3","b1","c3","w","react","6.Nc3","Support the clamp."),L(
+                        nd(mv("Bb4","f8","b4","b","idea","6...Bb4","Pin the c3-knight to pile on e4 — a sound anti-Maroczy idea."),L(
+                          nd(mv("Bd3","f1","d3","w","react","7.Bd3","Defend e4 and develop."),L(
+                            nd(mv("Nc6","b8","c6","b","mission","7...Nc6","Develop, prepare ...O-O and ...d6; trading on c3/d4 and the ...d5 break keep the long battle against the clamp fully playable."))
                           ))
                         ))
                       ))
